@@ -120,7 +120,7 @@ function render(strings, ...args) {
 					result += string +ref
 				} else {
 					// TODO
-					throw new Error('Panic! WTH now?')
+					//throw new Error('Panic! WTH now?')
 				}
 			} else {
 				result += string +(Array.isArray(handler)?handler.join(''):handler)

@@ -7,7 +7,7 @@
   "scripts": {
     "build": "rimraf dist && rimraf doc && rollup -c",
     "dev": "rollup -c -w",
-    "examples": "python3 -m http.server",
+    "examples": "http-server",
     "test": "jest"
   },
   "repository": {
@@ -39,6 +39,7 @@
     "@rollup/plugin-node-resolve": "^13.0.4",
     "babel-jest": "^27.2.0",
     "babel-register": "^6.26.0",
+    "http-server": "^13.0.2",
     "jest": "^27.2.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.56.3",

@@ -1,21 +1,39 @@
 import { render } from '../../dist/rxhtml.es.js';
-const { Subject } = rxjs;
 
-const hours = new Subject();
-const mins = new Subject();
-const secs = new Subject();
+const subj = new EventEmitter()
+
+const state = new Proxy({},
+	set(target, prop, value, receiver){
+		target[prop] = value
+		subj.emit(prop, value)
+		return true
+	}
+);
+
+const state2 = new Proxy(state,
+	get(target, prop, receiver) {
+		const handler = val => val
+		subj.on(prop, handler)
+		// off(....)
+		return handler
+	},
+);
 
 setInterval(() => {
-  const date = new Date();
-  hours.next(date.getHours());
-  mins.next(date.getMinutes());
-  secs.next(date.getSeconds());
+	const date = new Date();
+
+	state.hours = date.getHours()
+	state.minutes = date.getHours()
+	state.seconds = date.getHours()
+
+	alert(state.hours)
+
 }, 1000);
 
 document.body.innerHTML = render`
   <div class="clock">
-    <span class="hours">${hours}</span>
-    <span class="mins">${mins}</span>
-    <span class="secs">${secs}</span>
+	 <span class="hours">${state.hours}</span>
+	 <span class="mins">${state.mins}</span>
+	 <span class="secs">${state.secs}</span>
   </div>
 `;

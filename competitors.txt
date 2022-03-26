@@ -1,0 +1,6 @@
+https://www.npmjs.com/package/lit-html
+https://lit.dev/
+https://github.com/primarilysoftware/rx-html
+	https://github.com/primarilysoftware/rx-html/blob/master/src/index.ts
+https://www.npmjs.com/package/rx-html
+

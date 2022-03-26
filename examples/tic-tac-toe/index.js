@@ -1,6 +1,6 @@
 const { Subject } = rxjs
 const { distinct, filter, map, mapTo, merge, take, share, startWith, takeUntil, tap, withLatestFrom } = rxjs.operators
-import {render as rxhtml } from '../../dist/rxhtml.es.js'
+import {render as rxhtml } from '../../src/index.js'
 
 function* newGame() {
 	const counters = Array(8).fill(0)

@@ -9,14 +9,11 @@ What would the world look like?
 ```
 // a simple observable stream that
 // counts anything that passes through it
-const counter = (new BehaviorSubject(0)).pipe(
-	scan(a=>a+1)
-)
+const data = fetch('https://example.com')
+	.then(data=>data.text)
 
 document.body.innerHTML = render`
-	<button type="button" onclick="${counter}"> Click me </button>
-	You clicked the button <span>${counter}</span> times.
-`;
+	<div>${data}"</div>
 ```
 
 ## What just happened?
@@ -36,13 +33,12 @@ Combine it with a router of your choice (this is simple and amazing: (router-in-
 Any change you make to your state, when you use Observables or Promises, it gets wired directly to a DOM manipulation command at mount time, so it couldn't literally be any faster than that.
 
 ## Why not just use React, or Svelte?
-Simply put, React does the wrong thing incredibly well: the DOM diff.
+We don't like the concept of a virtual DOM and DOM diff, as it's overcomplicated.
 
-As a result, whenever you talk React, since the DOM diff is not an exact science, you talk about its performance issues and how to avoid unnecessary re-renders, so sometimes you wonder what's the point.
+Whenever you talk React, since the DOM diff is not an exact science, you talk about its performance issues and unnecessary re-renders taking place.
 
 Svelte? 
-Svelte does the right thing (does no DOM diff), so has a beautiful performance but it still does a few things to the language we couldn't swallow.
-It also needs a compiler and lacks the transformative power of observables.
+Svelte does the right thing (does no DOM diff), so has a beautiful performance but it also needs a compiler and lacks the transformative power of observables.
 
 RxHTML needs no transpiler, no DOM diffing, is designed to integrate with the most powerful functional-reactive library around and serves as the last-mile to it, by making HTML itself (appear) functional-reactive.
 

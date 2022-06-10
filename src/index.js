@@ -1,6 +1,7 @@
 window.no = {
 	// TODO: Test and verify with WeakRef/FinalizationRegistry
 	handlers: new WeakMap(),
+	iterators: new WeakMap(),
 	subscriptions: new WeakSet(),
 }
 
@@ -8,6 +9,8 @@ const ROOT = document.documentElement
 const nonBubblingAttributes = new Set(['ended', 'play', 'pause', 'volumechange']) // TODO: add more?
 const waitingElementHanlders = new Map()
 const isFunction = fn => typeof fn == 'function'
+const isGeneratorFunction = fn => /function\s*\*/.test(fn)
+const isIterable = obj => obj && typeof obj[Symbol.iterator] === 'function';
 const getEventName = eventAttributeString => ((/\s+on(?<event>\w+)=['"]?$/.exec(eventAttributeString) || {}).groups || {}).event
 // GOTCHA: attributes starting with "on" will be treated as event handlers -------> HERE <---, so don't do <tag ongoing="trouble">
 const getEventNameWithoutOn = eventAttributeString => eventAttributeString.replace(/^on/, '')
@@ -30,8 +33,8 @@ const terminationSink = (node)      => node.remove()
 
 const DOMSinks = new Map([
 	['innerHTML',    innerHTMLSink],
-	['innerText0',    innerTextSink],
-	['innerText',    textContentSink],
+	['innerText',    innerTextSink],
+	['textContent',  textContentSink],
 	// TODO: textContent sink
 	['attribute',    attributeSink],
 	['attributeset', attributesSink],
@@ -77,22 +80,27 @@ function render(strings, ...args) {
 		const existingRef = r && r.groups?r.groups.existingRef:undefined
 		const ref = existingRef || `#REF${refCount++}`
 		if(handler) {
+			const isGenerator = isGeneratorFunction(handler)
 			if(eventName) {
 				// handler is an event source
 				// handler is an Rx Subject | Observer | Function
 				// <a onclick="${subject}">
 				// <a onclick="${()=>doSomething}">
-				const h = isFunction(handler) ? handler : isFunction(handler.next) ? handler.next.bind(handler) : null
+				// handler is a generator function
+				// <a onclick="${function* {yield something}}">
+				// <a onclick="${async function* {yield await something}}">
+				const h = isFunction(handler) || isFunction(handler.next) || isGenerator
 				const isNonBubblingEvent = nonBubblingAttributes.has(eventName)
 				if(h) {
 					if(!isNonBubblingEvent) {
 						// Only use event delegation for bubbling events
-					delegateEvent(eventName)
+						// TODO: let users optionally choose if they want to use delegation or not: <a delegated:onclick="..."> <a undelegated:onclick="">
+						delegateEvent(eventName)
 					}
-					addRef(ref, { handler: h, type: 'event', eventName })
+					addRef(ref, { handler, type: 'event', eventName, isGenerator })
 				}
 				result += string +(eventName == 'mount' || isNonBubblingEvent ? ref : '') +(existingRef?'':`" RESOLVE="${ref}`)
-			} else if(typeof (handler.subscribe || handler.then)  == 'function' && i<strings.length -1) {
+			} else if((typeof (handler.subscribe || handler.then)  == 'function' || isGenerator) && i<strings.length -1) {
 				// handler is an observable. subscribe to it
 				// and set up a sink
 				const nextString = strings[i+1]
@@ -109,7 +117,7 @@ function render(strings, ...args) {
 						attributeName = attributeName.replace(/^data-/, '')
 					}
 					const initialValue = ''
-					addRef(ref, { handler, type: attributeType, attribute: attributeName })
+					addRef(ref, { handler, type: attributeType, attribute: attributeName, isGenerator })
 					result = (result +string +initialValue).replace(/<(\w+)\s+([^>]+)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`)
 					//result = result.replace(/([a-z0-9_\-]+=(?<q>['"]?)(?:.*(?!\k<q>)))$/i, `RESOLVE="${ref}" $1`)
 				//} else if(/<\s*\S+(?:\s+[^=>]+=(?<q>['"]?)[^\k<q>]*\k<q>)*(?:\s+\.\.\.)?$/.test(result +string) && /^[^<]*>/.test(nextString)) {
@@ -118,18 +126,18 @@ function render(strings, ...args) {
 					// <some-tag some-attribute="some-value" ...${observable}</some-tag>
 					// <some-tag some-attributes ...${observable<dataset>} other-stuff>...</some-tag>
 					// will bind multiple attributes and values
-					addRef(ref, { handler, type: 'attributeset' })
+					addRef(ref, { handler, type: 'attributeset', isGenerator })
 					//result += string.replace(/\.\.\.$/, '') +` RESOLVE="${ref}"`
 					result = (result +string).replace(/<(\w+)\s+([^<]+)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`)
 				} else if(/>\s*$/.test(string) && /^\s*</.test(nextString)) {
 					// <some-tag>${observable}</some-tag>
 					// will set innerHTML
-					addRef(ref, { handler, type: 'innerHTML', termination: terminationSink })
+					addRef(ref, { handler, type: 'innerHTML', termination: terminationSink, isGenerator })
 					result += existingRef?string:string.replace(/\s*>\s*$/, ` RESOLVE="${ref}">`)
 				} else if(/>[ \t]*[^<]+$/.test(string) && /^\s*</.test(nextString)) {
 					// TODO
 					// will set the textNode
-					addRef(ref, { handler, type: 'innerText' })
+					addRef(ref, { handler, type: 'innerText', isGenerator })
 					// FIXME: tbd
 					result += string +ref
 				} else {
@@ -155,23 +163,56 @@ function transferAttributes(node) {
 			const isEventSource = eventName !== key
 
 			if(/^#REF/.test(value) || key == 'onmount' || isEventSource) {
-				if(key == 'resolve') {
-					node.removeAttribute(key)
-				} else {
-					// or maybe removeAttribute altogether?
-					node.setAttribute(key, '')
-				}
+				node.removeAttribute(key);
 
 				(waitingElementHanlders.get(value) || []).forEach(conf => {
+					const hand = conf.handler
+					let iterator
+					let boundHandler
+					const isGenerator = isGeneratorFunction(hand)
+					if(isGenerator) {
+						if(isEventSource) {
+							iterator = hand.bind(node)(node)
+							no.iterators.set(hand, iterator)
+							const handlerSink = DOMSinks.get(conf.type)(node, conf.attribute)
+							boundHandler = (async function(...args) {
+								handlerSink(await no.iterators.get(hand).next(...args).value)
+							}).bind(node)
+						} else {
+							boundHandler =
+								//isAsyncGenerator ? (async function* (e) {let buffer; while(1) { buffer = yield buffer} }).bind(node) :
+								//isGenerator ? (function* (e) {let buffer; while(1) { buffer = yield iterator.next() || buffer } }) :
+								isGenerator ? (function bridge(e) { return no.iterators.get(hand).next().value }) :
+								isFunction(hand) ? hand.bind(node) :
+								isFunction(hand.next) ? hand.next.bind(hand) :
+								null
+						}
+					}
+
 					if(nonBubblingAttributes.has(eventName)) {
-						node.addEventListener(eventName, conf.handler)
+						node.addEventListener(eventName, boundHandler)
 					} else if(conf.type == 'event' || conf.type == 'source' || key == 'onmount') {
 						// if it's an event source (like onclick, etc)
-						Object.keys(conf).length && window.no.handlers.set(node, [].concat(window.no.handlers.get(node) || [], conf))
+						Object.keys(conf).length && window.no.handlers.set(node, [].concat(window.no.handlers.get(node) || [], {...conf, handler: boundHandler}))
 					//} else if(key != 'onmount' && (key != 'resolve' || ['innerHTML', 'innerText', 'attribute', 'attributeset', 'class', 'classset', 'dataset'].includes(conf.type))) {
-					} else {
-						if(DOMSinks.has(conf.type)) { // if it's a sink (innerHTML, etc)
-							const subscriptionCallback = DOMSinks.get(conf.type)(node, conf.attribute)
+					} else if(DOMSinks.has(conf.type)) {
+						// if it's a sink (innerHTML, innerText, etc)
+						// the function to be called when the source emits
+						const subscriptionCallback = DOMSinks.get(conf.type)(node, conf.attribute)
+						if(isGenerator) {
+							// for sync iterators
+							//boundHandler = ( function(...args) {
+							//	subscriptionCallback(iterator.next(...args).value)
+							//}).bind(node)
+							// for async iterators
+							//conf...
+							conf.sinks = conf.sinks || []
+							conf.sinks.push(
+								(async function(...args) {
+									subscriptionCallback(await no.iterators.get(hand).next(...args).value)
+								}).bind(node)
+							)
+						} else {
 							const subscription =
 								conf.handler.then ? conf.handler.then(subscriptionCallback, conf.error || undefined) :
 								conf.handler.subscribe ? conf.handler.subscribe(subscriptionCallback, conf.termination || undefined, conf.error || undefined) :

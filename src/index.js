@@ -1,12 +1,12 @@
-window.no = {
-	// TODO: Test and verify with WeakRef/FinalizationRegistry
-	handlers: new WeakMap(),
-	subscriptions: new WeakSet(),
-}
-
+// TODO: make it configurable?
 const ROOT = document.documentElement
-const nonBubblingAttributes = new Set(['ended', 'play', 'pause', 'volumechange']) // TODO: add more?
+
+// TODO: Test and verify with WeakRef/FinalizationRegistry
+const handlers = new WeakMap()
+const subscriptions = new WeakSet()
 const waitingElementHanlders = new Map()
+
+const nonBubblingAttributes = new Set(['ended', 'play', 'pause', 'volumechange']) // TODO: add more?
 const isFunction = fn => typeof fn == 'function'
 const getEventName = eventAttributeString => ((/\s+on(?<event>\w+)=['"]?$/.exec(eventAttributeString) || {}).groups || {}).event
 // GOTCHA: attributes starting with "on" will be treated as event handlers -------> HERE <---, so don't do <tag ongoing="trouble">
@@ -20,8 +20,17 @@ const innerHTMLSink   = (node)      => html => node.innerHTML=html
 const innerTextSink   = (node)      => str  => node.innerText=str
 const textContentSink = (node)      => str  => node.textContent=str
 const attributeSink   = (node, key) => str  => node.setAttribute(key, str)
+// const eventHandlerSink= (node)      => (e, h) => node.addEventListener(e, h)
 // set node attributes from an object {k: v, k2: v2}
-const attributesSink  = (node)      => attributeset => Object.entries(attributeset).forEach(([k, v])=>typeof v == 'undefined' ? node.removeAttribute(k) : node.setAttribute(k, v))
+//const attributesSink  = (node)      => attributeset => Object.entries(attributeset) .forEach(([k, v])=> typeof v == 'undefined' ? node.removeAttribute(k) : typeof v == 'function' ? node.addEventListener(k.replace(/^on/, ''), v) : node.setAttribute(k, v))
+const attributesSink  = (node)      => attributeset => Object
+	.entries(attributeset)
+	.forEach(([k, v])=>
+		typeof v == 'undefined'
+			? node.removeAttribute(k)
+			: typeof v == 'function'
+				? node.addEventListener(k.replace(/^on/, ''), v)
+				: node.setAttribute(k, v))
 
 const classSink       = (node)      => name => name && (typeof name == 'string' ? node.classList.add(name) : setClasses(node, name))
 const datasetSink     = (node, key) => str  => node.dataset[key] = str
@@ -45,7 +54,7 @@ const delegatedEvents = new Set()
 const delegateEvent = eventName => {
 	if(!delegatedEvents.has(eventName)) {
 	document.addEventListener(eventName, event => {
-		for(var handledTarget=event.target, h=no.handlers.get(event.target);!h && handledTarget;handledTarget=handledTarget.parentNode, h=no.handlers.get(handledTarget))
+		for(var handledTarget=event.target, h=handlers.get(event.target);!h && handledTarget;handledTarget=handledTarget.parentNode, h=handlers.get(handledTarget))
 				// TODO: do we need to support multiple event handlers from multiple parent nodes?
 			;
 			return (h || [])
@@ -113,14 +122,15 @@ function render(strings, ...args) {
 					result = (result +string +initialValue).replace(/<(\w+)\s+([^>]+)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`)
 					//result = result.replace(/([a-z0-9_\-]+=(?<q>['"]?)(?:.*(?!\k<q>)))$/i, `RESOLVE="${ref}" $1`)
 				//} else if(/<\s*\S+(?:\s+[^=>]+=(?<q>['"]?)[^\k<q>]*\k<q>)*(?:\s+\.\.\.)?$/.test(result +string) && /^[^<]*>/.test(nextString)) {
-				} else if(/<\s*\S+(?:\s+[^=>]+=(?:'[^']*'|"[^"]*"|\S+|[^>]+))(?:\s+\.\.\.)?$/.test(result +string) && /^[^<]*>/.test(nextString)) {
+				} else if(/<\s*\S+(?:\s+[^=>]+=(?:'[^']*'|"[^"]*"|\S+|[^>]+))+(?:\s+\.\.\.)?$/.test(result +string) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
 					// <some-tag some-attribute="some-value" ${observable}</some-tag>
 					// <some-tag some-attribute="some-value" ...${observable}</some-tag>
 					// <some-tag some-attributes ...${observable<dataset>} other-stuff>...</some-tag>
 					// will bind multiple attributes and values
 					addRef(ref, { handler, type: 'attributeset' })
 					//result += string.replace(/\.\.\.$/, '') +` RESOLVE="${ref}"`
-					result = (result +string).replace(/<(\w+)\s+([^<]+)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`)
+					result += string.replace(/\.\.\.$/, '')
+					result = result.replace(/<(\w+)\s+([^<]+)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`)
 				} else if(/>\s*$/.test(string) && /^\s*</.test(nextString)) {
 					// <some-tag>${observable}</some-tag>
 					// will set innerHTML
@@ -135,6 +145,17 @@ function render(strings, ...args) {
 				} else {
 					// TODO
 					//throw new Error('Panic! WTH now?')
+				}
+			} else if(/\.\.\.$/.test(string)) {
+				// ...${attributesObject}
+				// ...${attributesPromise}
+				// ...${attributesObservable}
+				result += string.substr(0, string.length -3)
+				if(isFunction(handler.next) || isFunction(handler.then)) {
+					// Promise or observable that will emit attributes later
+					addRef(ref, { handler, type: 'attributeset', attribute: handler })
+				} else {
+					result += Object.entries(handler || {}).map(([k, v])=>`${k}="${v}"`).join(' ')
 				}
 			} else {
 				result += string +(Array.isArray(handler)?handler.join(''):handler)
@@ -167,16 +188,16 @@ function transferAttributes(node) {
 						node.addEventListener(eventName, conf.handler)
 					} else if(conf.type == 'event' || conf.type == 'source' || key == 'onmount') {
 						// if it's an event source (like onclick, etc)
-						Object.keys(conf).length && window.no.handlers.set(node, [].concat(window.no.handlers.get(node) || [], conf))
+						Object.keys(conf).length && handlers.set(node, [].concat(handlers.get(node) || [], conf))
 					//} else if(key != 'onmount' && (key != 'resolve' || ['innerHTML', 'innerText', 'attribute', 'attributeset', 'class', 'classset', 'dataset'].includes(conf.type))) {
 					} else {
 						if(DOMSinks.has(conf.type)) { // if it's a sink (innerHTML, etc)
-							const subscriptionCallback = DOMSinks.get(conf.type)(node, conf.attribute)
+							const subscriptionCallback = DOMSinks.get(conf.type)(node)
 							const subscription =
-								conf.handler.then ? conf.handler.then(subscriptionCallback, conf.error || undefined) :
+								conf.handler.then ? conf.handler.then(subscriptionCallback).catch(conf.error || undefined) :
 								conf.handler.subscribe ? conf.handler.subscribe(subscriptionCallback, conf.termination || undefined, conf.error || undefined) :
 								() => {}
-							window.no.subscriptions.add(subscription)
+							subscriptions.add(subscription)
 						}
 					}
 				})

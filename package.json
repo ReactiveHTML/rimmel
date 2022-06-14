@@ -1,9 +1,9 @@
 {
-  "name": "rxhtml",
+  "name": "rimmel",
   "version": "1.0.0",
-  "description": "Minimal framework for webapps",
-  "main": "dist/rxhtml.cjs.js",
-  "module": "dist/rxhtml.es.js",
+  "description": "Reactive template engine for webapps",
+  "main": "dist/rimmel.cjs.js",
+  "module": "dist/rimmel.es.js",
   "scripts": {
     "build": "rimraf dist && rimraf doc && rollup -c",
     "dev": "rollup -c -w",
@@ -12,20 +12,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hellomenu/rxhtml.git"
+    "url": "git+https://github.com/hellomenu/rimmel.git"
   },
   "keywords": [
     "rx",
     "html",
-    "rxhtml",
+    "rimmel",
     "reacvive"
   ],
   "author": "Dario Mannu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hellomenu/rxhtml/issues"
+    "url": "https://github.com/hellomenu/rimmel/issues"
   },
-  "homepage": "https://github.com/hellomenu/rxhtml#readme",
+  "homepage": "https://github.com/hellomenu/rimmel#readme",
   "devDependencies": {
     "@babel/core": "^7.15.5",
     "@babel/plugin-proposal-async-generator-functions": "^7.15.4",
@@ -33,6 +33,7 @@
     "@babel/plugin-proposal-decorators": "^7.15.4",
     "@babel/plugin-proposal-export-default-from": "^7.14.5",
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
+    "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.15.6",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^20.0.0",

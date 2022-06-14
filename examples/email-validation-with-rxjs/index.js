@@ -1,4 +1,4 @@
-import { render } from '../../dist/rxhtml.es.js';
+import { render } from '../../dist/rimmel.es.js';
 import TextInput from './textInput.js';
 const { BehaviorSubject, Subject } = rxjs;
 const { map } = rxjs.operators

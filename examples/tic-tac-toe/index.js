@@ -1,6 +1,6 @@
 const { Subject } = rxjs
 const { distinct, filter, map, mapTo, merge, take, share, startWith, takeUntil, tap, withLatestFrom } = rxjs.operators
-import {render as rxhtml } from '../../src/index.js'
+import {render} from '../../src/index.js'
 
 function* newGame() {
 	const counters = Array(8).fill(0)
@@ -35,8 +35,8 @@ function App() {
 		share(),
 	)
 
-	const Board = () => rxhtml`<table>${[0,1,2].map(Row)}</table>`
-	const Row = y => rxhtml`<tr>${[0,1,2].map(x=>Cell(x,y))}</tr>`
+	const Board = () => render`<table>${[0,1,2].map(Row)}</table>`
+	const Row = y => render`<tr>${[0,1,2].map(x=>Cell(x,y))}</tr>`
 	const Cell = (x, y) => {
 		const isWinningCell = (c, i)=> Math.abs(c)==3&&(i<3&&i==y || i<6&&x==i-3 || i==6&&x==y || i==7&&y==2-x)
 		const click = new Subject().pipe(
@@ -56,10 +56,10 @@ function App() {
 			withLatestFrom(state),
 			map(([, state])=>({highlight: state?.value?.counters.map(isWinningCell).some(x=>x)})),
 		)
-		return rxhtml`<td><button onclick="${click}" class="cell ${highlight}" ...${disabled} data-move="${click}"></button></td>`
+		return render`<td><button onclick="${click}" class="cell ${highlight}" ...${disabled} data-move="${click}"></button></td>`
 	}
 
-	document.body.innerHTML = rxhtml`
+	document.body.innerHTML = render`
 		<h1>Tic Tac Toe</h1>
 		${Board()}
 		<div>Next : <span>${state.pipe(map(x=>x.done && ' - ' || PAWNS[1-x.value.piece]), startWith(PAWNS[0]))}</span></div>

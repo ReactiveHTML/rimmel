@@ -8,7 +8,8 @@ const data = fetch('https://example.com')
 	.then(data=>data.text())
 
 document.getElementById('target').innerHTML = render`
-	<div>${data}"</div>
+	<div>${data}</div>
+`
 ```
 
 ### Explanation

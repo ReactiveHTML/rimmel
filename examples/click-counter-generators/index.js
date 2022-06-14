@@ -1,4 +1,4 @@
-//import { render } from '../../dist/rxhtml.es.js';
+//import { render } from '../../dist/rimmel.es.js';
 import { render } from '../../src/index.js';
 
 function* counter() {

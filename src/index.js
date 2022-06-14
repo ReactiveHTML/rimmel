@@ -39,9 +39,8 @@ const terminationSink = (node)      => node.remove()
 
 const DOMSinks = new Map([
 	['innerHTML',    innerHTMLSink],
-	['innerText0',    innerTextSink],
-	['innerText',    textContentSink],
-	// TODO: textContent sink
+	['innerText',    innerTextSink],
+	['textContent',  textContentSink],
 	['attribute',    attributeSink],
 	['attributeset', attributesSink],
 	['class',        classSink],
@@ -101,6 +100,7 @@ function render(strings, ...args) {
 					addRef(ref, { handler: h, type: 'event', eventName })
 				}
 				result += string +(eventName == 'mount' || isNonBubblingEvent ? ref : '') +(existingRef?'':`" RESOLVE="${ref}`)
+				// TODO: set {once: true}?
 			} else if(typeof (handler.subscribe || handler.then)  == 'function' && i<strings.length -1) {
 				// handler is an observable. subscribe to it
 				// and set up a sink
@@ -122,7 +122,7 @@ function render(strings, ...args) {
 					result = (result +string +initialValue).replace(/<(\w+)\s+([^>]+)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`)
 					//result = result.replace(/([a-z0-9_\-]+=(?<q>['"]?)(?:.*(?!\k<q>)))$/i, `RESOLVE="${ref}" $1`)
 				//} else if(/<\s*\S+(?:\s+[^=>]+=(?<q>['"]?)[^\k<q>]*\k<q>)*(?:\s+\.\.\.)?$/.test(result +string) && /^[^<]*>/.test(nextString)) {
-				} else if(/<\s*\S+(?:\s+[^=>]+=(?:'[^']*'|"[^"]*"|\S+|[^>]+))+(?:\s+\.\.\.)?$/.test(result +string) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
+				} else if(/<\s*\S+(?:\s+[^=>]+=(?:'[^']*'|"[^"]*"|\S+|[^>]+))*(?:\s+\.\.\.)?$/.test(result +string) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
 					// <some-tag some-attribute="some-value" ${observable}</some-tag>
 					// <some-tag some-attribute="some-value" ...${observable}</some-tag>
 					// <some-tag some-attributes ...${observable<dataset>} other-stuff>...</some-tag>
@@ -176,23 +176,21 @@ function transferAttributes(node) {
 			const isEventSource = eventName !== key
 
 			if(/^#REF/.test(value) || key == 'onmount' || isEventSource) {
-				if(key == 'resolve') {
-					node.removeAttribute(key)
-				} else {
-					// or maybe removeAttribute altogether?
-					node.setAttribute(key, '')
-				}
+				node.removeAttribute(key);
 
 				(waitingElementHanlders.get(value) || []).forEach(conf => {
+					const hand = conf.handler
+					const boundHandler = isFunction(hand) ? hand.bind(node) : isFunction(hand.next) ? hand.next.bind(hand) : null
+
 					if(nonBubblingAttributes.has(eventName)) {
-						node.addEventListener(eventName, conf.handler)
+						node.addEventListener(eventName, boundHandler)
 					} else if(conf.type == 'event' || conf.type == 'source' || key == 'onmount') {
 						// if it's an event source (like onclick, etc)
-						Object.keys(conf).length && handlers.set(node, [].concat(handlers.get(node) || [], conf))
+						Object.keys(conf).length && handlers.set(node, [].concat(handlers.get(node) || [], {...conf, handler: boundHandler}))
 					//} else if(key != 'onmount' && (key != 'resolve' || ['innerHTML', 'innerText', 'attribute', 'attributeset', 'class', 'classset', 'dataset'].includes(conf.type))) {
 					} else {
 						if(DOMSinks.has(conf.type)) { // if it's a sink (innerHTML, etc)
-							const subscriptionCallback = DOMSinks.get(conf.type)(node)
+							const subscriptionCallback = DOMSinks.get(conf.type)(node, conf.attribute)
 							const subscription =
 								conf.handler.then ? conf.handler.then(subscriptionCallback).catch(conf.error || undefined) :
 								conf.handler.subscribe ? conf.handler.subscribe(subscriptionCallback, conf.termination || undefined, conf.error || undefined) :

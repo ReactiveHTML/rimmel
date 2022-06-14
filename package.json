@@ -15,10 +15,16 @@
     "url": "git+https://github.com/hellomenu/rimmel.git"
   },
   "keywords": [
+    "rimmel",
+    "rimmel.js",
+    "rimmeljs",
+    "rxjs",
     "rx",
     "html",
-    "rimmel",
-    "reacvive"
+    "reactive",
+    "reactive html",
+    "frp",
+    "functional-reactive"
   ],
   "author": "Dario Mannu",
   "license": "MIT",

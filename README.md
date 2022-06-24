@@ -41,7 +41,7 @@ Every time you click the button it emits a click event which is pushed into the 
 It gets some events as input, outputs the count and is wired into the `<span>` element setting `.innerHTML` on it.
 
 ## Why Rimmel?
-Rimmel is particularly light (~2.5K) fast (no DOM diff), and flexible (see the examples).
+Rimmel is particularly light (~2.5K) fast (no DOM diff), and flexible (see the (https://github.com/hellomenu/rimmel/tree/master/examples)[examples]).
 
 
 ## Get Started

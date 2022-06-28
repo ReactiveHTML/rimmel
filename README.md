@@ -3,7 +3,7 @@
 Reactive HTML for next-generation webapps, from the most simple, to really advanced stuff.
 No need for JSX, no need for React, no need for Babel. This is all pure standard JavaScript and a pinch of salt.
 
-```
+```javascript
 const data = fetch('https://example.com')
 	.then(data=>data.text())
 
@@ -22,7 +22,7 @@ That's is.
 ## Going reactive with RxJS
 
 This is a simple observable stream that counts anything that passes through it
-```
+```javascript
 const counter = (new BehaviorSubject(0)).pipe(
 	scan(a=>a+1)
 )
@@ -50,11 +50,11 @@ We'll just skip the "hello world" example, as it's not so exciting, but you can 
 ### Sources and Sinks
 There are two key concepts we use here, which come straight from functional programming: sources and sinks.
 
-Sources are things that generate events. You can optionally process them and what remains goes in your sinks.
+Sources are things that generate data. You can optionally process them and what remains goes in your sinks or UI elements.
 
-Sources typically include DOM elements, `fetch()` or promises in general, async functions, but most importantly, Observables.
+Sources typically include DOM elements that emit events, `fetch()` calls or promises in general, async functions and Observables.
 
-Sinks are most often the places where you want to display any information in your UI. Your main document, state, notifications, whatever.
+Sinks are most often the places where you want to display any information in your UI. Your main document, any state updates, notifications etc.
 
 With Rimmel you can think of most DOM elements as observable streams or sinks.
 

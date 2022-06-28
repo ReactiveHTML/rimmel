@@ -34,12 +34,7 @@ const attributesSink  = (node)      => attributeset => Object
 			: k.substr(0, 2) == 'on' && typeof (v.next || v) == 'function'
 				? node.addEventListener(k.replace(/^on/, ''), v.next ? v.next.bind(v) : v)
 				: typeof v.subscribe == 'function'
-					? v.subscribe(
-											// e=>console.log('mv', e, k, v),
-											(DOMSinks.get(k) || attributeSink)(node, k),
-											//()=>console.log('done', k, v),
-											//(e)=>console.error('err', e),
-					)
+					? v.subscribe((DOMSinks.get(k) || attributeSink)(node, k))
 					: typeof v.then == 'function'
 						? v.then((DOMSinks.get(k) || attributeSink)(node, k))
 						: node.setAttribute(k, v))

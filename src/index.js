@@ -120,7 +120,12 @@ function render(strings, ...args) {
 					// <some-tag some-attributes data-xxx="123" data-yyy="${observable}" other-stuff>...</some-tag>
 					// will set setAttribute
 					let attributeName = isAttribute.groups.attribute
-					const attributeType = attributeName == 'class' ? 'class' : !attributeName.indexOf('data') ? 'dataset' : 'attribute'
+					const attributeType =
+						attributeName == 'class' || attributeName == 'style'
+							? attributeName
+							: !attributeName.indexOf('data')
+								? 'dataset'
+								: 'attribute'
 					if(attributeType == 'dataset') {
 						attributeName = attributeName.replace(/^data-/, '')
 					}

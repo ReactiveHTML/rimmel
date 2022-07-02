@@ -88,7 +88,7 @@ function render(strings, ...args) {
 		const string = strings[i]
 		const handler = argsArray[i]
 		const eventName = getEventName(string)
-		const r = (result +string).match(/<\w+\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*$/)
+		const r = (result +string).match(/<\w+\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*(?:\s*>\s*)?$/)
 		const existingRef = r && r.groups?r.groups.existingRef:undefined
 		const ref = existingRef || `#REF${refCount++}`
 		if(handler) {
@@ -100,10 +100,8 @@ function render(strings, ...args) {
 				const h = isFunction(handler) ? handler : isFunction(handler.next) ? handler.next.bind(handler) : null
 				const isNonBubblingEvent = nonBubblingAttributes.has(eventName)
 				if(h) {
-					if(!isNonBubblingEvent) {
-						// Only use event delegation for bubbling events
-					delegateEvent(eventName)
-					}
+					// Only use event delegation for bubbling events
+					isNonBubblingEvent || delegateEvent(eventName)
 					addRef(ref, { handler: h, type: 'event', eventName })
 				}
 				result += string +(eventName == 'mount' || isNonBubblingEvent ? ref : '') +(existingRef?'':`" RESOLVE="${ref}`)

@@ -1,43 +1,58 @@
-import babel from '@rollup/plugin-babel';
+// import babel from '@rollup/plugin-babel';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import babelConfig from './babel.config.json';
+import typescript from 'rollup-plugin-typescript2'
+// import babelConfig from './babel.config.json';
 import sourceMaps from 'rollup-plugin-sourcemaps';
 import json from 'rollup-plugin-json';
 import { terser } from 'rollup-plugin-terser';
 import visualizer from 'rollup-plugin-visualizer';
 import cleanup from 'rollup-plugin-cleanup';
+import renameNodeModules from 'rollup-plugin-rename-node-modules';
 
-const {
-  name,
-  main,
-  module,
-  peerDependencies,
-} = require('./package.json');
+const { peerDependencies } = require('./package.json');
 
 const sourcemap = true;
 
 const external = [...Object.keys(peerDependencies || {})];
 
-const camelize = s => s.replace(/-./g, x=>x.toUpperCase()[1])
+const cjs = {
+  dir: 'dist',
+  entryFileNames: `[name].cjs`,
+  exports: 'named',
+  format: 'cjs',
+  interop: 'default',
+  sourcemap,
+};
+
+const es = {
+  ...cjs,
+  format: 'es',
+  entryFileNames: `[name].mjs`,
+  minifyInternalExports: false,
+};
+
+const formats = [cjs, es];
 
 export default {
-  input: 'src/index.js',
-  output: [
-    { file: main, name: camelize(name), format: 'umd', sourcemap },
-    { file: module, format: 'es', sourcemap },
-  ],
+  input: 'src/index.ts',
+  output: formats.reduce((acc, curr) => ([
+    ...acc,
+    curr,
+    { ...curr, dir: `${curr.dir}/modules`, preserveModules: true },
+  ]), []),
   external,
   watch: {
     include: 'src/**',
   },
   plugins: [
-    babel({
-      babelrc: false,
-      babelHelpers: 'bundled',
-      exclude: 'node_modules/**',
-      ...babelConfig,
-    }),
+    typescript({ useTsconfigDeclarationDir: true }),
+    // babel({
+    //   babelrc: false,
+    //   babelHelpers: 'bundled',
+    //   exclude: 'node_modules/**',
+    //   ...babelConfig,
+    // }),
     // Allow json resolution
     json(),
     // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
@@ -50,6 +65,7 @@ export default {
     sourceMaps(),
     terser(),
     cleanup({ sourcemap }),
+    renameNodeModules('modules_node'),
     visualizer({ filename: './doc/bundle-stats.html', sourcemap }),
   ],
 }

@@ -1,0 +1,1 @@
+export { createEntry } from './createEntry';

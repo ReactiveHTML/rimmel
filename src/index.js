@@ -62,17 +62,16 @@ const delegatedEvents = new Set()
 const delegateEvent = eventName => {
 	if(!delegatedEvents.has(eventName)) {
 	document.addEventListener(eventName, event => {
-			for(var handledTarget=event.target, h=handlers.get(event.target);!h && handledTarget;handledTarget=handledTarget.parentNode, h=handlers.get(handledTarget))
-				// TODO: do we need to support multiple event handlers from multiple parent nodes?
+		for(var handledTarget=event.target, h=handlers.get(event.target);handledTarget && !(h && h.some(conf=>conf.eventName == event.type));handledTarget=handledTarget.parentNode, h=handlers.get(handledTarget))
 			;
-			return (h || [])
-				.filter(h=>h.handler && h.eventName==event.type)
-				.map(h=>h.handler(event) || false)
-				.reduce((a, b)=>a||b, false)
+		return (h || [])
+			.filter(h=>h.handler && h.eventName==event.type)
+			.map(h=>h.handler(event) || true)
+			.reduce((a, b)=>a&&b, true)
 		}
 		// doing it once would also need to add it multiple times!
 		//, eventName == 'mount' ? {once: true} : undefined)
-		)
+	)
 	delegatedEvents.add(eventName)
 	}
 }

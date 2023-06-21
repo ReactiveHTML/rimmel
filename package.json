@@ -1,6 +1,6 @@
 {
   "name": "rimmel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Reactive template engine for webapps",
   "main": "dist/rimmel.cjs.js",
   "module": "dist/rimmel.es.js",

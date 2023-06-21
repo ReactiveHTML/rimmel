@@ -1,19 +1,20 @@
 import { render } from '../../dist/rimmel.es.js';
 import TextInput from './textInput.js';
-const { BehaviorSubject, Subject } = rxjs;
-const { map } = rxjs.operators
+const { BehaviorSubject } = rxjs;
+const { map, startWith, } = rxjs.operators
 
-const disabled = new BehaviorSubject({ disabled: 'disabled' });
-
-const valid = (new Subject()).pipe(
-	map(value => ({ disabled: value || undefined }))
+const validState = (new BehaviorSubject('')).pipe(
+	map(value => ({ disabled: value && 'disabled' || undefined })),
+	startWith(({ disabled: 'disabled' })),
 )
 
 document.body.innerHTML = render`
 	<div class="subscribe">
-		${TextInput(valid)}
-		<button type="button" ${valid}>
+		${TextInput(validState)}
+
+		<button type="button" ...${validState}>
 			Subscribe
 		</button>
 	</div>
 `;
+

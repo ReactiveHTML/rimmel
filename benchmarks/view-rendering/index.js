@@ -1,4 +1,4 @@
-import { render } from '../../dist/rimmel.es.js';
+import { rml } from '../../dist/rimmel.es.js';
 const { Subject, BehaviorSubject } = rxjs;
 const { map, scan } = rxjs.operators
 
@@ -6,7 +6,7 @@ const view1 = () => {
 	const counter = (new BehaviorSubject(0)).pipe(
 		scan(a=>a+1)
 	)
-	return render`
+	return rml`
 		<h1>View 1</h1>
 		<p>This is <strong>view1</strong>. It does some stuff, etc</p>
 		<p>This is <strong>view1</strong>. It does some stuff, etc</p>
@@ -20,7 +20,7 @@ const view2 = () => {
 	const counter = (new BehaviorSubject(0)).pipe(
 		scan(a=>a+1)
 	)
-	return render`
+	return rml`
 		<h1>View 2</h1>
 		<button type="button" onclick="${counter}"> Click me </button>
 		<p>This is <stron>view2</strong>. It does some more stuff, etc</p>
@@ -46,14 +46,14 @@ function run() {
 		requestAnimationFrame(changeView)
 	}
 
-	document.body.innerHTML = render`
+	document.body.innerHTML = rml`
 		<span style="color: red;"  onmouseover="${()=>currentView.next(view1())}">render view 1</span>
 		<span style="color: blue;" onmouseover="${()=>currentView.next(view2())}">render view 2</span>
 		<br>
-		${[...Array(20).fill(0)].map((x,i)=>render`
+		${[...Array(20).fill(0)].map((x,i)=>rml`
 			<span style="color: red;" onmouseover="${()=>currentView.next(views[i&1]())}">X <span>${renderCount}</span></span>
 		`)}
-		${[...Array(20).fill(0)].map((x,i)=>render`
+		${[...Array(20).fill(0)].map((x,i)=>rml`
 			<span style="color: red;" onmouseover="${()=>currentView.next(views[i&1]())}">Y <span>${renderCount}</span></span>
 		`)}
 

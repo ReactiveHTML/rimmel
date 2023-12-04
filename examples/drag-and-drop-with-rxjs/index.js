@@ -1,8 +1,8 @@
-import {Draggable} from './draggable.js'
-import {render} from '../../src/index.js'
+import { Draggable } from './draggable.js'
+import { rml } from '../../src/index.js'
 
 function App() {
-	document.body.innerHTML = render`
+	document.body.innerHTML = rml`
 		<h1>Drag'n'drop example</h1>
 
 		<div ...${Draggable()}>${'Drag Me'}</div>

@@ -1,7 +1,7 @@
 // N.B.: We'll refer to Rx Subjects just as "streams"
 const { Subject } = rxjs
 const { distinct, filter, map, mapTo, merge, take, share, startWith, switchMap, takeUntil, tap, withLatestFrom } = rxjs.operators
-import {render} from '../../src/index.js'
+import { rml } from '../../src/index.js'
 
 // There are so few ways to win this game we can list them all.
 const winningLines = [
@@ -55,10 +55,10 @@ function App() {
 	)
 
 	// A board component to render each row
-	const Board = () => render`<table>${[0,1,2].map(Row)}</table>`
+	const Board = () =>  rml `<table>${[0,1,2].map(Row)}</table>`
 
 	// A Row component to render each cell
-	const Row = y => render`<tr>${[0,1,2].map(x=>Cell(x,y))}</tr>`
+	const Row = y =>  rml `<tr>${[0,1,2].map(x=>Cell(x,y))}</tr>`
 
 	// A Cell component that handles user clicks
 	const Cell = (x, y) => {
@@ -94,7 +94,7 @@ function App() {
 		)
 
 		// And this is the actual cell.
-		return render`<td><button onclick="${click}" class="cell ${highlight}" data-move="${click}" ${disable}></button></td>`
+		return  rml `<td><button onclick="${click}" class="cell ${highlight}" data-move="${click}" ${disable}></button></td>`
 		// "onclick" emits into the "click" stream above
 		// the "highlight" stream above is sinked into the class attribute
 		// the "click" stream above is also sinked into a data element (this will cause the current move
@@ -113,7 +113,7 @@ function App() {
 	// then some reporting below:
 	//   - the "state" stream sinks into the <span> element, telling who's next
 	//   - the "action" stream just sinks into the last <span> to indicate the current state: Ready | Playing | Game Over
-	document.body.innerHTML = render`
+	document.body.innerHTML =  rml `
 		<h1>Tic Tac Toe</h1>
 
 		${Board()}

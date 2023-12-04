@@ -1,4 +1,4 @@
-import { render } from '../../dist/rimmel.es.js';
+import { rml } from '../../dist/rimmel.es.js';
 const { BehaviorSubject } = rxjs;
 const { scan } = rxjs.operators
 
@@ -8,7 +8,7 @@ const counter = (new BehaviorSubject(0)).pipe(
 	scan(a=>a+1)
 )
 
-document.body.innerHTML = render`
+document.body.innerHTML = rml`
 	<button type="button" onclick="${counter}"> Click me </button>
 	You clicked the button <span>${counter}</span> times.
 `;

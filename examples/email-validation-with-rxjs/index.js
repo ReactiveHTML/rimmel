@@ -1,4 +1,4 @@
-import { render } from '../../dist/rimmel.es.js';
+import { rml } from '../../dist/rimmel.es.js';
 import TextInput from './textInput.js';
 const { BehaviorSubject } = rxjs;
 const { map, startWith, } = rxjs.operators
@@ -8,7 +8,7 @@ const validState = (new BehaviorSubject('')).pipe(
 	startWith(({ disabled: 'disabled' })),
 )
 
-document.body.innerHTML = render`
+document.body.innerHTML = rml`
 	<div class="subscribe">
 		${TextInput(validState)}
 

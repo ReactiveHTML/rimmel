@@ -7,7 +7,7 @@ No need for JSX, no need for React, no need for Babel. This is all pure standard
 const data = fetch('https://example.com')
 	.then(data=>data.text())
 
-document.getElementById('target').innerHTML = render`
+document.getElementById('target').innerHTML = rml`
 	<div>${data}</div>
 `
 ```
@@ -27,7 +27,7 @@ const counter = (new BehaviorSubject(0)).pipe(
 	scan(a=>a+1)
 )
 
-document.body.innerHTML = render`
+document.body.innerHTML = rml`
 	<button type="button" onclick="${counter}"> Click me </button>
 	You clicked the button <span>${counter}</span> times.
 `;

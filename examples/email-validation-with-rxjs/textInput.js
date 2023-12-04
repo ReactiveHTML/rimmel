@@ -1,4 +1,4 @@
-import { render } from '../../dist/rimmel.es.js';
+import { rml } from '../../dist/rimmel.es.js';
 const { Subject } = rxjs;
 const { map, tap } = rxjs.operators
 
@@ -23,7 +23,7 @@ export default (onValid: Observable<bool>) => {
 		})),
 	)
 
-	return render`
+	return rml`
 	 <div class="base ${colorFeedback}">
 		<input type="email" oninput="${keyStream}" />
 	 </div>

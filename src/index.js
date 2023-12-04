@@ -82,7 +82,7 @@ const addRef = (ref, data) => {
 }
 
 let refCount = 0
-function render(strings, ...args) {
+function rml(strings, ...args) {
 	let result = ''
 	const argsArray = [].concat(args || [])
 	for(let i=0;i<strings.length;i++) {
@@ -176,7 +176,7 @@ function render(strings, ...args) {
 				result += string +handler.join('')
 			} else if(typeof handler == 'object') {
 				const [strings, args] = Object.entries(handler).reduce(([strings, args], [k, v]) => [strings.concat(k), args.concat(v)], [[], []])
-				result += string +render(strings, ...args)
+				result += string +rml(strings, ...args)
 			} else {
 				result += string +handler
 			}
@@ -245,6 +245,7 @@ function mount(mutationsList, observer) {
 	.observe(ROOT, { attributes: false, childList: true, subtree: true })
 
 export {
-	render
+	render: rml, // Deprecated, always use rml instead
+	rml,
 }
 

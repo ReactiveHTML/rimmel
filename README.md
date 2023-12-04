@@ -41,7 +41,7 @@ Every time you click the button it emits a click event which is pushed into the 
 It gets some events as input, outputs the count and is wired into the `<span>` element setting `.innerHTML` on it.
 
 ## Why Rimmel?
-Rimmel is particularly light (~2.5K) fast (no DOM diff), and flexible (see the (https://github.com/hellomenu/rimmel/tree/master/examples)[examples]).
+Rimmel is particularly light (~2.5K) fast (no DOM diff), and flexible (see the [examples](https://github.com/hellomenu/rimmel/tree/master/examples)).
 
 
 ## Get Started
@@ -104,7 +104,7 @@ Then point your browser to one of the URLs specified and navigate to the example
 ## Standardisation
 There are people trying to make HTML natively support Observables and some discussion is going on here:
 
-[https://github.com/whatwg/dom/issues/544]
+[whatwg/544](https://github.com/whatwg/dom/issues/544)
 
 ## We're looking for contributors
 If you like what you've seen please join the party and help us stir the JavaScript world up a bit. There is a clear need for yet another JavaScript framework, that's why we are here ;)

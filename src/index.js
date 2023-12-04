@@ -22,6 +22,7 @@ const styleSink       = (node, key) => {
 	const t = node.style //[key];
 	return kvp => Object.entries(kvp).forEach(([k, v])=> t[k] = v)
 }
+const valueSink       = (node)      => str  => node.value = str
 const attributeSink   = (node, key) => str  => node.setAttribute(key, str)
 // const eventHandlerSink= (node)      => (e, h) => node.addEventListener(e, h)
 // set node attributes from an object {k: v, k2: v2}
@@ -53,6 +54,7 @@ const DOMSinks = new Map([
 	['class',        classSink],
 	['dataset',      datasetSink],
 	['multidataset', datasetMultiSink],
+	['value',        valueSink],
 // ['termination',  terminationSink],
 ])
 
@@ -120,7 +122,7 @@ function rml(strings, ...args) {
 					// will set setAttribute
 					let attributeName = isAttribute.groups.attribute
 					const attributeType =
-						attributeName == 'class' || attributeName == 'style'
+						attributeName == 'class' || attributeName == 'style' || attributeName == 'value'
 							? attributeName
 							: !attributeName.indexOf('data')
 								? 'dataset'

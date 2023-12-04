@@ -244,8 +244,10 @@ function mount(mutationsList, observer) {
 (new MutationObserver(mount))
 	.observe(ROOT, { attributes: false, childList: true, subtree: true })
 
+const render = rml // Deprecated, always use rml instead. Compat only
+
 export {
-	render: rml, // Deprecated, always use rml instead
+	render,
 	rml,
 }
 

@@ -2,7 +2,7 @@
 
 Functional-Reactive HTML/RML Template Engine for next-generation webapps that scales gracefully and thrives in complexity.
 
-In RML, Promises and Observable streams are fist-class citizens. Rimmel subscribes to them behind the scenes, making a seamless, elegant and testable integration.
+In RML, Promises and Observable streams are fist-class citizens. Rimmel subscribes to them behind the scenes both ways, in and out, making a seamless, elegant and testable integration.
 No need for JSX, React, Babel. It's 100% pure JavaScript.
 
 ```javascript
@@ -121,35 +121,35 @@ be able to dynamically set/change/toggle class names in the component. More deta
 ### Supported Browsers
 Our focus is modern browsers only that support ES6+ and there is no plan to ever support IE4, etc.
 
-### Node.js / Deno
-We are working on server-side-rendering, with support for streaming and a new concept of transferable promises and observables (stay tuned)
-
 ## Current State
 Rimmel is created and maintained by Hello Menu, is being used in production on our advanced and complex web platform and is now an independent spin-off project of its own.
 
-It's not to be considered a "mature" web framework yet and it may have some minor bugs and gotchas, but it's ready for early adopters and FRP enthusiasts to create webapps with logic of any complexity.
+It's not to be considered a "mature" web framework yet and it certainly has some minor bugs and gotchas, but it's ready for early adopters and FRP enthusiasts to create webapps with logic of any complexity.
 It becomes especially powerful if paired with RxJS or possibly with other Observable libraries.
 
 ## Run the Examples
 ```bash
-	npm install
-	npm run examples
+npm install
+npm run examples
 ```
 Then point your browser to one of the URLs specified and navigate to the examples folder.
 
 ## Roadmap
-	- Bug fixes
-	- Observable completion handlers
-	- Observable error sinks
-	- Fair performance benchmarks for real-life scenarios (so not like 100 million DOM elements on a page, etc)
-	- SSR
-	- Support for Rx Schedulers for high-throughput highly-responsive real-time apps (trading front-ends, ad-tech, etc)
-	- Full ObservableArray support for lists, grids and complex repeatable data structures
-	- Tree-shakeable separation of sources and sinks
-	- Support for the EventEmitter type as source and sink
-	- TypeScript support
-	- Compiled Templates
+- Full ObservableArray support for lists, grids and complex repeatable data structures
+- Observable completion handlers
+- Observable error sinks
+- Fair performance benchmarks for real-life scenarios (so not like 100 million DOM elements on a page, etc)
+- Bug fixes
+- SSR
+- Support for Rx Schedulers for high-throughput highly-responsive real-time apps (trading front-ends, ad-tech, etc)
+- Support text node and HTML comment sinks
+- Tree-shakeable separation of sources and sinks
+- Support for the EventEmitter type as source and sink
+- TypeScript support
+- Compiled Templates
+- Plugin support
+- RML Security
 
-## Standardisation
+## Web Standards
 There are people trying to make HTML natively support Observables and some discussion is going on at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544)
 

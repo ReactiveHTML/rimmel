@@ -1,11 +1,12 @@
 {
   "name": "rimmel",
-  "version": "1.0.4",
+  "version": "1.1.0-rc",
   "description": "Reactive template engine for webapps",
   "main": "dist/rimmel.cjs.js",
   "module": "dist/rimmel.es.js",
+  "types": "dist/main.d.ts",
   "scripts": {
-    "build": "rimraf dist && rimraf doc && rollup -c",
+    "build": "rimraf dist && rimraf doc && tsc --noEmitOnError && rollup -c",
     "dev": "rollup -c -w",
     "examples": "http-server",
     "test": "jest"
@@ -23,8 +24,12 @@
     "html",
     "reactive",
     "reactive html",
+    "rml",
+    "fp",
     "frp",
-    "functional-reactive"
+    "functional programming",
+    "functional-reactive",
+    "functional-reactive programming"
   ],
   "author": "Dario Mannu",
   "license": "MIT",
@@ -44,6 +49,8 @@
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^20.0.0",
     "@rollup/plugin-node-resolve": "^13.0.4",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.5",
     "babel-jest": "^27.2.0",
     "babel-register": "^6.26.0",
     "http-server": "^13.0.2",
@@ -53,6 +60,7 @@
     "rollup-plugin-cleanup": "^3.2.1",
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-sourcemaps": "^0.6.3",
-    "rollup-plugin-terser": "^7.0.2"
+    "rollup-plugin-terser": "^7.0.2",
+    "typescript": "^5.3.3"
   }
 }

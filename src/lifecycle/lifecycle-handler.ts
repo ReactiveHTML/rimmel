@@ -56,12 +56,14 @@ export const transferAttributes = (node: HTMLElement): void => {
 						if(DOMSinks.has(conf.type)) { // if it's a sink (innerHTML, etc)
 							// TODO: conf.attribute may itself be a promise or an observable, so need to subscribe to it
 							const sink = DOMSinks.get(conf.type) as Sink;
-                            const subscriptionCallback = sink(<HTMLElement>intermediateInteractiveNode || node, conf.attribute);
+                            const sinkFn = sink(<HTMLElement>intermediateInteractiveNode || node, conf.attribute);
 							const sourceStream = conf.attribute?.then || conf.attribute?.subscribe ? conf.attribute: conf.handler;
+							// console.log('sourceStream TYPE', typeof sourceStream, sourceStream);
 							const subscription =
-								sourceStream.then ? sourceStream.then(subscriptionCallback).catch(conf.error || errorSink)
-								: sourceStream.subscribe ? sourceStream.subscribe(subscriptionCallback, conf.error || errorSink, conf.termination || terminationSink)
+								sourceStream.then ? sourceStream.then(sinkFn, conf.error || errorSink)
+								: sourceStream.subscribe ? sourceStream.subscribe(sinkFn, conf.error || errorSink, conf.termination || terminationSink)
 								: typeof sourceStream == 'function' ? sourceStream(node)
+								: typeof sourceStream == 'object' ? sink(node)(sourceStream)
 								: () => {}
                             ;
 							if(sourceStream.subscribe) {
@@ -75,6 +77,7 @@ export const transferAttributes = (node: HTMLElement): void => {
 				waitingElementHanlders.delete(value as string);
 
 				if(key == 'onmount') {
+					// TODO: namespace and rename event to rml:mount?
 					setTimeout(()=>node.dispatchEvent(new CustomEvent('mount', {bubbles: true, detail: {}})), 0);
 					//node.dispatchEvent(new CustomEvent('mount', {bubbles: true, detail: {}}))
 				}

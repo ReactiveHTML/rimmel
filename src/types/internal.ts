@@ -32,4 +32,8 @@ export type Handler = {
 	termination?: any;
 };
 
+export type InlineAttributeHandler = Handler & {
+	handler: JSONObject;
+}
+
 export type MaybeHandler = MaybeFuture<unknown>;

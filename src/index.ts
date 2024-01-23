@@ -1,4 +1,3 @@
-import { SinkSpecifier as Sink } from './sinks';
 import { mount } from './lifecycle/lifecycle-handler';
 import rml from './parser/parser';
 
@@ -17,9 +16,6 @@ const setRoot = (e: HTMLElement): RML => {
 
 init();
 
-export default {
-	Sink,
-	render: rml, // Deprecated, always use rml instead. Compat only,
-	rml,
-	//root,
-};
+export { default as rml } from './parser/parser';
+export const render = rml;  // Deprecated, always use rml instead. Compat only,
+export { SinkSpecifier as Sink } from './sinks';

@@ -7,5 +7,3 @@ export const Classes = new Proxy({}, {
 		return scrambled
 	},
 })
-
-

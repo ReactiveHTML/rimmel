@@ -1,5 +1,5 @@
-import { Handler, MaybeHandler } from "../types/internal";
-import { HTMLEventAttributeName, HTMLEventName, HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
+import { Handler, InlineAttributeHandler, MaybeHandler } from "../types/internal";
+import { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
 import { waitingElementHanlders } from "../internal-state";
 import { isFunction } from "../utils/is-function";
 import { BehaviorSubject, Observable, Subject } from "../types/futures";
@@ -18,17 +18,10 @@ const addRef = (ref: string, data: Handler) => {
 	waitingElementHanlders.set(ref, t);
 };
 
-const a = (fn: any) => {
-	if(isFunction(fn)) {
-		fn(123);
-	}
-	else fn.next(123);
-}
-
 const getEventName = (eventAttributeString: RMLEventAttributeName): RMLEventName | undefined => <RMLEventName>/\s+on(?<event>\w+)=['"]?$/.exec(eventAttributeString)?.groups?.event;
 // GOTCHA: attributes starting with "on" will be treated as event handlers ------------------------------------> HERE <------------------------, so don't do <tag ongoing="trouble">
 
-export default function rml(strings: string[], ...args: MaybeHandler[]): HTMLString {
+export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler[]): HTMLString {
 	let result = '';
 	for(let i=0;i<strings.length;i++) {
 		const string = strings[i];
@@ -102,10 +95,11 @@ export default function rml(strings: string[], ...args: MaybeHandler[]): HTMLStr
 					// will bind multiple attributes and values
 
 					//result += string.replace(/\.\.\.$/, '') +` RESOLVE="${ref}"`
+					// console.log('INLINE OBJECT', string, maybeHandler);
 					result += string.replace(/\.\.\.$/, '');
 
 					if(true) {
-						addRef(ref, <Handler>{ handler: maybeHandler, type: 'attributeset', attribute: maybeHandler });
+						addRef(ref, <InlineAttributeHandler>{ handler: maybeHandler, type: 'attributeset', attribute: maybeHandler });
 					} else {
 						result += Object.entries(maybeHandler || {}).map(([k, v])=>`${k}="${v}"`).join(' ');
 						//addRef(ref, { handler, type: 'attributeset' })
@@ -115,8 +109,8 @@ export default function rml(strings: string[], ...args: MaybeHandler[]): HTMLStr
 				} else if(/>\s*$/.test(string) && /^\s*<\s*/.test(nextString)) {
 					// <some-tag>${observable}</some-tag>
 					// will set innerHTML
-					let sinkType;
-					let string2;
+					let sinkType; // TODO: maybe stop using a string that needs looking up?
+					let string2: string;
 
 					string2 = string.replace(sinkSpecifierPattern, '');
 					//sinkType = RegExp.$1 || 'collection' || 'innerHTML'

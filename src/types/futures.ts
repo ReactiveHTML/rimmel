@@ -17,7 +17,13 @@ export type Transformer<I, O> = Observer<I> & {
 
 export type Observable<T> = {
     subscribe: (observer: ObserverFunction<T>) => Subscription;
-};  
+};
+
+export const isObservable = (x: any): x is Observable<any> =>
+    !!x.subscribe;
+
+export const isPromise = (x: any): x is Promise<any> =>
+    !!x.then;
 
 export type Subject<T> = {
     subscribe: (observer: ObserverFunction<T>) => Subscription;

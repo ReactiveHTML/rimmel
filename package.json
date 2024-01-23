@@ -8,7 +8,7 @@
   "sideEffect": false,
   "scripts": {
     "build": "rimraf dist && rollup --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",
-    "dev": "rollup -c -w",
+    "dev": "rimraf dist && rollup -w --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",
     "examples": "http-server",
     "test": "jest"
   },
@@ -52,7 +52,6 @@
     "jest": "^27.2.0",
     "rimraf": "^3.0.2",
     "rollup": "^4.9.5",
-    "rollup-plugin-esbuild": "^6.1.0",
     "ts-node": "^10.9.2",
     "tslib": "^2.6.2",
     "typescript": "^5.3.3"

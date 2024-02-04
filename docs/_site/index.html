@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Rimmel.js | A functional-reactive templating library for JavaScript</title>
+<meta name="generator" content="Jekyll v3.9.3" />
+<meta property="og:title" content="Rimmel.js" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A functional-reactive templating library for JavaScript" />
+<meta property="og:description" content="A functional-reactive templating library for JavaScript" />
+<link rel="canonical" href="http://localhost:4000/" />
+<meta property="og:url" content="http://localhost:4000/" />
+<meta property="og:site_name" content="Rimmel.js" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Rimmel.js" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","description":"A functional-reactive templating library for JavaScript","headline":"Rimmel.js","name":"Rimmel.js","url":"http://localhost:4000/"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Rimmel.js" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Rimmel.js</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+  <header class="post-header">
+    <h1 class="post-title"></h1>
+  </header>
+
+  <div class="post-content">
+    <p>Functional-Reactive templating library for next-generation async webapps.</p>
+
+<p>Rimmel lets you use promises and in-out observables as first-class citizens in your templates without the need to create and manage subscriptions or low-level transformations. No need for JSX, React, Babel or other transpilation.</p>
+
+<h1 id="sources-and-sinks">Sources and Sinks</h1>
+<p>There are two essential parts to a Rimmel template: sources and sinks.</p>
+
+<p><strong>Data sources</strong> take input events, typically from the DOM, websockets, or other sources and are turned into streams for you to consume.</p>
+
+<p><strong><em>Sinks</em></strong> are connections to the DOM, the console, web sockets, the output of your view-models or other data streams is fed into.</p>
+
+<p><img src="/how-rimmel-works-3.svg" alt="Rimmel Sources and Sinks" class="img-responsive" /></p>
+
+<h3 id="using-promises">Using Promises</h3>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">remoteDataComponent</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">fetch</span><span class="p">(</span><span class="dl">'</span><span class="s1">https://example.com</span><span class="dl">'</span><span class="p">).</span><span class="nx">then</span><span class="p">(</span><span class="nx">data</span> <span class="o">=&gt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">text</span><span class="p">());</span>
+
+    <span class="k">return</span> <span class="nx">rml</span><span class="s2">`
+        &lt;div&gt;</span><span class="p">${</span><span class="nx">data</span><span class="p">}</span><span class="s2">&lt;/div&gt;
+    `</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">remoteDataComponent</span><span class="p">();</span>
+
+</code></pre></div></div>
+<p>Try on <a href="https://codepen.io/fourtyeighthours/pen/mdzMYPd??editors=0111">Codepen</a></p>
+
+<h2 id="using-observables">Using Observables</h2>
+
+<p>Following we have a view-model, a state machine, a simple observable stream that counts any events passing through</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Emits 0, 1, 2, 3, ...</span>
+<span class="kd">const</span> <span class="nx">counter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">BehaviorSubject</span><span class="p">(</span><span class="mi">0</span><span class="p">).</span><span class="nx">pipe</span><span class="p">(</span>
+    <span class="nx">scan</span><span class="p">(</span><span class="nx">a</span> <span class="o">=&gt;</span> <span class="nx">a</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="nb">document</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="nx">rml</span><span class="s2">`
+    &lt;button type="button" onclick="</span><span class="p">${</span><span class="nx">counter</span><span class="p">}</span><span class="s2">"&gt; Click me &lt;/button&gt;
+    You clicked the button &lt;span&gt;</span><span class="p">${</span><span class="nx">counter</span><span class="p">}</span><span class="s2">&lt;/span&gt; times.
+`</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">&lt;button&gt;</code> element’s <code class="language-plaintext highlighter-rouge">onclick</code> handler gets <em>wired</em> into <code class="language-plaintext highlighter-rouge">counter</code>, which is a Subject, an in-out RxJS transform stream.
+Every time you click the button it emits a click event which is pumped into <code class="language-plaintext highlighter-rouge">counter</code>.
+Since it’s a transform stream, what it does is take the input, transform it and re-emit the result.
+Rimmel then wires it back to the DOM as a sink.</p>
+
+<h2 id="why-rimmel">Why Rimmel?</h2>
+<p>Top reasons to choose it:</p>
+<ul>
+  <li>Light weight: ~2.5K in version 1. &lt;1K size planned in subsequent versions</li>
+  <li>No virtual DOM, no DOM diff</li>
+  <li>Fast: “fast-enough” first-time renders, then subsequent DOM updates should run at “vanilla+” speed</li>
+  <li>Powerful: manage the most complex state with incredible ease when using Observales</li>
+  <li>Functional-Reactive: support for most DOM sources and sinks</li>
+</ul>
+
+<p>Example code: see the <a href="https://github.com/hellomenu/rimmel/tree/master/examples">examples</a></p>
+
+<h2 id="get-started">Get Started</h2>
+<p>We’ll just skip the “hello world” example, as it’s not so exciting, but you can see several examples in the code or online.</p>
+
+<h3 id="sources-and-sinks-1">Sources and Sinks</h3>
+<p>There are two key concepts we use here, which come straight from functional programming: sources and sinks.</p>
+
+<p>Sources are things that generate data. You can optionally process them and what remains goes in your sinks or UI elements.</p>
+
+<p>Sources typically include any DOM events such as <code class="language-plaintext highlighter-rouge">onclick</code> or <code class="language-plaintext highlighter-rouge">onmousemove</code>, <code class="language-plaintext highlighter-rouge">fetch()</code> calls, just like promises in general, async functions and Observables.</p>
+
+<p>Sinks are most often the places where you want to display any information in your UI. Your main document, any state updates, notifications, console logs, etc.</p>
+
+<p>With RML/Rimmel you can treat most DOM elements as sources, sinks, or both.</p>
+
+<h3 id="stream-processing">Stream Processing</h3>
+<p>Sources normally emit raw data, not meant to display in a UI (e.g.: a ScrollEvent), so what we do is to process and format them.
+This can include mapping, reducing, etc. RxJS comes with a comprehensive set of utility functions to transform data.</p>
+
+<h3 id="supported-sources">Supported Sources</h3>
+<p>Rimmel supports the following as observable sources:
+	- Event listeners from DOM elements. Essentially any attribute beginning with “on” can be bound to an observable.
+	- Anything else that can map to an Observable or a Promise. Websockets, Timers, <code class="language-plaintext highlighter-rouge">fetch()</code> calls, etc.
+	- Static values will be simply treated as non-reactive values and no data-binding will be created.</p>
+
+<h3 id="supported-sinks">Supported Sinks</h3>
+<p>Rimmel supports two types of sinks: render-time and dynamic sinks.
+Render-time sinks are the simplest and most intuitive ones: those you define in a template from which the data binding can be easily inferred. These include:
+	- Attributes for any HTML element.
+	- Style attributes
+	- Datasets (data- attributes)
+	- innerHTML/innerText/textContent</p>
+
+<p>Dynamic sinks enable apps to inject pretty much anything into them and the content will determine at runtime the correct bindings.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">mixin</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+	<span class="kd">const</span> <span class="nx">onmouseover</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">mouseover</span><span class="dl">'</span><span class="p">)</span>
+
+	<span class="kd">const</span> <span class="nx">onclick</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Subject</span><span class="p">()</span>
+
+	<span class="c1">// emit 'clickable' first,</span>
+	<span class="c1">// then 'clicked' afterwards</span>
+	<span class="kd">const</span> <span class="nx">classes</span> <span class="o">=</span> <span class="nx">onclick</span><span class="p">.</span><span class="nx">pipe</span><span class="p">(</span>
+		<span class="nx">mapTo</span><span class="p">(</span><span class="dl">'</span><span class="s1">clicked-class</span><span class="dl">'</span><span class="p">),</span>
+		<span class="nx">startWith</span><span class="p">(</span><span class="dl">'</span><span class="s1">clickable</span><span class="dl">'</span><span class="p">),</span>
+	<span class="p">)</span>
+
+	<span class="k">return</span> <span class="p">{</span>
+		<span class="nx">onclick</span><span class="p">,</span>
+		<span class="nx">onmouseover</span><span class="p">,</span>
+		<span class="dl">'</span><span class="s1">data-new-attribute</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">some value</span><span class="dl">'</span><span class="p">,</span>
+		<span class="na">class</span><span class="p">:</span> <span class="nx">classes</span><span class="p">,</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">component</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+	<span class="k">return</span> <span class="nx">rml</span><span class="s2">`
+		&lt;div ...</span><span class="p">${</span><span class="nx">mixin</span><span class="p">()}</span><span class="s2">&gt;&lt;/div&gt;
+	`</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>When the above component is rendered on the page, the mixin will inject everything else into it, including the <code class="language-plaintext highlighter-rouge">onclick</code> and <code class="language-plaintext highlighter-rouge">onmouseover</code> event handlers,
+a statically defined <code class="language-plaintext highlighter-rouge">data-new-attribute</code> and a merge-in observable stream to set classes… dynamically. Essentially, whenever the classes stream emits, it will
+be able to dynamically set/change/toggle class names in the component. More details in the upcoming RDOM (Reactive DOM) documentation.</p>
+
+<h3 id="supported-browsers">Supported Browsers</h3>
+<p>Our focus is modern browsers only that support ES6+ and there is no plan to ever support IE4, etc.</p>
+
+<h2 id="current-state">Current State</h2>
+<p>Rimmel is created and maintained by Hello Menu, is being used in production on our advanced and complex web platform and is now an independent spin-off project of its own.</p>
+
+<p>It’s not to be considered a “mature” web framework yet and it certainly has some minor bugs and gotchas, but it’s ready for early adopters and FRP enthusiasts to create webapps with logic of any complexity.
+It becomes especially powerful if paired with RxJS or possibly with other Observable libraries.</p>
+
+<h2 id="run-the-examples">Run the Examples</h2>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install
+</span>npm run examples
+</code></pre></div></div>
+<p>Then point your browser to one of the URLs specified and navigate to the examples folder.</p>
+
+<h2 id="roadmap">Roadmap</h2>
+<ul>
+  <li>Full ObservableArray support for lists, grids and complex repeatable data structures</li>
+  <li>Observable completion handlers</li>
+  <li>Observable error sinks</li>
+  <li>Fair performance benchmarks for real-life scenarios (so not like 100 million DOM elements on a page, etc)</li>
+  <li>Bug fixes</li>
+  <li>SSR</li>
+  <li>Support for Rx Schedulers for high-throughput highly-responsive real-time apps (trading front-ends, ad-tech, etc)</li>
+  <li>Support text node and HTML comment sinks</li>
+  <li>Tree-shakeable separation of sources and sinks</li>
+  <li>Support for the EventEmitter type as source and sink</li>
+  <li>TypeScript support</li>
+  <li>Compiled Templates</li>
+  <li>Plugin support</li>
+  <li>RML Security</li>
+</ul>
+
+<h2 id="web-standards">Web Standards</h2>
+<p>There are people trying to make HTML natively support Observables and some discussion is going on at <a href="https://github.com/whatwg/dom/issues/544">WHATWG DOM/544</a></p>
+
+
+  </div>
+
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Rimmel.js</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Rimmel.js</li><li><a class="u-email" href="mailto:your-email@example.com">your-email@example.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A functional-reactive templating library for JavaScript</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

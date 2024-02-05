@@ -1,0 +1,27 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+body { font-size: 18px; line-height: 26px; }
+header { background: #ac4142; }
+#banner { border-radius: 0px 2px .6rem 0px; }
+section { margin-top: 170px; }
+
+code { font-family: monospace; font-size: 12px; }
+
+code>* {
+    margin: 0;
+    padding: 0;
+    line-height: normal;
+}
+
+ul{ list-style-type: disclosure-closed; list-style-image: none; }
+::marker{ color: #ac4142; }
+
+section img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}

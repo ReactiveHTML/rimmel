@@ -12,7 +12,7 @@ Rimmel lets you create async templates using promises and in-out observable stre
 
 No need to create and manage subscriptions. No need for JSX, React, Babel or other transpilation.
 
-# Taster
+# A first taster
 Here is a simple component, using RxJS for the state management, that counts your clicks on a button, using a single observable stream called "counter", connected both ends, to a button as input and a `<span>` element as output.
 ```js
 const counter = new BehaviorSubject(0).pipe(
@@ -26,6 +26,12 @@ document.body.innerHTML = rml`
 ```
 
 Try it on [Codepen](https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111){:target="_blank"}
+
+And this is a more visual view of the above
+![Rimmel Sources and Sinks](./assets/click-counter-diagram.png)
+
+"onclick" is treated as an event source, wired to a state machine that takes hits in input and emits counts in output, in the form of an Observable stream, and all is wired as an HTML Sink in a `span` element.
+
 
 
 # Sources and Sinks
@@ -62,12 +68,6 @@ const template = rml`
 
 target.innerHTML = template;
 ```
-
-## A visual diagram
-Here's a diagram showing how the above works
-![Rimmel Sources and Sinks](./assets/click-counter-diagram.png){:class="img-responsive"}
-
-"onclick" is treated as an event source, wired to a state machine that takes hits in input and emits counts in output, in the form of an Observable stream, and all is wired as an HTML Sink in a `span` element.
 
 
 ## How complex can it get?

@@ -12,8 +12,13 @@ Rimmel lets you create async templates using promises and in-out observable stre
 
 No need to create and manage subscriptions. No need for JSX, React, Babel or other transpilation.
 
-# A first taster
-Here is a simple component, using RxJS for the state management, that counts your clicks on a button, using a single observable stream called "counter", connected both ends, to a button as input and a `<span>` element as output.
+# Hello World
+This is a library that really shines with async functional-reactive interactivity, so we'd rather start in the deep water, instead of printing out _Hello World_.
+
+The following is a simple component that makes use of an RxJS Observable stream for state management, counts the clicks you made on a button.
+The stream is connected to a `<button>` in input and a `<span>` element in output.
+
+
 ```js
 const counter = new BehaviorSubject(0).pipe(
     scan(a => a+1) // Emits 0, 1, 2, 3, ...

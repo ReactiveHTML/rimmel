@@ -10,19 +10,59 @@ h1, h2, h3 {
 }
 
 header { background: #ac4142; }
+
+@media print, screen and (max-width: 720px) {
+    header p {
+        display: block;
+    }
+}
+
 #banner {
     border-radius: 0px 2px .6rem 0px;
+}
+
+section {
+    padding: 1rem;
+    margin-top: 170px;
+}
+
+section img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+}
+
+
+@media print, screen and (max-width: 720px) {
+    #banner {
+        top: 115px;
+    }
+
+    #banner .fork {
+        float: none;
+        display: inline-block;
+        position: static;
+        margin-left: 1rem;
+    }
+}
+
+@media print, screen and (max-width: 480px) {
+    #banner {
+        position: static;
+        display: block;
+    }
+
+    section {
+        position: static;
+        margin-top: 0px;
+    }
 }
 
 #banner #logo {
 	background: url(/assets/rimmel.png);
 	background-size: cover;
 	filter: saturate(0) brightness(2);
-}
-
-section {
-    padding: 1rem;
-    margin-top: 170px;
 }
 
 code { font-family: monospace; font-size: 12px; }
@@ -35,11 +75,4 @@ code>* {
 
 ul{ list-style-type: disclosure-closed; list-style-image: none; }
 ::marker{ color: #ac4142; }
-
-section img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-}
 

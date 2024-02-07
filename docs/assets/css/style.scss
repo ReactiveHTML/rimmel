@@ -76,3 +76,9 @@ code>* {
 ul{ list-style-type: disclosure-closed; list-style-image: none; }
 ::marker{ color: #ac4142; }
 
+footer {
+    position: static;
+    width: auto;
+    margin-left: 0;
+}
+

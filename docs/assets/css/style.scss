@@ -4,9 +4,26 @@
 @import "{{ site.theme }}";
 
 body { font-size: 18px; line-height: 26px; }
+
+h1, h2, h3 {
+    margin-top: 3rem;
+}
+
 header { background: #ac4142; }
-#banner { border-radius: 0px 2px .6rem 0px; }
-section { margin-top: 170px; }
+#banner {
+    border-radius: 0px 2px .6rem 0px;
+}
+
+#banner #logo {
+	background: url(/assets/rimmel.png);
+	background-size: cover;
+	filter: saturate(0) brightness(2);
+}
+
+section {
+    padding: 1rem;
+    margin-top: 170px;
+}
 
 code { font-family: monospace; font-size: 12px; }
 
@@ -25,3 +42,4 @@ section img {
     margin-right: auto;
     width: 100%;
 }
+

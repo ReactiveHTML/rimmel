@@ -107,9 +107,8 @@ We played with basic promises and observables. However, Rimmel allows you to emi
 There's no clash between Rimmel and jQuery. You can start adding RML templates in your jQuery apps now. [Codepen](https://codepen.io/fourtyeighthours/pen/mdzMYPd)
 
 ## Testing
-We're creating a Marbles-based library to make testing Rimmel components simple and powerful, especially at scale.
-	[Testing, StackBlitz](https://stackblitz.com/edit/testing-rimmel-components-with-jest-and-marbles?file=README.md)
-
+We created [Leaping Bunny](https://github.com/hellomenu/leaping-bunny) an rx-marbles based library to make testing Rimmel components straight forward, especially when async and complex interactions are involved.
+A working playground is available [LeapingBunny on StackBlitz](https://stackblitz.com/edit/rimmel-testing-with-vitest-and-leaping-bunny?file=README.md)
 
 ## Example code
 See and interact with various examples:

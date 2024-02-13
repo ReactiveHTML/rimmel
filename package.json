@@ -10,7 +10,8 @@
     "build": "rimraf dist && rollup --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",
     "dev": "rimraf dist && rollup -w --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",
     "examples": "http-server",
-    "test": "jest"
+    "test": "jest",
+    "website:local": "bundle exec jekyll serve"
   },
   "repository": {
     "type": "git",

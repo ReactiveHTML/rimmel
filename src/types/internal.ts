@@ -1,3 +1,4 @@
+export { HandlerFunction } from "./dom";
 import { HTMLEventName } from "./dom";
 import { MaybeFuture, Observable, Observer } from "./futures";
 
@@ -12,13 +13,6 @@ export type JSON = string | number | boolean | null | JSONObject | JSON[];
 interface JSONObject {
   [property: string]: JSON;
 };
-
-// export interface JSONArray extends Array<JSON> {};
-
-/**
- * A DOM Source defined in a RML template
- */
-export type HandlerFunction = (event: Event, handledTarget?: EventTarget | null) => Boolean;
 
 /**
  * An internal Rimmel representation of a RML template argument

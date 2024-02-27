@@ -28,3 +28,19 @@ export type RMLEventName = RemovePrefix<'on', RMLEventAttributeName>;
  * A string representing HTML code
  */
 export type HTMLString = string & { _HTMLStringBrand: never };
+// export interface JSONArray extends Array<JSON> {};
+/**
+ * A DOM Source defined in a RML template
+ */
+
+export type HandlerFunction = (event: Event, handledTarget?: EventTarget | null) => Boolean;
+
+export type EventListener = EventListenerFunction | EventListenerObject | undefined;
+
+interface EventListenerFunction {
+    (e: Event): void;
+}
+
+interface EventListenerObject {
+    handleEvent(e: Event): void;
+}

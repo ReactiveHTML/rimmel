@@ -1,6 +1,6 @@
 # Rimmel.js
 
-Functional-Reactive HTML/RML Template Engine for next-generation webapps that scales gracefully and thrives in complexity.
+A Functional-Reactive templating library for the Rx.Observable Universe.
 
 In RML, Promises and Observable streams are fist-class citizens. Rimmel subscribes to them behind the scenes both ways, in and out, making a seamless, elegant and testable integration.
 No need for JSX, React, Babel. It's 100% pure JavaScript.
@@ -43,21 +43,27 @@ Rimmel then wires it back to the DOM as a sink.
 ## Why Rimmel?
 Top reasons to choose it:
 	- Light weight: ~2.5K in version 1. <1K size planned in subsequent versions
-	- Fast: "fast-enough" first-time renders, then vanilla-speed DOM updates
+	- Fast: "fast-enough" renders, then vanilla+ DOM updates in certain use cases
 	- Powerful: manage the most complex state with incredible ease when using Observales
 	- Functional-Reactive: support for most DOM sources and sinks
 
 
 Example code: see the [examples](https://github.com/hellomenu/rimmel/tree/master/examples)
 
+Playground: [Codepen](https://codepen.io/fourtyeighthours/)
 
 ## Get Started
 We'll just skip the "hello world" example, as it's not so exciting, but you can see several examples in the code or online.
 
+```
+import { rml } from 'rimmel'
+```
+
+
 ### Sources and Sinks
 There are two key concepts we use here, which come straight from functional programming: sources and sinks.
 
-Sources are things that generate data. You can optionally process them and what remains goes in your sinks or UI elements.
+Sources are things that generate data. You can optionally process them and what remains goes somewhere. That _somewhere_ is usually referred to as sinks.
 
 Sources typically include any DOM events such as `onclick` or `onmousemove`, `fetch()` calls, just like promises in general, async functions and Observables.
 
@@ -118,8 +124,8 @@ a statically defined `data-new-attribute` and a merge-in observable stream to se
 be able to dynamically set/change/toggle class names in the component. More details in the upcoming RDOM (Reactive DOM) documentation.
 
 
-### Supported Browsers
-Our focus is modern browsers only that support ES6+ and there is no plan to ever support IE4, etc.
+### Supported Environments
+Our focus is modern EcmaScript code.
 
 ## Current State
 Rimmel is created and maintained by Hello Menu, is being used in production on our advanced and complex web platform and is now an independent spin-off project of its own.
@@ -145,11 +151,11 @@ Then point your browser to one of the URLs specified and navigate to the example
 - Support text node and HTML comment sinks
 - Tree-shakeable separation of sources and sinks
 - Support for the EventEmitter type as source and sink
-- TypeScript support
 - Compiled Templates
 - Plugin support
 - RML Security
 
 ## Web Standards
-There are people trying to make HTML natively support Observables and some discussion is going on at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544)
+There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and [WICG Observable](https://github.com/WICG/observable).
 
+Rimmel.js intends to align with these efforts as they develop, mature and hopefully standardise.

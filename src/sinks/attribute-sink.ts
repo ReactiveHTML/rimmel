@@ -1,6 +1,7 @@
 import { DOMSinks } from '.';
 import { CSSDeclaration } from '../types/css';
 import { MaybeFuture } from '../types/futures';
+import { ClassName, ClassRecord } from './class-sink';
 
 export const attributeSink = (node: HTMLElement, attributeName: string) =>
     (value: string) => {
@@ -28,7 +29,7 @@ export const attributesSink = (node: HTMLElement) =>
     (attributeset: MaybeFuture<CSSDeclaration>) => {
         (Object.entries(attributeset) ?? [])
             .forEach(([k, v]) => {
-                return typeof v == 'undefined' ? node.removeAttribute(k) // TODO: toggle/remove event listener, if matches /^on/
+                return v == false || typeof v == 'undefined' ? node.removeAttribute(k) // TODO: toggle/remove event listener, if matches /^on/
                 : k.substring(0, 2) == 'on' && typeof (v.next ?? v) == 'function' ? node.addEventListener(k.substring(2), v.next?.bind(v) ?? v, {capture: true})
                 : typeof v.subscribe == 'function' ? v.subscribe((DOMSinks.get(k) || attributeSink)(node, k))
                 : typeof v.then == 'function' ? v.then((DOMSinks.get(k) || attributeSink)(node, k))

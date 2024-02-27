@@ -126,7 +126,7 @@ console.log('xxxx SINK TYPE:', sinkType, maybeHandler)
 					// }
 
 					// FIXME: .skip(1) is RxJS<=5 specific. No dependencies here, pls
-					addRef(ref, <Handler>{ handler: initialValue ? maybeHandler.skip(1) : maybeHandler, type: sinkType, error: errorSink, ...sinkType == 'collection' && {attribute: maybeHandler} || {}, termination: terminationSink });
+					addRef(ref, <Handler>{ handler: initialValue && maybeHandler.skip ? maybeHandler.skip(1) : maybeHandler, type: sinkType, error: errorSink, ...sinkType == 'collection' && {attribute: maybeHandler} || {}, termination: terminationSink });
 					result += existingRef?string2:string2.replace(/\s*>\s*$/, ` RESOLVE="${ref}">`)
 						+(initialValue || '');
 				} else if(/>\s*[^<]+$/m.test(string) && /^\s*[^<]*\s*</m.test(nextString)) {
@@ -158,10 +158,12 @@ console.log('xxxx SINK TYPE:', sinkType, maybeHandler)
 					result += Object.entries(maybeHandler || {}).map(([k, v])=>`${k}="${v}"`).join(' ');
 				}
 			} else if(Array.isArray(maybeHandler)) {
+				// TODO: handle array elements not being just simple strings to join...
 				result = resultPlusString +maybeHandler.join('');
 			} else if(typeof maybeHandler == 'object') {
-				const [strings, args] = Object.entries(maybeHandler).reduce(([strings, args], [k, v]) => [strings.concat(k), args.concat(v)], [[], []]);
-				result += string +rml(strings, ...args);
+				const [strings, args] = Object.entries(maybeHandler)
+					.reduce(([strings, args], [k, v]) => [strings.concat(k), args.concat(v)], [[], []]);
+				result += string +rml(<TemplateStringsArray><unknown>strings, ...args);
 			} else {
 				result = resultPlusString +maybeHandler;
 			}
@@ -169,5 +171,5 @@ console.log('xxxx SINK TYPE:', sinkType, maybeHandler)
 			result = resultPlusString;
 		}
 	}
-	return result;
+	return <HTMLString>result;
 }

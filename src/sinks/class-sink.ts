@@ -1,7 +1,7 @@
 import { Sink } from "../types/sink";
 
-type ClassRecord = Record<string, string>;
-type ClassName = string;
+export type ClassRecord = Record<string, string>;
+export type ClassName = string;
 
 export const toggleClass = (node: HTMLElement, className: ClassName) =>
     (state: Boolean) => (state ? node.classList.add : node.classList.remove)(className);

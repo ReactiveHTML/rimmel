@@ -6,13 +6,12 @@ export const innerHTMLSink: Sink = (node: HTMLElement) =>
         node.innerHTML = html
     };
 
-export const appendHTMLSink: Sink = (node: HTMLElement) => {
-	// const append = (str: string) => node.insertAdjacentHTML('beforeEnd', str)
-	const appendFn = node.insertAdjacentHTML.bind(null, 'beforeEnd' as InsertPosition);
+export const appendHTMLSink: Sink = (node: HTMLElement, pos: InsertPosition = 'beforeend') => {
+	const appendFn = node.insertAdjacentHTML.bind(node, pos);
 
     return (html: MaybeFuture<string>) => {
         (<MaybeObservable<string>>html).subscribe?.(appendFn) ?? (<MaybePromise<string>>html).then?.(appendFn) ?? appendFn(<Present<string>>html ?? '');
-    };    
+    };
 }
 
 export const innerTextSink: Sink = (node: HTMLElement) =>

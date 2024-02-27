@@ -40,7 +40,7 @@ export const transferAttributes = (node: HTMLElement): void => {
 				(waitingElementHanlders.get(value as string) || []).forEach(conf => {
 					const hand = conf.handler;
 					const boundHandler =
-						isFunction(hand) ? (<HandlerFunction>hand).bind(node, <EventTarget>node) :
+						isFunction(hand) ? (<HandlerFunction>hand).bind(node) :
 							isFunction((<Observer<unknown>>hand).next) ? (<Observer<unknown>>hand).next.bind(hand) :
 								null
 						;
@@ -63,10 +63,11 @@ export const transferAttributes = (node: HTMLElement): void => {
 							const subscription =
 								sourceStream.then ? sourceStream.then(sinkFn, conf.error || errorSink)
 									: sourceStream.subscribe ? sourceStream.subscribe(sinkFn, conf.error || errorSink, conf.termination || terminationSink)
-										: typeof sourceStream == 'function' ? sourceStream(node)
-											: typeof sourceStream == 'object' ? sink(node)(sourceStream)
-												: () => { }
-								;
+									: typeof sourceStream == 'function' ? sourceStream(node)
+									: typeof sourceStream == 'object' ? sink(node)(sourceStream)
+									: () => { }
+							;
+
 							if (sourceStream.subscribe) {
 								const subscriptionList = subscriptions.get(node) || [];
 								subscriptionList.push(subscription);
@@ -78,7 +79,7 @@ export const transferAttributes = (node: HTMLElement): void => {
 				waitingElementHanlders.delete(value as string);
 
 				if (key == 'onmount') {
-					// TODO: namespace and rename event to rml:mount?
+					// TODO: namespace and rename event to rml:onmount?
 					setTimeout(() => node.dispatchEvent(new CustomEvent('mount', { bubbles: true, detail: {} })), 0);
 					//node.dispatchEvent(new CustomEvent('mount', {bubbles: true, detail: {}}))
 				}
@@ -96,7 +97,7 @@ export const removeListeners = (node: HTMLElement) => {
 export const mount: MutationCallback = (mutationsList, observer) => {
 	const childList = mutationsList
 		.filter(m => m.type === 'childList')
-		;
+	;
 
 	// TODO: performance - use document.createTreeWalker
 	const addedNodes = childList

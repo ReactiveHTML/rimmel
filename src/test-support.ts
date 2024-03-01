@@ -1,24 +1,19 @@
 import { innerHTMLSink } from "./sinks/content-sink";
 import { RMLEventAttributeName } from "./types/dom";
 
-export interface MockElement {
-    dataset?: DOMStringMap;
-    style?: CSSStyleDeclaration;
-    value?: string;
+export interface MockElement extends HTMLElement, HTMLInputElement {
+    dataset: DOMStringMap;
+    style: CSSStyleDeclaration;
+    value: string;
     innerText: string;
     innerHTML: string;
     textContent: string;
-    disabled?: string;
     readonly?: string;
     selectedIndex?: number;
     setAttribute(name: string, value: string): void;
     getAttribute(name: string): string | null;
     removeAttribute(name: string): void;
     className: string;
-    classList: {
-        add(name: string): void;
-        remove(name: string): void;
-    },
     insertAdjacentHTML(pos: InsertPosition, html: string): void;
     addEventListener(eventName: string, handler: EventListenerOrEventListenerObject): void;
     removeEventListener(eventName: string, handler: EventListenerOrEventListenerObject): void;

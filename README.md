@@ -41,16 +41,12 @@ Since it's a transform stream, what it does is take the input, transform it and 
 Rimmel then wires it back to the DOM as a sink.
 
 ## Why Rimmel?
-Top reasons to choose it:
-	- Light weight: ~2.5K in version 1. <1K size planned in subsequent versions
-	- Fast: "fast-enough" renders, then vanilla+ DOM updates in certain use cases
-	- Powerful: manage the most complex state with incredible ease when using Observales
-	- Functional-Reactive: support for most DOM sources and sinks
+	- Functional-Reactive: you can treat nearly everything in the DOM as observable streams
+	- Fast: Renders should be about _fast-enough_ for most front-end use cases. Updates can run at "vanilla+" speed in certain cases
+	- Simple to start, no toolchain required: [Play on Codepen](https://codepen.io/fourtyeighthours/)
+	- Powerful: use Observable streams to manage gracefully even the most complex state you can think of
 
-
-Example code: see the [examples](https://github.com/hellomenu/rimmel/tree/master/examples)
-
-Playground: [Codepen](https://codepen.io/fourtyeighthours/)
+Playground: [Stackblitz](https://stackblitz.com/@dariomannu/collections/rimmel-js-experiments)
 
 ## Get Started
 We'll just skip the "hello world" example, as it's not so exciting, but you can see several examples in the code or online.
@@ -61,11 +57,11 @@ import { rml } from 'rimmel'
 
 
 ### Sources and Sinks
-There are two key concepts we use here, which come straight from functional programming: sources and sinks.
+There are two key concepts we use here: sources and sinks.
 
-Sources are things that generate data. You can optionally process them and what remains goes somewhere. That _somewhere_ is usually referred to as sinks.
+Sources are things that generate data, which you can optionally process/transform along the way and what remains goes somewhere. That _somewhere_ is usually referred to as sinks.
 
-Sources typically include any DOM events such as `onclick` or `onmousemove`, `fetch()` calls, just like promises in general, async functions and Observables.
+Sources typically include any DOM events such as `onclick` or `onmousemove`, `fetch()` calls, just like promises in general, async functions and, most remarkably, Observables.
 
 Sinks are most often the places where you want to display any information in your UI. Your main document, any state updates, notifications, console logs, etc.
 
@@ -125,37 +121,31 @@ be able to dynamically set/change/toggle class names in the component. More deta
 
 
 ### Supported Environments
-Our focus is modern EcmaScript code.
+Our focus is modern EcmaScript code. Client side. SSR is in the making in some branch.
 
 ## Current State
-Rimmel is created and maintained by Hello Menu, is being used in production on our advanced and complex web platform and is now an independent spin-off project of its own.
+Rimmel is created and maintained by Hello Menu, is being used in production on an advanced and complex webapp and is now an independent spin-off project of its own.
 
 It's not to be considered a "mature" web framework yet and it certainly has some minor bugs and gotchas, but it's ready for early adopters and FRP enthusiasts to create webapps with logic of any complexity.
 It becomes especially powerful if paired with RxJS or possibly with other Observable libraries.
-
-## Run the Examples
-```bash
-npm install
-npm run examples
-```
-Then point your browser to one of the URLs specified and navigate to the examples folder.
 
 ## Roadmap
 - Full ObservableArray support for lists, grids and complex repeatable data structures
 - Observable completion handlers
 - Observable error sinks
-- Fair performance benchmarks for real-life scenarios (so not like 100 million DOM elements on a page, etc)
+- Performance benchmarks
 - Bug fixes
 - SSR
-- Support for Rx Schedulers for high-throughput highly-responsive real-time apps (trading front-ends, ad-tech, etc)
+- Support for Rx Schedulers for high-throughput highly-responsive real-time apps (trading front-ends, ad-tech, gaming, ...)
 - Support text node and HTML comment sinks
 - Tree-shakeable separation of sources and sinks
 - Support for the EventEmitter type as source and sink
+- Separate memory-optimised and speed-optimised sinks.
 - Compiled Templates
 - Plugin support
 - RML Security
 
-## Web Standards
+## Web Standards alignment
 There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and [WICG Observable](https://github.com/WICG/observable).
 
 Rimmel.js intends to align with these efforts as they develop, mature and hopefully standardise.

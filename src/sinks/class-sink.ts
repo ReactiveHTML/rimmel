@@ -3,12 +3,19 @@ import { Sink } from "../types/sink";
 export type ClassRecord = Record<string, string>;
 export type ClassName = string;
 
-export const toggleClass = (node: HTMLElement, className: ClassName) =>
-    (state: Boolean) => (state ? node.classList.add : node.classList.remove)(className);
+export const toggleClass = (node: HTMLElement, className: ClassName) => {
+    const set = node.classList.add.bind(node.classList, className);
+    const clear = node.classList.remove.bind(node.classList, className);
+    return (state: Boolean) => {
+        state ? set() : clear();
+    }
+};
 
-// set classes from an object {class-name: boolean}
-export const setClasses = (node: HTMLElement, classset: ClassRecord) =>
-    Object.entries(classset).forEach(([k, v]) => node.classList[v?'add':'remove'](k));
+// // set classes from an object {class-name: boolean}
+// code-size optimised, but not as fast as classSink
+// export const setClasses = (node: HTMLElement, classset: ClassRecord) =>
+//     Object.entries(classset).forEach(([k, v]) =>
+//         node.classList[v?'add':'remove'](k));
 
 export const classSink: Sink = (node: HTMLElement) => {
     const cl = node.classList;

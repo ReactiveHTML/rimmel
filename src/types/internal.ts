@@ -19,11 +19,11 @@ interface JSONObject {
  */
 export type Handler = {
 	type: string;
-	handler: Promise<unknown> | Observable<unknown> | Observer<unknown> | HandlerFunction;
+	handler: Promise<unknown> | Observable<unknown> | Observer<unknown> | EventListenerOrEventListenerObject;
 	eventName?: HTMLEventName;
 	attribute?: any;
-	error?: any;
-	termination?: any;
+	error?: EventListener;
+	termination?: EventListener;
 };
 
 export type InlineAttributeHandler = Handler & {

@@ -1,9 +1,5 @@
 type RemovePrefix<TPrefix extends string, TString extends string> = TString extends `${TPrefix}${infer T}` ? T : never;
 
-// export type EventName = keyof HTMLElement & `on${string}`
-// export type EventHandler = (e: Event) => void
-// export type HTMLEventName = keyof HTMLElement | `on${string}`export type RemovePrefix<TPrefix extends string, TString extends string> = TString extends `${TPrefix}${infer T}` ? T : never;
-
 /**
  * An HTML event name prefixed by 'on'
  */
@@ -29,13 +25,11 @@ export type RMLEventName = RemovePrefix<'on', RMLEventAttributeName>;
  */
 export type HTMLString = string & { _HTMLStringBrand: never };
 // export interface JSONArray extends Array<JSON> {};
-/**
- * A DOM Source defined in a RML template
- */
+
+
+// TODO use EventListenerOrEventListenerObject
 
 export type HandlerFunction = (event: Event, handledTarget?: EventTarget | null) => Boolean;
-
-export type EventListener = EventListenerFunction | EventListenerObject | undefined;
 
 interface EventListenerFunction {
     (e: Event): void;
@@ -44,3 +38,5 @@ interface EventListenerFunction {
 interface EventListenerObject {
     handleEvent(e: Event): void;
 }
+
+export type EventListener = EventListenerFunction | EventListenerObject | undefined;

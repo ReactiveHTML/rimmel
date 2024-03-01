@@ -115,7 +115,7 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 					string2 = string.replace(sinkSpecifierPattern, '');
 					//sinkType = RegExp.$1 || 'collection' || 'innerHTML'
 					sinkType = RegExp.$1 || maybeHandler.sink || 'innerHTML';
-console.log('xxxx SINK TYPE:', sinkType, maybeHandler)
+					// console.log('xxxx SINK TYPE:', sinkType, maybeHandler)
 
 					// if(sinkSpecifierPattern.test(string)) {
 					// 	sinkType = RegExp.$1 || 'appendHTML' // TODO: maybe use DOMSinks.get('appendHTML'), etc, everywhere, instead of strings?
@@ -162,7 +162,7 @@ console.log('xxxx SINK TYPE:', sinkType, maybeHandler)
 				result = resultPlusString +maybeHandler.join('');
 			} else if(typeof maybeHandler == 'object') {
 				const [strings, args] = Object.entries(maybeHandler)
-					.reduce(([strings, args], [k, v]) => [strings.concat(k), args.concat(v)], [[], []]);
+					.reduce(([strings, args], [k, v]) => [strings.concat(k), args.concat(v)], [<string[]>[], []]);
 				result += string +rml(<TemplateStringsArray><unknown>strings, ...args);
 			} else {
 				result = resultPlusString +maybeHandler;

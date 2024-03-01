@@ -1,2 +1,3 @@
 export const valueSink = (node: HTMLInputElement) =>
-    (str: string) => node.value = str;
+    (str: string) =>
+        node.value = str;

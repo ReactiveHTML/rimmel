@@ -18,10 +18,10 @@ const sourcemap = true;
 
 const external = [...Object.keys(peerDependencies || {})];
 
-const camelize = s => s.replace(/-./g, x=>x.toUpperCase()[1])
+const camelize = s => s.replace(/-./g, x=>x.toUpperCase()[1]);
 
 export default {
-  input: 'src/index.js',
+  input: 'ts-build/index.js',
   output: [
     { file: main, name: camelize(name), format: 'umd', sourcemap },
     { file: module, format: 'es', sourcemap },
@@ -50,4 +50,4 @@ export default {
     terser(),
     cleanup({ sourcemap }),
   ],
-}
+};

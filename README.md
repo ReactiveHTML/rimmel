@@ -2,49 +2,42 @@
 
 A Functional-Reactive templating library for the Rx.Observable Universe.
 
-In RML, Promises and Observable streams are fist-class citizens. Rimmel subscribes to them behind the scenes both ways, in and out, making a seamless, elegant and testable integration.
-No need for JSX, React, Babel. It's 100% pure JavaScript.
+In RML, Promises and Observables are fist-class citizens, so whenever they emit, their output is rendered.
+
+No need for JSX, React, Babel or Webpack. 100% pure JavaScript/TypeScript that just works out of the box.
+
+## Hello World!
+The modern Hello World for reactive frameworks is a component with a button that counts how many times you click it.
+
+To best illustrate reactivity in general we'll be using RxJS.
 
 ```javascript
-const remoteDataComponent = () => {
-
-	const data = fetch('https://example.com')
-		.then(data => data.text())
-
-	return rml`
-		<div>${data}</div>
-	`
-}
-
-document.body.innerHTML = remoteDataComponent()
-
-```
-
-## Going functional-reactive with Observables
-
-Following we have a view-model, a state machine, a simple observable stream that counts any events passing through
-```javascript
-// Emits 0, 1, 2, 3, ...
+// This click-counter view-model is just a simple
+// in-out RxJS stream
 const counter = new BehaviorSubject(0).pipe(
+	// Emits 0, 1, 2, 3, ...
 	scan(a => a+1)
 )
 
+// The template simply references the observable stream in an
+// intuitive way,so it's clear what goes in and what comes out.
 document.body.innerHTML = rml`
-	<button type="button" onclick="${counter}"> Click me </button>
-	You clicked the button <span>${counter}</span> times.
+  <button type="button" onclick="${counter}"> Click me </button>
+  You clicked the button <span>${counter}</span> times.
 `;
 ```
 
-The `<button>` element's `onclick` handler gets _wired_ into `counter`, which is a Subject, an in-out RxJS transform stream.
-Every time you click the button it emits a click event which is pumped into `counter`.
+The `onclick` handler of the `<button>` element is _wired_ into `counter`, which is a Subject, an in-out RxJS transform stream.
+Every time you click the button it emits a `MouseEvent` which is pumped into `counter`.
 Since it's a transform stream, what it does is take the input, transform it and re-emit the result.
-Rimmel then wires it back to the DOM as a sink.
+The result is then wired back to the DOM through a `Sink`.
 
 ## Why Rimmel?
-	- Functional-Reactive: you can treat nearly everything in the DOM as observable streams
-	- Fast: Renders should be about _fast-enough_ for most front-end use cases. Updates can run at "vanilla+" speed in certain cases
-	- Simple to start, no toolchain required: [Play on Codepen](https://codepen.io/fourtyeighthours/)
-	- Powerful: use Observable streams to manage gracefully even the most complex state you can think of
+- Functional-Reactive: you can treat nearly everything in the DOM as observable streams, which means a lot less code to write
+- Fast: Rimmel doesn't use any virtual DOM, so renders are around _fast-enough_ for most use cases and updates can run at "vanilla+" speed in certain others
+- Super simple to start: no toolchain required, just click and change [on Codepen](https://codepen.io/fourtyeighthours/)
+- Powerful: when using Observable streams you can gracefully manage even the most complex state you can think of
+- Scalable: Scalability is a side-effect of good architecture.
 
 Playground: [Stackblitz](https://stackblitz.com/@dariomannu/collections/rimmel-js-experiments)
 
@@ -73,46 +66,53 @@ This can include mapping, reducing, etc. RxJS comes with a comprehensive set of 
 
 ### Supported Sources
 Rimmel supports the following as observable sources:
-	- Event listeners from DOM elements. Essentially any attribute beginning with "on" can be bound to an observable.
-	- Anything else that can map to an Observable or a Promise. Websockets, Timers, `fetch()` calls, etc.
-	- Static values will be simply treated as non-reactive values and no data-binding will be created.
+- Event listeners from DOM elements. Essentially any attribute beginning with "on" can be bound to an observable.
+- Anything else that can map to an Observable or a Promise. Websockets, Timers, `fetch()` calls, etc.
+- Static values will be simply treated as non-reactive values and no data-binding will be created.
 
 ### Supported Sinks
 Rimmel supports two types of sinks: render-time and dynamic sinks.
 Render-time sinks are the simplest and most intuitive ones: those you define in a template from which the data binding can be easily inferred. These include:
-	- Attributes for any HTML element.
-	- Style attributes
-	- Datasets (data- attributes)
-	- innerHTML/innerText/textContent
+- Attributes for any HTML element.
+- Style attributes
+- Datasets (data- attributes)
+- innerHTML/innerText/textContent
 
 Dynamic sinks enable apps to inject pretty much anything into them and the content will determine at runtime the correct bindings.
 
 ```javascript
 const mixin = () => {
-	const onmouseover = () => console.log('mouseover')
+  const onmouseover = () => console.log('mouseover')
 
-	const onclick = new Subject()
+  const onclick = new Subject()
 
-	// emit 'clickable' first,
-	// then 'clicked' afterwards
-	const classes = onclick.pipe(
-		mapTo('clicked-class'),
-		startWith('clickable'),
-	)
+  // emit 'clickable' first,
+  // then 'clicked' afterwards
+  const classes = onclick.pipe(
+    mapTo('clicked-class'),
+    startWith('clickable'),
+  )
 
-	return {
-		onclick,
-		onmouseover,
-		'data-new-attribute': 'some value',
-		class: classes,
-	}
+  return {
+    onclick,
+    onmouseover,
+    'data-new-attribute': 'some value',
+    class: classes,
+  }
 }
 
 const component = () => {
-	return rml`
-		<div ...${mixin()}></div>
-	`
+  return rml`
+    <div ...${mixin()}></div>
+  `
 }
+```
+
+### Building and testing
+```bash
+bun install
+bun run build
+bun test
 ```
 
 When the above component is rendered on the page, the mixin will inject everything else into it, including the `onclick` and `onmouseover` event handlers,
@@ -121,7 +121,7 @@ be able to dynamically set/change/toggle class names in the component. More deta
 
 
 ### Supported Environments
-Our focus is modern EcmaScript code. Client side. SSR is in the making in some branch.
+Our focus is modern EcmaScript code. SSR is in the making.
 
 ## Current State
 Rimmel is created and maintained by Hello Menu, is being used in production on an advanced and complex webapp and is now an independent spin-off project of its own.

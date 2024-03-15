@@ -1,4 +1,3 @@
-// import { describe } from 'node:test'
 import { MockElement } from '../test-support';
 import { disabledSink } from './disabled-sink';
 

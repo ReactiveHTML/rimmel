@@ -36,23 +36,21 @@ The result is then wired back to the DOM through a `Sink`.
 - Functional-Reactive: you can treat nearly everything in the DOM as observable streams, which means a lot less code to write
 - Fast: Rimmel doesn't use any virtual DOM, so renders are around _fast-enough_ for most use cases and updates can run at "vanilla+" speed in certain others
 - Super simple to start: no toolchain required, just click and change [on Codepen](https://codepen.io/fourtyeighthours/)
-- Powerful: when using Observable streams you can gracefully manage even the most complex state you can think of
-- Scalable: Scalability is a side-effect of good architecture.
+- Powerful: when using Observable streams you can manage even the most complex state you can think of with grace, elegance and simplicity
+- Scalable: Scalability is an architectural feature. Bad architectures don't scale. Good ones do, and Rimmel will not be your bottleneck.
 
 Playground: [Stackblitz](https://stackblitz.com/@dariomannu/collections/rimmel-js-experiments)
 
 ## Get Started
-We'll just skip the "hello world" example, as it's not so exciting, but you can see several examples in the code or online.
-
 ```
-import { rml } from 'rimmel'
+import { rml } from 'rimmel';
 ```
 
 
 ### Sources and Sinks
-There are two key concepts we use here: sources and sinks.
+There are two key concepts here: sources and sinks.
 
-Sources are things that generate data, which you can optionally process/transform along the way and what remains goes somewhere. That _somewhere_ is usually referred to as sinks.
+Sources are things that generate data, which you can optionally process/transform along the way. What remains goes somewhere. That _somewhere_ is usually referred to as a sink.
 
 Sources typically include any DOM events such as `onclick` or `onmousemove`, `fetch()` calls, just like promises in general, async functions and, most remarkably, Observables.
 
@@ -61,7 +59,7 @@ Sinks are most often the places where you want to display any information in you
 With RML/Rimmel you can treat most DOM elements as sources, sinks, or both.
 
 ### Stream Processing
-Sources normally emit raw data, not meant to display in a UI (e.g.: a ScrollEvent), so what we do is to process and format them.
+Sources normally emit raw data, not meant to display in a UI (e.g.: a ScrollEvent or a MouseEvent), so what we do is to process and format them.
 This can include mapping, reducing, etc. RxJS comes with a comprehensive set of utility functions to transform data.
 
 ### Supported Sources
@@ -73,7 +71,7 @@ Rimmel supports the following as observable sources:
 ### Supported Sinks
 Rimmel supports two types of sinks: render-time and dynamic sinks.
 Render-time sinks are the simplest and most intuitive ones: those you define in a template from which the data binding can be easily inferred. These include:
-- Attributes for any HTML element.
+- Attributes for any HTML element
 - Style attributes
 - Datasets (data- attributes)
 - innerHTML/innerText/textContent
@@ -107,6 +105,10 @@ const component = () => {
   `
 }
 ```
+When the above component is rendered on the page, the mixin will inject everything else into it, including the `onclick` and `onmouseover` event handlers,
+a statically defined `data-new-attribute` and a merge-in observable stream to set classes... dynamically!
+Essentially, whenever the classes stream emits, it will be able to set/change/toggle class names in the component. More details in the upcoming RDOM (Reactive DOM) documentation.
+
 
 ### Building and testing
 ```bash
@@ -114,10 +116,6 @@ bun install
 bun run build
 bun test
 ```
-
-When the above component is rendered on the page, the mixin will inject everything else into it, including the `onclick` and `onmouseover` event handlers,
-a statically defined `data-new-attribute` and a merge-in observable stream to set classes... dynamically. Essentially, whenever the classes stream emits, it will
-be able to dynamically set/change/toggle class names in the component. More details in the upcoming RDOM (Reactive DOM) documentation.
 
 
 ### Supported Environments

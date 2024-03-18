@@ -30,7 +30,9 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 		const maybeHandler: MaybeHandler = args[i];
 		const initialValue = (maybeHandler as BehaviorSubject<unknown>)?.value; // if it's a BehaviorSubject, pick its initial/current value to render it synchronously
 		const eventName = getEventName(string as RMLEventAttributeName);
-		const r = (resultPlusString).match(/<\w+\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*(?:\s*>\s*)?$/);
+		// const r = (resultPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*(?:\s*>\s*)?$/);
+		// include the above, plus <!--SINK markers--> Needed for custom content sinks
+		const r = (resultPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*(?:\s*>\s*)?(?:<!--[^>]+>\s*)*$/);
 		const existingRef = r && r.groups?r.groups.existingRef:undefined;
 		const ref = existingRef || `#REF${refCount++}`;
 
@@ -59,7 +61,7 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 				// Custom/user-defined sink
 				addRef(ref, <Handler>{ handler: maybeHandler, type: maybeHandler.sink });
 					// FIXME: wrong regexp, will only work for a whole tag
-				result = result + string.replace(/<(\w+)\s*([^>]*)/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`);
+				result = result + string.replace(/<(\w[\w-]*)\s*([^>]*)/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`);
 			} else if(typeof ((<Observable<unknown>>maybeHandler).subscribe ?? (<Promise<unknown>>maybeHandler).then)  == 'function' && i<strings.length -1 || typeof maybeHandler == 'object' || maybeHandler.sink) {
 				// handler is an observable. subscribe to it
 				// and set up a sink
@@ -84,7 +86,7 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 					}
 					const initialValue = '';
 					addRef(ref, <Handler>{ handler: maybeHandler, type: attributeType, attribute: attributeName });
-					result = (resultPlusString +initialValue).replace(/<(\w+)\s+([^>]+)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`);
+					result = (resultPlusString +initialValue).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`);
 					//result = result.replace(/([a-z0-9_\-]+=(?<q>['"]?)(?:.*(?!\k<q>)))$/i, `RESOLVE="${ref}" $1`)
 				//} else if(/<\s*\S+(?:\s+[^=>]+=(?<q>['"]?)[^\k<q>]*\k<q>)*(?:\s+\.\.\.)?$/.test(resultPlusString) && /^[^<]*>/.test(nextString)) {
 				} else if(/<\s*\S+(?:\s+[^=>]+(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+)))*(?:\s+\.\.\.)?$/.test(resultPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
@@ -105,7 +107,7 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 						//addRef(ref, { handler, type: 'attributeset' })
 					}
 
-					result = result.replace(/<\s*(\w+)\s+([^<]*)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`);
+					result = result.replace(/<\s*(\w[\w-]*)\s+([^<]*)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`);
 				} else if(/>\s*$/.test(string) && /^\s*<\s*/.test(nextString)) {
 					// <some-tag>${observable}</some-tag>
 					// will set innerHTML
@@ -127,7 +129,8 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 
 					// FIXME: .skip(1) is RxJS<=5 specific. No dependencies here, pls
 					addRef(ref, <Handler>{ handler: initialValue && maybeHandler.skip ? maybeHandler.skip(1) : maybeHandler, type: sinkType, error: errorSink, ...sinkType == 'collection' && {attribute: maybeHandler} || {}, termination: terminationSink });
-					result += existingRef?string2:string2.replace(/\s*>\s*$/, ` RESOLVE="${ref}">`)
+					result = result
+						+(existingRef?string2:string2.replace(/\s*>\s*$/, ` RESOLVE="${ref}">`))
 						+(initialValue || '');
 				} else if(/>\s*[^<]+$/m.test(string) && /^\s*[^<]*\s*</m.test(nextString)) {
 					// TODO

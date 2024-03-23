@@ -1,8 +1,8 @@
 import { isFunction } from "../utils/is-function";
 import { handlers, subscriptions, waitingElementHanlders } from "../internal-state";
-import { errorSink } from "../sinks/error-sink";
+import { errorHandler } from "../sinks/error-sink";
 import { DOMSinks } from "../sinks/index";
-import { terminationSink } from "../sinks/termination-sink";
+import { terminationHandler } from "../sinks/termination-sink";
 import { Observer } from "../types/futures";
 import { Handler } from "../types/internal";
 import { HandlerFunction } from "../types/dom";
@@ -61,11 +61,11 @@ export const transferAttributes = (node: HTMLElement): void => {
 							const sourceStream = conf.attribute?.then || conf.attribute?.subscribe ? conf.attribute : conf.handler;
 							// console.log('sourceStream TYPE', typeof sourceStream, sourceStream);
 							const subscription =
-								sourceStream.then ? sourceStream.then(sinkFn, conf.error || errorSink)
-									: sourceStream.subscribe ? sourceStream.subscribe(sinkFn, conf.error || errorSink, conf.termination || terminationSink)
-									: typeof sourceStream == 'function' ? sourceStream(node)
-									: typeof sourceStream == 'object' ? sink(node)(sourceStream)
-									: () => { }
+								sourceStream.then ? sourceStream.then(sinkFn, conf.error || errorHandler)
+								: sourceStream.subscribe ? sourceStream.subscribe(sinkFn, conf.error || errorHandler, conf.termination || terminationHandler)
+								: typeof sourceStream == 'function' ? sourceStream(node)
+								: typeof sourceStream == 'object' ? sink(node)(sourceStream)
+								: () => { } // Maybe lose this?
 							;
 
 							if (sourceStream.subscribe) {
@@ -111,9 +111,12 @@ export const mount: MutationCallback = (mutationsList, observer) => {
 	;
 
 	// TODO: performance - use document.createTreeWalker
-	childList
+	const removedNodes = childList
 		.flatMap(m => ([...m.removedNodes])) // .values() for an iterator, according to TS
-		.filter(elementNodes)
+		.filter(elementNodes) as HTMLElement[]
+	;
+
+	removedNodes
 		.forEach(removeListeners as (node: Node) => void)
 	;
 };

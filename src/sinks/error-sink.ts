@@ -1,3 +1,3 @@
 import { Sink } from "../types/sink";
 
-export const errorSink: Sink = () => () => void console.error;
+export const errorHandler = console.error;

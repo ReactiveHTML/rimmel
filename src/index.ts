@@ -19,3 +19,5 @@ init();
 export { default as rml } from './parser/parser';
 export const render = rml;  // Deprecated, always use rml instead. Compat only,
 export { SinkSpecifier as Sink } from './sinks';
+export { DOMSinks } from './sinks';
+

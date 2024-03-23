@@ -1,6 +1,6 @@
 import { DOMSinks } from '.';
 import { CSSDeclaration } from '../types/css';
-import { MaybeFuture } from '../types/futures';
+import { MaybeFuture, Observable } from '../types/futures';
 import { ClassName, ClassRecord } from './class-sink';
 
 export const attributeSink = (node: HTMLElement, attributeName: string) =>
@@ -9,8 +9,8 @@ export const attributeSink = (node: HTMLElement, attributeName: string) =>
     };
 
 const setClassNowOrLater = (node: HTMLElement, v: MaybeFuture<ClassName | ClassRecord>) => {
-    v.subscribe?.(v=>setClassX(node, v)) ??
-    v.then?.(v=>setClassX(node, v)) ??
+    (<Observable<ClassName | ClassRecord>>v).subscribe?.(v=>setClassX(node, v)) ??
+    (<Promise<ClassName | ClassRecord>>v).then?.(v=>setClassX(node, v)) ??
     setClassX(node, v);
 };
 

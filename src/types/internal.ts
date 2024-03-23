@@ -1,5 +1,5 @@
 export { HandlerFunction } from "./dom";
-import { HTMLEventName } from "./dom";
+import { RMLEventName } from "./dom";
 import { MaybeFuture, Observable, Observer } from "./futures";
 
 /**
@@ -19,9 +19,10 @@ interface JSONObject {
  */
 export type Handler = {
 	type: string;
-	handler: Promise<unknown> | Observable<unknown> | Observer<unknown> | EventListenerOrEventListenerObject;
-	eventName?: HTMLEventName;
+	handler: Function | Promise<unknown> | Observable<unknown> | Observer<unknown> | EventListenerOrEventListenerObject;
+	eventName?: RMLEventName;
 	attribute?: any;
+	sink?: string;
 	error?: EventListener;
 	termination?: EventListener;
 };
@@ -30,4 +31,4 @@ export type InlineAttributeHandler = Handler & {
 	handler: JSONObject;
 }
 
-export type MaybeHandler = MaybeFuture<unknown>;
+export type MaybeHandler = Handler | MaybeFuture<unknown>;

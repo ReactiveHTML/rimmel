@@ -1,4 +1,4 @@
 export const checkedSink = (node: HTMLInputElement) =>
-    (checked: boolean) => {
+    (checked: unknown) => {
         node.checked = !!checked
     };

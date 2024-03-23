@@ -12,7 +12,6 @@ export const DOMSinks: Map<string, Sink> = new Map(<[string, Sink][]>[
 	['attribute',    attributeSink],
 	['attributeset', attributesSink],
 	['class',        classSink],
-	// ['collection',   CollectionSink],
 	['dataset',      datasetSink],
 	['innerHTML',    innerHTMLSink],
 	['innerText',    innerTextSink],

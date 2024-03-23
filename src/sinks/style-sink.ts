@@ -21,9 +21,7 @@ export const styleSink: Sink = <K extends keyof CSSDeclaration>(node: HTMLElemen
 
 export const styleMultiSink: Sink = (node: HTMLElement) => {
 	const style = node.style;
-	return (kvp: CSSDeclaration) => {
-		Object.entries(kvp).forEach(([k, v]) =>
-			style[k] = v)
-		;
-	};
+	return (kvp: CSSDeclaration) =>
+		Object.entries(kvp).forEach(([k, v]) => style[k] = v)
+	;
 };

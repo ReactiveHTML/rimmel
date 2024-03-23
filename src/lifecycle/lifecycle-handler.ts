@@ -87,7 +87,7 @@ export const transferAttributes = (node: HTMLElement): void => {
 		});
 };
 
-export const removeListeners = (node: HTMLElement) => {
+export const removeListeners = (node: Element) => {
 	[...node.children]
 		.forEach(node => removeListeners(node as HTMLElement));
 	subscriptions.get(node)?.forEach(l => l.unsubscribe?.());

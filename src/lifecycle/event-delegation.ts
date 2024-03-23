@@ -1,8 +1,8 @@
 import { delegatedEvents, handlers } from "../internal-state"
 import { HandlerFunction } from "../types/internal"
-import { HTMLEventName } from "../types/dom"
+import { RMLEventName } from "../types/dom"
 
-export const delegateEvent = (eventName: HTMLEventName) => {
+export const delegateEvent = (eventName: RMLEventName) => {
 	if(!delegatedEvents.has(eventName)) {
 		// TODO: allow registering deletegated event handlers at different levels than document
 		// TODO: register at root element level

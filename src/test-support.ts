@@ -1,8 +1,13 @@
-import { innerHTMLSink } from "./sinks/content-sink";
 import { RMLEventAttributeName } from "./types/dom";
 
-export interface MockElement extends HTMLElement, HTMLInputElement {
+type HTMLEventSource = {
+    [key in RMLEventAttributeName]?: any;
+}
+
+export interface MockElement extends HTMLElement {
     dataset: DOMStringMap;
+    checked?: boolean;
+    disabled?: boolean;
     style: CSSStyleDeclaration;
     value: string;
     innerText: string;
@@ -53,11 +58,10 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
                 el.innerHTML = html + el.innerHTML            
         },
         addEventListener(eventName: string, handler: EventListenerOrEventListenerObject) {
-            el[`on${eventName}` as keyof RMLEventAttributeName] = handler;
+            (<HTMLEventSource>el)[`on${eventName}` as RMLEventAttributeName] = handler;
         },
         dispatchEvent(event: Event) {
-            if(el[`on${event.type}` as keyof RMLEventAttributeName])
-                el[`on${event.type}` as keyof RMLEventAttributeName](event);
+            (<HTMLEventSource>el)[`on${event.type}` as RMLEventAttributeName]?.(event);
         },
         ...props,
     };

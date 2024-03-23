@@ -9,6 +9,7 @@ import { errorHandler } from "../sinks/error-sink";
 import { terminationHandler } from "../sinks/termination-sink";
 import { POJOSource, isPOJOSource } from "../sources/pojo-source";
 import { ObserverSource, isObserverSource } from "../sources/observer-source";
+import { Sink, isSink } from "../types/sink";
 
 // FIXME: can this be removed by linters?
 const sinkSpecifierPattern = /\s*<!--\s*SINK:\s*(\w+)\s*-->\s*$/;
@@ -67,7 +68,7 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 				// TODO: support {once: true} and {capture: true} and { passive: true }?
 			} else {
 				// It's a Data Sink. Determine which type before connecting.
-				if(maybeHandler.sink) {
+				if(isSink(maybeHandler)) {
 					// Custom/user-defined sink, registered in DOMSinks
 					addRef(ref, <Handler>{ handler: maybeHandler, type: maybeHandler.sink });
 						// FIXME: wrong regexp, will only work for a whole tag
@@ -123,7 +124,7 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 						let string2: string;
 
 						string2 = string.replace(sinkSpecifierPattern, '');
-						sinkType = RegExp.$1 || maybeHandler.sink || 'innerHTML';
+						sinkType = RegExp.$1 || (<Sink>maybeHandler).sink || 'innerHTML';
 						// FIXME: .skip(1) is RxJS<=5 specific. No dependencies here, pls
 						addRef(ref, <Handler>{ handler: initialValue && maybeHandler.skip ? maybeHandler.skip(1) : maybeHandler, type: sinkType, error: errorHandler, ...sinkType == 'collection' && {attribute: maybeHandler} || {}, termination: terminationHandler });
 						result = result

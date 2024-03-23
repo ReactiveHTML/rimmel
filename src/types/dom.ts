@@ -13,7 +13,7 @@ export type HTMLEventName = RemovePrefix<'on', HTMLEventAttributeName>;
 /**
  * A RML event name prefixed by 'on', which includes all HTML events and RML events (currently only 'onmount').
  */
-export type RMLEventAttributeName = HTMLEventName & 'onmount';
+export type RMLEventAttributeName = HTMLEventAttributeName | 'onmount';
 
 /**
  * A RML event name without the 'on' prefix, which includes all HTML events and RML events.

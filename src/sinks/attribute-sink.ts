@@ -1,45 +1,43 @@
+import { isFunction } from '../utils/is-function';
 import { DOMSinks } from '.';
-import { CSSDeclaration } from '../types/css';
-import { MaybeFuture, Observable } from '../types/futures';
-import { ClassName, ClassRecord } from './class-sink';
+import { MaybeFuture, Observable, Observer } from '../types/futures';
+import { Sink, SinkFunction } from '../types/sink';
+import { RMLEventAttributeName } from '../types/dom';
 
-export const attributeSink = (node: HTMLElement, attributeName: string) =>
-    (value: string) => {
-        node.setAttribute(attributeName, value);
+export const attributeSink = (node: HTMLElement, attributeName: string) => {
+    const setAttribute = node.setAttribute.bind(node, attributeName);
+    return (value: string) => {
+        setAttribute(value);
     };
-
-const setClassNowOrLater = (node: HTMLElement, v: MaybeFuture<ClassName | ClassRecord>) => {
-    (<Observable<ClassName | ClassRecord>>v).subscribe?.(v=>setClassX(node, v)) ??
-    (<Promise<ClassName | ClassRecord>>v).then?.(v=>setClassX(node, v)) ??
-    setClassX(node, v);
 };
 
-// TODO: it's a dupe, extract it out...
-const setStyle = (node: HTMLElement, kvp: CSSDeclaration) => {
-    const style = node.style;
-    Object.entries(kvp)
-        .forEach(([k, v]) => style[k] = v);
+const asap = (fn: SinkFunction, arg: MaybeFuture<unknown>) => {
+    (<Observable<unknown>>arg).subscribe?.(fn) ??
+    (<Promise<unknown>>arg).then?.(fn) ??
+    fn(arg);
+};
+
+const SinkAnything = (node: HTMLElement, sinkType: string, v: MaybeFuture<unknown>) => {
+    // Fall back to 'attribute' unless it's any of the others
+    const sink = DOMSinks.get(sinkType) ?? <Sink>DOMSinks.get('attribute');
+    asap(sink(node), v);
 }
 
-const setClassX = (a: any, b: any) => {
-    console.log('TODO');    
-}
+type EventListenerDeclarationWithOptions = [Function, EventListenerOptions];
+
+const isSource = (k: RMLEventAttributeName, v: MaybeFuture<unknown> | EventListenerObject | EventListenerDeclarationWithOptions) =>
+    k.substring(0, 2) == 'on' && (isFunction((<Observer<unknown>>v).next ?? v) || isFunction((<EventListenerDeclarationWithOptions>v)[0]));
 
 export const attributesSink = (node: HTMLElement) =>
-    (attributeset: MaybeFuture<CSSDeclaration>) => {
+    (attributeset: MaybeFuture<Record<string, unknown>>) => {
         (Object.entries(attributeset) ?? [])
-            .forEach(([k, v]) => {
-                return v == false || typeof v == 'undefined' ? node.removeAttribute(k) // TODO: toggle/remove event listener, if matches /^on/
-                : k.substring(0, 2) == 'on' && typeof (v.next ?? v) == 'function' ? node.addEventListener(k.substring(2), v.next?.bind(v) ?? v, {capture: true})
-                : typeof v.subscribe == 'function' ? v.subscribe((DOMSinks.get(k) || attributeSink)(node, k))
-                : typeof v.then == 'function' ? v.then((DOMSinks.get(k) || attributeSink)(node, k))
-                : k == 'class' ? (v.then ? v.then(v=>setClassX(node, v)) : v.subscribe ? v.subscribe(v=>setClassX(node, v)) : setClassX(node, v))
-                : k == 'style' ? setStyle(node, v)
-                : k == 'value' ? (<HTMLInputElement>node).value = v
-                : node.setAttribute(k, v)
-            });
+            .forEach(([k, v]) =>
+                // TODO: toggle/remove event listener, if matches /^on/
+                v == false || typeof v == 'undefined' ? node.removeAttribute(k)
+                : k.substring(0, 2) == 'on' && isFunction(v.next ?? v) ? node.addEventListener(k.substring(2), v.next?.bind(v) ?? v, {capture: true})
+                : SinkAnything(node, k, v)
+            );
     };
-
 
     // if(k.substring(0, 2) == 'on' && typeof (v.next ?? v) == 'function') {
     //     console.log('EVENTXXXXX', k, v)

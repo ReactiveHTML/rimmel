@@ -14,7 +14,7 @@ describe('Checked Sink', () => {
             expect(el.getAttribute('checked')).toEqual(true);
         });
 
-        it('clears the the readonly attribute on falsey', () => {
+        it('clears the the readonly attribute on falsy', () => {
             const el = MockElement();
             const sink = checkedSink(<HTMLInputElement>el);
 

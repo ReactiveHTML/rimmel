@@ -19,7 +19,7 @@ describe('Class Sink', () => {
             expect(el.className).toContain('class3');
         });
 
-        it('clears classes for falsey attributes on sink', () => {
+        it('clears classes for falsy attributes on sink', () => {
             const el = MockElement({ className: 'class1 class2 class3' });
             const sink = classSink(<HTMLElement>el);
             expect(el.className).toContain('class1');
@@ -52,7 +52,7 @@ describe('Class Toggle Sink', () => {
             expect(el.className).toContain('class1');
         });
 
-        it('clears classes for falsey values on sink', () => {
+        it('clears classes for falsy values on sink', () => {
             const el = MockElement({ className: 'class1' });
             const sink = toggleClass(<HTMLElement>el, 'class1');
             expect(el.className).toContain('class1');

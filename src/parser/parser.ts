@@ -78,11 +78,11 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 					const nextString = strings[i+1];
 					const isAttribute = /(?<attribute>[a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(resultPlusString);
 					if(isAttribute && new RegExp(`^(?:[^>${isAttribute.groups?.quote}]*)${isAttribute.groups?.quote}`).test(nextString)) {
+						// Attribute Sink
 						// Use Cases:
-						// <some-tag some-attributes another-attribute="${observable}" other-stuff>...</some-tag>
-						// <some-tag some-attributes class="some classes ${observable} and more" other-stuff>...</some-tag>
-						// <some-tag some-attributes data-xxx="123" data-yyy="${observable}" other-stuff>...</some-tag>
-						// will set setAttribute
+						// <some-tag some-attributes another-attribute="${observable}" other-stuff></some-tag>
+						// <some-tag some-attributes class="some classes ${observable} and more" other-stuff></some-tag>
+						// <some-tag some-attributes data-xxx="123" data-yyy="${observable}" other-stuff></some-tag>
 						let attributeName = isAttribute.groups?.attribute ?? '';
 						const attributeType =
 							attributeName == 'class' || attributeName == 'style' || attributeName == 'value'
@@ -144,9 +144,11 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 				} else if(/\.\.\.$/.test(string)) {
 					// Mixins
 					// Use Cases:
-					// <some-tag ...${attributesObject}>
-					// <some-tag ...${attributesPromise}>
-					// <some-tag ...${attributesObservable}>
+					// <some-tag ...${RDOMObject}>
+					// <some-tag ...${Promise<RDOMObject>}>
+					// <some-tag ...${Observable<RDOMObject>}>
+					// N.B: these will be merged post-mount.
+					// TODO: enable merging objects directly into the template string, too
 					result += string
 						.substr(0, string.length -3)
 						.replace(/\.\.\.$/, '');

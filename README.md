@@ -22,7 +22,10 @@ const counter = new BehaviorSubject(0).pipe(
 // The template simply references the observable stream in an
 // intuitive way,so it's clear what goes in and what comes out.
 document.body.innerHTML = rml`
-  <button type="button" onclick="${counter}"> Click me </button>
+  <button type="button" onclick="${counter}">
+    Click me
+  </button>
+
   You clicked the button <span>${counter}</span> times.
 `;
 ```
@@ -33,11 +36,10 @@ Since it's a transform stream, what it does is take the input, transform it and 
 The result is then wired back to the DOM through a `Sink`.
 
 ## Why Rimmel?
-- Functional-Reactive: you can treat nearly everything in the DOM as observable streams, which means a lot less code to write
-- Fast: Rimmel doesn't use any virtual DOM, so renders are around _fast-enough_ for most use cases and updates can run at "vanilla+" speed in certain others
-- Super simple to start: no toolchain required, just click and change [on Codepen](https://codepen.io/fourtyeighthours/)
-- Powerful: when using Observable streams you can manage even the most complex state you can think of with grace, elegance and simplicity
-- Scalable: Scalability is an architectural feature. Bad architectures don't scale. Good ones do, and Rimmel will not be your bottleneck.
+- Functional-Reactive: you can treat nearly everything as observable streams, which means a lot less code to write
+- Fast: No Virtual DOM, so renders are around _fast-enough_ for most use cases and updates can run at "vanilla+" speed in certain others
+- Super simple to start: no toolchain required, just click and go [on Codepen](https://codepen.io/fourtyeighthours/)
+- Powerful: Observables are not a requirement, but when using them you can manage even the most complex state you can think of with grace, elegance and simplicity
 
 Playground: [Stackblitz](https://stackblitz.com/@dariomannu/collections/rimmel-js-experiments)
 
@@ -48,13 +50,13 @@ import { rml } from 'rimmel';
 
 
 ### Sources and Sinks
-There are two key concepts here: sources and sinks.
+There are two key concepts used by Rimmel: sources and sinks.
 
 Sources are things that generate data, which you can optionally process/transform along the way. What remains goes somewhere. That _somewhere_ is usually referred to as a sink.
 
-Sources typically include any DOM events such as `onclick` or `onmousemove`, `fetch()` calls, just like promises in general, async functions and, most remarkably, Observables.
+Sources typically include any DOM events such as `onclick` or `onmousemove`, `fetch()` calls, just like promises in general, async functions and, most notably, Observables.
 
-Sinks are most often the places where you want to display any information in your UI. Your main document, any state updates, notifications, console logs, etc.
+Sinks are most often the place where you want to display any information in the UI. Your main document, any state updates, notifications, console logs, etc.
 
 With RML/Rimmel you can treat most DOM elements as sources, sinks, or both.
 
@@ -62,13 +64,13 @@ With RML/Rimmel you can treat most DOM elements as sources, sinks, or both.
 Sources normally emit raw data, not meant to display in a UI (e.g.: a ScrollEvent or a MouseEvent), so what we do is to process and format them.
 This can include mapping, reducing, etc. RxJS comes with a comprehensive set of utility functions to transform data.
 
-### Supported Sources
+### Sources
 Rimmel supports the following as observable sources:
 - Event listeners from DOM elements. Essentially any attribute beginning with "on" can be bound to an observable.
 - Anything else that can map to an Observable or a Promise. Websockets, Timers, `fetch()` calls, etc.
 - Static values will be simply treated as non-reactive values and no data-binding will be created.
 
-### Supported Sinks
+### Sinks
 Rimmel supports two types of sinks: render-time and dynamic sinks.
 Render-time sinks are the simplest and most intuitive ones: those you define in a template from which the data binding can be easily inferred. These include:
 - Attributes for any HTML element
@@ -84,18 +86,19 @@ const mixin = () => {
 
   const onclick = new Subject()
 
-  // emit 'clickable' first,
+  // Emit 'clickable' first,
   // then 'clicked' afterwards
   const classes = onclick.pipe(
     mapTo('clicked-class'),
     startWith('clickable'),
   )
 
+  // The following DOM Object will be "merged" into the element
   return {
     onclick,
     onmouseover,
-    'data-new-attribute': 'some value',
     class: classes,
+    'data-new-attribute': 'some value',
   }
 }
 
@@ -117,7 +120,6 @@ bun run build
 bun test
 ```
 
-
 ### Supported Environments
 Our focus is modern EcmaScript code. SSR is in the making.
 
@@ -128,7 +130,6 @@ It's not to be considered a "mature" web framework yet and it certainly has some
 It becomes especially powerful if paired with RxJS or possibly with other Observable libraries.
 
 ## Roadmap
-- Full ObservableArray support for lists, grids and complex repeatable data structures
 - Observable completion handlers
 - Observable error sinks
 - Performance benchmarks

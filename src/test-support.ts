@@ -49,13 +49,19 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
             },
             remove(name: string) {
                 el.className = el.className.split(' ').filter(x => x !== name).join(' ');
-            }
+            },
+            toggle(name: string) {
+                el.className.includes(name)
+                    ? el.classList.remove(name)
+                    : el.classList.add(name)
+                ;
+            },
         },
         insertAdjacentHTML(pos: InsertPosition, html: string) {
             if(pos === 'beforeend')
                 el.innerHTML += html
             else if(pos === 'afterbegin')
-                el.innerHTML = html + el.innerHTML            
+                el.innerHTML = html + el.innerHTML
         },
         addEventListener(eventName: string, handler: EventListenerOrEventListenerObject) {
             (<HTMLEventSource>el)[`on${eventName}` as RMLEventAttributeName] = handler;

@@ -1,7 +1,7 @@
 import type { RMLEventName, EventListener } from "../types/dom";
 import type { Sink } from "../types/sink";
 
-export const eventHandlerSink: Sink = (node: HTMLElement, e: RMLEventName) =>
+export const EventHandlerSink: Sink = (node: HTMLElement, e: RMLEventName) =>
 	// FIXME: wrap h and options in an object, as nothing will emit both values!
 	(h: EventListener, options?: boolean | AddEventListenerOptions) => {
 		h === undefined

@@ -1,5 +1,5 @@
 import { MockElement } from '../test-support';
-import { styleSink, styleMultiSink } from './style-sink'
+import { StyleSink, StyleMultiSink } from './style-sink'
 
 describe('Style Sink', () => {
 
@@ -7,7 +7,7 @@ describe('Style Sink', () => {
 
         it('should set the property on sink', () => {
             const el = MockElement()
-            const sink = styleSink(<HTMLElement>el, 'color')
+            const sink = StyleSink(<HTMLElement>el, 'color')
 
             sink('red')
             expect(el.style.color).toEqual('red');
@@ -26,7 +26,7 @@ describe('Style Object Sink', () => {
 
         it('sets properties', () => {
             const el = MockElement()
-            const sink = styleMultiSink(el)
+            const sink = StyleMultiSink(el)
 
             sink({ color: 'red'})
             expect(el.style.color).toEqual('red');
@@ -34,7 +34,7 @@ describe('Style Object Sink', () => {
 
         it('clears properties with undefined values', () => {
             const el = MockElement({style: {color: 'red'}})
-            const sink = styleMultiSink(el)
+            const sink = StyleMultiSink(el)
 
             sink({ color: 'red', background: 'blue'})
             expect(el.style.color).toEqual('red');

@@ -1,24 +1,26 @@
 import { Sink } from "../types/sink";
-import { attributeSink, attributesSink } from "./attribute-sink";
-import { classSink } from "./class-sink";
-import { datasetSink, datasetMultiSink } from "./dataset-sink";
-import { appendHTMLSink, innerHTMLSink, innerTextSink, textContentSink } from "./content-sink";
-import { styleMultiSink } from "./style-sink";
-import { valueSink } from "./value-sink";
+import { AttributeSink, AttributesSink } from "./attribute-sink";
+import { ClassSink } from "./class-sink";
+import { DatasetSink, DatasetMultiSink } from "./dataset-sink";
+import { AppendHTMLSink, InnerHTMLSink, InnerTextSink, TextContentSink } from "./content-sink";
+import { RemovalSink } from "./removal-sink";
+import { StyleMultiSink } from "./style-sink";
+import { ValueSink } from "./value-sink";
 
 // TODO: Add option to register custon sinks
 export const DOMSinks: Map<string, Sink> = new Map(<[string, Sink][]>[
-	['appendHTML',   appendHTMLSink],
-	['attribute',    attributeSink],
-	['attributeset', attributesSink],
-	['class',        classSink],
-	['dataset',      datasetSink],
-	['innerHTML',    innerHTMLSink],
-	['innerText',    innerTextSink],
-	['multidataset', datasetMultiSink],
-	['style',        styleMultiSink],
-	['textContent',  textContentSink],
-	['value',        valueSink],
+	['appendHTML',   AppendHTMLSink],
+	['attribute',    AttributeSink],
+	['attributeset', AttributesSink],
+	['class',        ClassSink],
+	['dataset',      DatasetSink],
+	['innerHTML',    InnerHTMLSink],
+	['innerText',    InnerTextSink],
+	['multidataset', DatasetMultiSink],
+	['removal',      RemovalSink],
+	['style',        StyleMultiSink],
+	['textContent',  TextContentSink],
+	['value',        ValueSink],
 	// ['termination',  terminationSink],
 ]);
 

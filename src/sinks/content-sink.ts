@@ -1,12 +1,12 @@
 import { MaybeFuture, MaybeObservable, MaybePromise, Present } from "../types/futures";
 import { Sink } from "../types/sink";
 
-export const innerHTMLSink: Sink = (node: HTMLElement) =>
+export const InnerHTMLSink: Sink = (node: HTMLElement) =>
     (html: string) => {
         node.innerHTML = html
     };
 
-export const appendHTMLSink: Sink = (node: HTMLElement, pos: InsertPosition = 'beforeend') => {
+export const AppendHTMLSink: Sink = (node: HTMLElement, pos: InsertPosition = 'beforeend') => {
 	const appendFn = node.insertAdjacentHTML.bind(node, pos);
 
     return (html: MaybeFuture<string>) => {
@@ -14,12 +14,12 @@ export const appendHTMLSink: Sink = (node: HTMLElement, pos: InsertPosition = 'b
     };
 }
 
-export const innerTextSink: Sink = (node: HTMLElement) =>
+export const InnerTextSink: Sink = (node: HTMLElement) =>
     (str: string) => {
         node.innerText = str
     };
 
-export const textContentSink: Sink = (node: HTMLElement) =>
+export const TextContentSink: Sink = (node: HTMLElement) =>
     (str: string) => {
         node.textContent = str
     };

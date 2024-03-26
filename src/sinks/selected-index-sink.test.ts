@@ -1,5 +1,5 @@
 import { MockElement } from '../test-support';
-import { selectedIndexSink } from './selected-index-sink';
+import { SelectedIndexSink } from './selected-index-sink';
 
 describe('selectedIndex Sink', () => {
 
@@ -7,7 +7,7 @@ describe('selectedIndex Sink', () => {
 
         it('sets the the corresponding selectedIndex on sink', () => {
             const el = MockElement();
-            const sink = selectedIndexSink(<HTMLSelectElement>el);
+            const sink = SelectedIndexSink(<HTMLSelectElement>el);
 
             sink(1);
             expect(el.selectedIndex).toEqual(1);

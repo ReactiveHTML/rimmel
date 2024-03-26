@@ -76,7 +76,7 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 				} else if(typeof ((<Observable<unknown>>maybeHandler).subscribe ?? (<Promise<unknown>>maybeHandler).then)  == 'function' && i<strings.length -1 || typeof maybeHandler == 'object') {
 					// handler is a promise or an observable. subscribe to it and set up a sink
 					const nextString = strings[i+1];
-					const isAttribute = /(?<attribute>[a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(resultPlusString);
+					const isAttribute = /(?<attribute>[:a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(resultPlusString);
 					if(isAttribute && new RegExp(`^(?:[^>${isAttribute.groups?.quote}]*)${isAttribute.groups?.quote}`).test(nextString)) {
 						// Attribute Sink
 						// Use Cases:
@@ -85,6 +85,8 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 						// <some-tag some-attributes data-xxx="123" data-yyy="${observable}" other-stuff></some-tag>
 						let attributeName = isAttribute.groups?.attribute ?? '';
 						const attributeType =
+							attributeName == 'rml:remove'
+								? 'removal' :
 							attributeName == 'class' || attributeName == 'style' || attributeName == 'value'
 								? attributeName
 								: !attributeName.indexOf('data')

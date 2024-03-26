@@ -1,5 +1,5 @@
 import { MockElement } from '../test-support';
-import { checkedSink } from './checked-sink';
+import { CheckedSink } from './checked-sink';
 
 describe('Checked Sink', () => {
 
@@ -7,7 +7,7 @@ describe('Checked Sink', () => {
 
         it('sets the the checked attribute on sink', () => {
             const el = MockElement();
-            const sink = checkedSink(<HTMLInputElement>el);
+            const sink = CheckedSink(<HTMLInputElement>el);
 
             sink(true);
             expect(el.checked).toEqual(true);
@@ -16,7 +16,7 @@ describe('Checked Sink', () => {
 
         it('clears the the readonly attribute on falsy', () => {
             const el = MockElement();
-            const sink = checkedSink(<HTMLInputElement>el);
+            const sink = CheckedSink(<HTMLInputElement>el);
 
             sink(true);
             sink(false);

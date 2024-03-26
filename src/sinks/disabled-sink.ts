@@ -1,7 +1,7 @@
 import { Sink } from "../types/sink";
 
 const disabled = 'disabled';
-export const disabledSink: Sink = (node: HTMLElement) => {
+export const DisabledSink: Sink = (node: HTMLElement) => {
     const set = node.setAttribute.bind(node, disabled, disabled);
     const unset = node.removeAttribute.bind(node, disabled);
     return (value: unknown) => {

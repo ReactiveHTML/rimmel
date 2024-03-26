@@ -1,5 +1,5 @@
 import { MockElement } from '../test-support';
-import { valueSink } from './value-sink'
+import { ValueSink } from './value-sink'
 
 describe('Value Sink', () => {
 
@@ -9,7 +9,7 @@ describe('Value Sink', () => {
             // N.B.: this won't, and is not expected to set
             // the "value" attribute in the HTML
             const el = MockElement()
-            const sink = valueSink(<HTMLInputElement>el)
+            const sink = ValueSink(<HTMLInputElement>el)
 
             const str = 'hello, world'
             sink(str)

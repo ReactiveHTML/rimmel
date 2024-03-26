@@ -1,5 +1,5 @@
 import { MockElement } from '../test-support';
-import { classSink, toggleClass } from './class-sink';
+import { ClassSink, toggleClass } from './class-sink';
 
 describe('Class Sink', () => {
 
@@ -7,7 +7,7 @@ describe('Class Sink', () => {
 
         it('sets classes for truthy attributes on sink', () => {
             const el = MockElement();
-            const sink = classSink(<HTMLElement>el);
+            const sink = ClassSink(<HTMLElement>el);
 
             sink({
                 class1: true,
@@ -21,7 +21,7 @@ describe('Class Sink', () => {
 
         it('clears classes for falsy attributes on sink', () => {
             const el = MockElement({ className: 'class1 class2 class3' });
-            const sink = classSink(<HTMLElement>el);
+            const sink = ClassSink(<HTMLElement>el);
             expect(el.className).toContain('class1');
             expect(el.className).toContain('class2');
             expect(el.className).toContain('class3');

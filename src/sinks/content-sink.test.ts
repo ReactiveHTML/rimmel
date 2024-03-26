@@ -1,5 +1,5 @@
 import { MockElement } from '../test-support';
-import { appendHTMLSink, innerHTMLSink, innerTextSink, textContentSink } from './content-sink';
+import { AppendHTMLSink, InnerHTMLSink, InnerTextSink, TextContentSink } from './content-sink';
 
 describe('innerHTML Sink', () => {
 
@@ -7,7 +7,7 @@ describe('innerHTML Sink', () => {
 
         it('sets the innerHTML on sink', () => {
             const el = MockElement();
-            const sink = innerHTMLSink(<HTMLElement>el);
+            const sink = InnerHTMLSink(<HTMLElement>el);
             const str = '<div>hello</div>';
 
             sink(str);
@@ -16,7 +16,7 @@ describe('innerHTML Sink', () => {
 
         it('replaces existing innerHTML on sink', () => {
             const el = MockElement({ innerHTML: '<div>old text</div>' });
-            const sink = innerHTMLSink(<HTMLElement>el);
+            const sink = InnerHTMLSink(<HTMLElement>el);
             const str = '<div>hello</div>';
 
             sink(str);
@@ -36,7 +36,7 @@ describe('appendHTML Sink', () => {
             const str2 = '<div>hello</div>';
 
             const el = MockElement({ innerHTML: str1 });
-            const sink = appendHTMLSink(<HTMLElement>el);
+            const sink = AppendHTMLSink(<HTMLElement>el);
 
             sink(str2);
             expect(el.innerHTML).toEqual(str1 +str2);
@@ -52,7 +52,7 @@ describe('innerText Sink', () => {
 
         it('sets the innerText on sink', () => {
             const el = MockElement();
-            const sink = innerTextSink(<HTMLElement>el);
+            const sink = InnerTextSink(<HTMLElement>el);
             const str = 'hello';
 
             sink(str);
@@ -61,7 +61,7 @@ describe('innerText Sink', () => {
 
         it('replaces existing innerText on sink', () => {
             const el = MockElement({ innerHTML: '<div>old text</div>' });
-            const sink = innerTextSink(<HTMLElement>el);
+            const sink = InnerTextSink(<HTMLElement>el);
             const str = 'hello';
 
             sink(str);
@@ -78,7 +78,7 @@ describe('textContent Sink', () => {
 
         it('sets the textContent on sink', () => {
             const el = MockElement();
-            const sink = textContentSink(<HTMLElement>el);
+            const sink = TextContentSink(<HTMLElement>el);
             const str = 'hello';
 
             sink(str);
@@ -87,7 +87,7 @@ describe('textContent Sink', () => {
 
         it('replaces existing textContent on sink', () => {
             const el = MockElement({ innerHTML: '<div>old text</div>' });
-            const sink = textContentSink(<HTMLElement>el);
+            const sink = TextContentSink(<HTMLElement>el);
             const str = 'hello';
 
             sink(str);

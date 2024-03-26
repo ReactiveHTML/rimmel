@@ -1,2 +1,2 @@
-export const selectedIndexSink = (node: HTMLSelectElement) =>
+export const SelectedIndexSink = (node: HTMLSelectElement) =>
     (index: number) => node.selectedIndex = index;

@@ -18,7 +18,7 @@ const elementNodes = (n: Node) => n.nodeType == 1;
 
 export const transferAttributes = (node: HTMLElement): void => {
 	// ([].concat(...node.attributes) || []))
-	(Array.from(node.attributes) || [])
+	([...node.attributes] || [])
 		.forEach(attr => {
 			const key = attr.nodeName;
 			const value = attr.nodeValue;

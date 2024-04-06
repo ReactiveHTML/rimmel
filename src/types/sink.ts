@@ -9,7 +9,7 @@ export type SinkFunction = (values?: any) => void;
  */
 // export type Sink<T> = (node: T, ...args: SinkParams[]) => SinkFunction;
 export interface Sink extends Function {
-    (node: HTMLElement, ...args: any[]): SinkFunction;
+    (node: Element | HTMLElement | HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | HTMLButtonElement, ...args: any[]): SinkFunction;
     sink?: string;
 };
 

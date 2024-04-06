@@ -14,6 +14,7 @@ export interface MockElement extends HTMLElement {
     innerHTML: string;
     textContent: string;
     readonly?: string;
+    remove: () => void;
     selectedIndex?: number;
     setAttribute(name: string, value: string): void;
     getAttribute(name: string): string | null;
@@ -33,6 +34,7 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
         'innerText': '',
         'innerHTML': '',
         'value': '',
+        remove: () => {},
         setAttribute(name: string, value: string) {
             this[name] = value;
         },

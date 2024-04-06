@@ -7,7 +7,7 @@ describe('disabled Sink', () => {
 
         it('sets the the readonly attribute on sink', () => {
             const el = MockElement();
-            const sink = DisabledSink(<HTMLElement>el);
+            const sink = DisabledSink(<HTMLInputElement>el);
 
             sink(true);
             expect(el.disabled).toEqual('disabled');
@@ -16,7 +16,7 @@ describe('disabled Sink', () => {
 
         it('clears the the readonly attribute on falsy', () => {
             const el = MockElement();
-            const sink = DisabledSink(<HTMLElement>el);
+            const sink = DisabledSink(<HTMLInputElement>el);
 
             sink(true);
             sink(false);

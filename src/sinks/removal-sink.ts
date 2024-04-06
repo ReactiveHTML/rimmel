@@ -5,7 +5,7 @@ import { Sink } from "../types/sink";
  * @param e A DOM element
  * @returns 
  */
-export const RemovalSink: Sink = (e: Element) =>
+export const RemovalSink: Sink<Element> = (e: Element) =>
     () => {
         e.remove();
     };

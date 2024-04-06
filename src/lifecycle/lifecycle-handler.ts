@@ -56,7 +56,7 @@ export const transferAttributes = (node: HTMLElement): void => {
 					} else {
 						if (DOMSinks.has(conf.type)) { // if it's a sink (innerHTML, etc)
 							// TODO: conf.attribute may itself be a promise or an observable, so need to subscribe to it
-							const sink = DOMSinks.get(conf.type) as Sink;
+							const sink = DOMSinks.get(conf.type) as Sink<Element>;
 							const sinkFn = sink(<HTMLElement>intermediateInteractiveNode || node, conf.attribute);
 							const sourceStream = conf.attribute?.then || conf.attribute?.subscribe ? conf.attribute : conf.handler;
 							// console.log('sourceStream TYPE', typeof sourceStream, sourceStream);

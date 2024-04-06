@@ -12,7 +12,7 @@ export const toggleClass = (node: HTMLElement, className: ClassName) =>
 //     Object.entries(classset).forEach(([k, v]) =>
 //         node.classList[v?'add':'remove'](k));
 
-export const ClassSink: Sink = (node: HTMLElement) => {
+export const ClassSink: Sink<HTMLElement> = (node: HTMLElement) => {
     const cl = node.classList;
     const add = cl.add.bind(cl);
     const remove = cl.remove.bind(cl);

@@ -8,7 +8,7 @@ import { StyleMultiSink } from "./style-sink";
 import { ValueSink } from "./value-sink";
 
 // TODO: Add option to register custon sinks
-export const DOMSinks: Map<string, Sink> = new Map(<[string, Sink][]>[
+export const DOMSinks: Map<string, Sink<any>> = new Map(<[string, Sink<any>][]>[
 	['appendHTML',   AppendHTMLSink],
 	['attribute',    AttributeSink],
 	['attributeset', AttributesSink],
@@ -30,7 +30,7 @@ export const DOMSinks: Map<string, Sink> = new Map(<[string, Sink][]>[
  * @param data 
  * @returns Sink
  */
-export const SinkSpecifier = (sink: Sink, data: unknown) => ({
+export const SinkSpecifier = (sink: Sink<any>, data: unknown) => ({
 	type: 'custom',
 	sink,
 	data,

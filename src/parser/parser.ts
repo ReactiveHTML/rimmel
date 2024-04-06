@@ -126,7 +126,7 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 						let string2: string;
 
 						string2 = string.replace(sinkSpecifierPattern, '');
-						sinkType = RegExp.$1 || (<Sink>maybeHandler).sink || 'innerHTML';
+						sinkType = RegExp.$1 || (<Sink<Element>>maybeHandler).sink || 'innerHTML';
 						// FIXME: .skip(1) is RxJS<=5 specific. No dependencies here, pls
 						addRef(ref, <Handler>{ handler: initialValue && maybeHandler.skip ? maybeHandler.skip(1) : maybeHandler, type: sinkType, error: errorHandler, ...sinkType == 'collection' && {attribute: maybeHandler} || {}, termination: terminationHandler });
 						result = result

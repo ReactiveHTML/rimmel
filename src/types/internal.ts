@@ -1,6 +1,7 @@
 export { HandlerFunction } from "./dom";
 import { RMLEventName } from "./dom";
 import { MaybeFuture, Observable, Observer } from "./futures";
+import { Sink } from "./sink";
 
 /**
  * A JSON entity
@@ -17,12 +18,11 @@ interface JSONObject {
 /**
  * An internal Rimmel representation of a RML template argument
  */
-export type Handler = {
+export type Handler = Sink<any> | {
 	type: string;
 	handler: Function | Promise<unknown> | Observable<unknown> | Observer<unknown> | EventListenerOrEventListenerObject;
 	eventName?: RMLEventName;
 	attribute?: any;
-	sink?: string;
 	error?: EventListener;
 	termination?: EventListener;
 };

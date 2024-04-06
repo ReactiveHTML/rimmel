@@ -4,7 +4,7 @@ import { MaybeFuture, Observable, Observer } from '../types/futures';
 import { Sink, SinkFunction } from '../types/sink';
 import { RMLEventAttributeName } from '../types/dom';
 
-export const AttributeSink = (node: HTMLElement, attributeName: string) => {
+export const AttributeSink: Sink<HTMLElement> = (node: HTMLElement, attributeName: string) => {
     const setAttribute = node.setAttribute.bind(node, attributeName);
     return (value: string) => {
         setAttribute(value);
@@ -21,14 +21,14 @@ const SinkAnything = (node: HTMLElement, sinkType: string, v: MaybeFuture<unknow
     // Fall back to 'attribute' unless it's any of the others
     const sink = DOMSinks.get(sinkType) ?? AttributeSink;
     asap(sink(node, sinkType), v);
-}
+};
 
 type EventListenerDeclarationWithOptions = [Function, EventListenerOptions];
 
 const isSource = (k: RMLEventAttributeName, v: MaybeFuture<unknown> | EventListenerObject | EventListenerDeclarationWithOptions) =>
     k.substring(0, 2) == 'on' && (isFunction((<Observer<unknown>>v).next ?? v) || isFunction((<EventListenerDeclarationWithOptions>v)[0]));
 
-export const AttributesSink = (node: HTMLElement) =>
+export const AttributesSink: Sink<HTMLElement> = (node: HTMLElement) =>
     (attributeset: MaybeFuture<Record<string, unknown>>) => {
         (Object.entries(attributeset) ?? [])
             .forEach(([k, v]) =>

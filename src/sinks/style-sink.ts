@@ -14,12 +14,12 @@ import type { Sink } from "../types/sink";
  * const setBackgroundColor = styleSink(divElement, 'backgroundColor');
  * setBackgroundColor('red'); // Sets the div's background color to red
  */
-export const StyleSink: Sink = <K extends keyof CSSDeclaration>(node: HTMLElement, key: K) =>
+export const StyleSink: Sink<HTMLElement> = <K extends keyof CSSDeclaration>(node: HTMLElement, key: K) =>
 	(value: CSSValue<K>) => {
 		node.style[key] = value;
 	};
 
-export const StyleMultiSink: Sink = (node: HTMLElement) => {
+export const StyleMultiSink: Sink<HTMLElement> = (node: HTMLElement) => {
 	const style = node.style;
 	return (kvp: CSSDeclaration) =>
 		Object.entries(kvp ?? {}).forEach(([k, v]) => style[k] = v)

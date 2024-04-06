@@ -116,30 +116,31 @@ See and interact with various examples:
 
 
 # Motivation?
-Rimmel is for you if you've tried other functional-reactive JavaScript frameworks but you weren't totally satisfied,
-or if you find other pseudo-observable implementations like signals and hooks very limiting, plus you wouldn't mind
-any of the following:
+Rimmel is for you if you've tried other reactive JavaScript frameworks but you weren't satisfied or if you find other pseudo-observable implementations like signals and hooks very limiting, plus you wouldn't mind any of the following:
 
-- Light weight: 100LoC, ~2.5K @v1. We're planning to reduce its size even more, below 1K
+- Light weight
 - No virtual DOM, no DOM diff
-- No unwanted/unexpected re-rendering storms. A component does never actually re-render the way it happens in other frameworks.
-    Data sources emit data, you transform it, filter it and only sink it when you decide and allow.
-- Fast: There are no official benchmarks yet, but first-time renders (new HTML sent to the page) is fast, feels "fast-enough".
-    Subsequent DOM updates can run at "vanilla+" speed in certain cases.
-- Powerful: state can get as powerful and advanced as your creativity and RxJS skills when paired with Observales
+- No unwanted/unexpected re-rendering storms. A component does never actually re-renders the way it happens in other frameworks.
+- The DOM updates when you say so, so you're in full control.
+- DOM updates can run at "vanilla+" speed in certain cases.
+- State can grow as complex as you need it RxJS skills when paired with Observales
 - Functional-Reactive: support for most DOM sources and sinks
 - Great unit-testability, especially in complex and/or async interaction scenarios
 
 
-# Supported Browsers
-Our focus is modern browsers only that support ES6+. There is no plan to support any IE4, etc.
-
 # Performance
-Rimmel doesn't use a Virtual DOM. What it does, instead, is mounting some high-throughput DOM sinks, which can give you vanilla+ performance in _certain_ use cases.
-That means a little bit faster than `document.getElementById('target').style.color = 'blue';`
+Rimmel doesn't need a Virtual DOM. What it does, instead, is mounting some high-throughput DOM sinks, which can give you vanilla+ performance in _certain_ use cases.<br />
+That means even faster than the usual:
+
+```
+document.getElementById('target').style.color = 'blue';
+```
 
 # Further documentation
-A number of articles are being published on state management, state as a stream, structured state, examples, challenges, components, etc. Just search for "rimmel.js", search engines are your friends. We're building a custom GPT, as well, but its coding skills are not there yet.
+A number of articles are being published on state management, state as a stream, structured state, examples, challenges, components, etc. Just search for "rimmel.js", search engines are your friends.
+
+# Use with AI
+We created an experimental [RimmelGPT.js](https://chat.openai.com/g/g-L01pb60It-rimmelgpt-js), a custom ChatGPT based coding assistant you can use to convert existing components or to create new ones.
 
 # Current State
 Rimmel is created and maintained by Hello Menu, is being used in production on our advanced and complex web platform.
@@ -151,21 +152,22 @@ Although not necessary, it becomes especially powerful if paired with RxJS or po
 
 
 # Roadmap
-- TypeScript support (in progress)
-- Full ObservableArray support for lists, grids and complex repeatable data structures
-- Completion handlers
-- Error sinks
-- Fair performance benchmarks for real-life scenarios (so not like 100 million DOM elements on a page, etc)
-- SSR with Transferable Promises and Transferable Observables
-- Scheduler support for high-throughput highly-interactive real-time apps
+- Observable completion handlers
+- Observable error sinks
+- Performance benchmarks
+- SSR
+- Scheduler support for real-time apps (trading front-ends, ad-tech, gaming, ...)
 - Support text node and HTML comment sinks
-- Tree-shakeable separation of sources and sinks
-- EventEmitter support
+- Support for the EventEmitter type as source and sink
+- Separate memory-optimised and speed-optimised sinks.
 - Compiled Templates
-- Rendering pipelines/Plugin support
+- Rendering pipelines
+- Plugin support
 - Micro frontend support
-- JSX/ESX support?
 - RML Security
+- JSX/ESX support
 
-# Web Standards
-There are people trying to make the DOM natively support Observables and some discussion is going on at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544)
+## Web Standards alignment
+There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and [WICG Observable](https://github.com/WICG/observable).
+
+Rimmel.js follows and aims to align with these efforts as they develop.

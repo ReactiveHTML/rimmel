@@ -1,7 +1,7 @@
 import { MockElement } from '../test-support';
 import { SelectedIndexSink } from './selected-index-sink';
 
-describe('selectedIndex Sink', () => {
+describe('SelectedIndex Sink', () => {
 
     describe('Given a number', () => {
 

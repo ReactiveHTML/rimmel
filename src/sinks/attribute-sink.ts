@@ -28,7 +28,7 @@ type EventListenerDeclarationWithOptions = [Function, EventListenerOptions];
 const isSource = (k: RMLEventAttributeName, v: MaybeFuture<unknown> | EventListenerObject | EventListenerDeclarationWithOptions) =>
     k.substring(0, 2) == 'on' && (isFunction((<Observer<unknown>>v).next ?? v) || isFunction((<EventListenerDeclarationWithOptions>v)[0]));
 
-export const AttributesSink: Sink<HTMLElement> = (node: HTMLElement) =>
+export const AttributeObjectSink: Sink<HTMLElement> = (node: HTMLElement) =>
     (attributeset: MaybeFuture<Record<string, unknown>>) => {
         (Object.entries(attributeset) ?? [])
             .forEach(([k, v]) =>

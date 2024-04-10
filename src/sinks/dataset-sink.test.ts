@@ -17,7 +17,7 @@ describe('dataset Sink', () => {
 
 });
 
-describe('dataset MultiSink', () => {
+describe('Dataset Object Sink', () => {
 
     describe('Given a dataset object', () => {
 

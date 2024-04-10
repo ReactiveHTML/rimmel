@@ -9,7 +9,7 @@ export const DatasetSink: Sink<HTMLElement> = (node: HTMLElement, key: DatasetKe
     };
 };
 
-export const DatasetMultiSink: Sink<HTMLElement> = (node: HTMLElement) => {
+export const DatasetObjectSink: Sink<HTMLElement> = (node: HTMLElement) => {
     const { dataset } = node;
     return (data: Record<DatasetKey, string | undefined>) => {
         for (const [key, str] of Object.entries(data ?? {})) {

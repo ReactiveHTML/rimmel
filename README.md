@@ -17,8 +17,7 @@ Rimmel uses standard JavaScript and it works out of the box.
 ## Hello World
 The modern "Hello World" for reactive stuff is a button with a click counter.
 Schematically it looks as follows:
-![Rimmel Sources and Sinks](docs/assets/click-counter-diagram.png)
-The corresponding code:
+<img src="docs/assets/click-counter-diagram.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
 
 ```javascript
 // This click-counter is just
@@ -45,6 +44,46 @@ document.body.innerHTML = rml`
 The `onclick` above is "sourced" into `counter`, an RxJS Subject that takes `Event` objects in and spits numbers out.
 
 The result is automatically wired back to the `<span>` by means of a `Sink`.
+
+
+## Hello World++
+Want a little more involved example?<br>
+Let's make a component featuring a Red, Green and Blue gauge that get transformed into a full RGB colour string then sinked back into a text box and the colour of an SVG box:
+
+<img src="docs/assets/how-rimmel-works-5.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
+
+```javascript
+const Component = () => {
+  const toHex = n => n.toString(16).padStart(0, 2);
+  const toRGBString = (rgbArr) => `#${rgbArr.map(toHex).join(''))}`;
+  const toValue = map(e => e.target.value);
+
+
+  // The juicy stuff starts here:
+  const [R, G, B] = [0, 0, 0].map(x=>new BehaviorSubject(x).pipe(toValue));
+
+  // This merges the colours into an Observable<string>
+  const RGB$ = combineLatest([R, G, B]),
+    map(toRGBString)
+  );
+
+  return rml`
+    <input type="range" oninput="${R}" min="0" max="255" step="1" value="0">
+    <input type="range" oninput="${G}" min="0" max="255" step="1" value="0">
+    <input type="range" oninput="${B}" min="0" max="255" step="1" value="0">
+
+    Current <span>${RGB}</span>
+
+    <svg>
+      <rect fill="${RGB}" x="0" y="0" w="10" h="10" />
+    </svg>
+  `;
+}
+
+document.body.innerHTML = Component();
+```
+
+As you can see, there are 3 main streams, one for each colour component. When the gauges in the HTML emit, their values are 
 
 ## Imperative-Reactive? No
 Most other reactive or non-reactive JavaScript templating solutions out there are designed for the imperative programming paradigm. Occasionally they may support a few aspects of functional programming. Third-party adapters can also help with it, but the truth is that FRP was just an afterhthought, severely limiting its use in practice.
@@ -96,7 +135,6 @@ However, those components are just an architectural abstraction to help you orga
 ```
 import { rml } from 'rimmel';
 ```
-
 
 ## Sources vs. Sinks
 There are two key concepts used by Rimmel: sources and sinks.

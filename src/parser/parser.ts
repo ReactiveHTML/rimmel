@@ -1,5 +1,5 @@
 import { Handler, InlineAttributeHandler, MaybeHandler } from "../types/internal";
-import { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
+import { HTMLContainerElement, HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
 import { waitingElementHanlders } from "../internal-state";
 import { isFunction } from "../utils/is-function";
 import { BehaviorSubject, Observable, Subject } from "../types/futures";
@@ -11,18 +11,20 @@ import { POJOSource, isPOJOSource } from "../sources/pojo-source";
 import { ObserverSource, isObserverSource } from "../sources/observer-source";
 import { Sink, isSink } from "../types/sink";
 
-// FIXME: can this be removed by linters?
+import { skip } from 'rxjs';
+
+// Probably deprecating this and moving to have sinks out of the map
 const sinkSpecifierPattern = /\s*<!--\s*SINK:\s*(\w+)\s*-->\s*$/;
 
 let refCount = 0;
 
-const addRef = (ref: string, data: Handler) => {
+const addRef = (ref: string, data: Handler<Element>) => {
 	const t = (waitingElementHanlders.get(ref) || []).concat(data);
 	waitingElementHanlders.set(ref, t);
 };
 
 const getEventName = (eventAttributeString: RMLEventAttributeName): RMLEventName | undefined => <RMLEventName>/\s+on(?<event>\w+)=['"]?$/.exec(eventAttributeString)?.groups?.event;
-// GOTCHA: attributes starting with "on" will be treated as event handlers ------------------------------------> HERE <-----------------------, so avoid any <tag ongoing="trouble">
+// GOTCHA: attributes starting with "on" will be treated as event handlers ------------------------------------> HERE <------------------, so avoid any <tag with ongoing="trouble">
 
 export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler[]): HTMLString {
 	let result = '';
@@ -65,12 +67,12 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 				result = resultPlusString
 					+(eventName == 'mount' || isNonBubblingEvent ? ref : '')
 					+(!h || existingRef ? '' : `${ref}" RESOLVE="${ref}`);
-				// TODO: support {once: true} and {capture: true} and { passive: true }?
+				// TODO: support {once: true}, {capture: true} and { passive: true }?
 			} else {
-				// It's a Data Sink. Determine which type before connecting.
+				// It's a Data Sink. Determine its type before connecting.
 				if(isSink(maybeHandler)) {
 					// Custom/user-defined sink, registered in DOMSinks
-					addRef(ref, <Handler>{ handler: maybeHandler, type: maybeHandler.sink });
+					addRef(ref, <Handler<HTMLElement>>{ handler: maybeHandler, type: maybeHandler.sink });
 						// FIXME: wrong regexp, will only work for a whole tag
 					result = result + string.replace(/<(\w[\w-]*)\s*([^>]*)/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`);
 				} else if(typeof ((<Observable<unknown>>maybeHandler).subscribe ?? (<Promise<unknown>>maybeHandler).then)  == 'function' && i<strings.length -1 || typeof maybeHandler == 'object') {
@@ -156,7 +158,7 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 						.replace(/\.\.\.$/, '');
 					if(isFunction((maybeHandler as Subject<unknown>).next) || isFunction((maybeHandler as Promise<unknown>).then)) {
 						// Promise or observable that will emit attributes later
-						addRef(ref, <Handler>{ handler: maybeHandler, type: 'attributeset', attribute: maybeHandler });
+						addRef(ref, <Handler>{ handler: maybeHandler, type: 'attributeobject', attribute: maybeHandler });
 					} else if(typeof maybeHandler == 'string') {
 						result += maybeHandler;
 					} else {

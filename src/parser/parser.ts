@@ -104,6 +104,7 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 						//result = result.replace(/([a-z0-9_\-]+=(?<q>['"]?)(?:.*(?!\k<q>)))$/i, `RESOLVE="${ref}" $1`)
 					//} else if(/<\s*\S+(?:\s+[^=>]+=(?<q>['"]?)[^\k<q>]*\k<q>)*(?:\s+\.\.\.)?$/.test(resultPlusString) && /^[^<]*>/.test(nextString)) {
 					} else if(/<\s*\S+(?:\s+[^=>]+(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+)))*(?:\s+\.\.\.)?$/.test(resultPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
+						// Mixin Sink
 						// Use Cases:
 						// <some-tag some-attribute="some-value" ${observable}</some-tag>
 						// <some-tag some-attribute="some-value" ...${observable}</some-tag>
@@ -111,13 +112,15 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 						// will bind multiple attributes and values
 						result += string.replace(/\.\.\.$/, '');
 
-						if(true) {
-							addRef(ref, <InlineAttributeHandler>{ handler: maybeHandler, type: 'attributeset', attribute: maybeHandler });
-						} else {
-							result += Object.entries(maybeHandler || {}).map(([k, v])=>`${k}="${v}"`).join(' ');
-							//addRef(ref, { handler, type: 'attributeset' })
-						}
+						// Map static (string, number) properties of the mixin to attributes
+						result += Object.entries(maybeHandler || {})
+							.filter(([, v]) => typeof v == 'string' || typeof v == 'number')
+							.map(([k, v])=>`${k}="${v}"`)
+							.join(' ')
+						;
 
+						// TODO: should we care about cleaning up the sink object from static attributes?
+						addRef(ref, <InlineAttributeHandler>{ handler: maybeHandler, type: 'attributeobject', attribute: maybeHandler });
 						result = result.replace(/<\s*(\w[\w-]*)\s+([^<]*)$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2`);
 					} else if(/>\s*$/.test(string) && /^\s*<\s*/.test(nextString)) {
 						// InnerHTMLSink
@@ -129,8 +132,11 @@ export default function rml(strings: TemplateStringsArray, ...args: MaybeHandler
 
 						string2 = string.replace(sinkSpecifierPattern, '');
 						sinkType = RegExp.$1 || (<Sink<Element>>maybeHandler).sink || 'innerHTML';
-						// FIXME: .skip(1) is RxJS<=5 specific. No dependencies here, pls
-						addRef(ref, <Handler>{ handler: initialValue && maybeHandler.skip ? maybeHandler.skip(1) : maybeHandler, type: sinkType, error: errorHandler, ...sinkType == 'collection' && {attribute: maybeHandler} || {}, termination: terminationHandler });
+						// If we have an initialValue, it's a BehaviorSubject.
+						// Take its current value, render is synchronously to avoid reflows
+						// and subscribe to subsequent emissions
+						const handler = initialValue ? (<BehaviorSubject<HTMLString>>maybeHandler).pipe?.(skip(1)) : maybeHandler;
+						addRef(ref, <Handler<HTMLContainerElement>>{ handler, type: sinkType, error: errorHandler, ...sinkType == 'collection' && {attribute: maybeHandler} || {}, termination: terminationHandler });
 						result = result
 							+(existingRef?string2:string2.replace(/\s*>\s*$/, ` RESOLVE="${ref}">`))
 							+(initialValue || '');

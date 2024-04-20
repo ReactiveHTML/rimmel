@@ -3,6 +3,8 @@
   "compilerOptions": {
     "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "declaration": true,
+    "declarationDir": "./dist/types",
     "noEmit": true,
   },
   "include": ["rollup.config.ts"],

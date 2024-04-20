@@ -66,17 +66,13 @@ What you do instead, is you _declare_ which stream should your changes come from
 <target property="${source}">
 ```
 
-## Easily scalable
-With Rimmel you make extensive use of _components_ — plain old functions that return a string, a "RML template" (just a normal template literal tagged with `rml`).
-However, those components are just an architectural abstraction to help you organise code for large applications.
-
-## State doesn't exist. Event streams do.
+## State doesn't exist: it's a Stream.
 "State", as the word itself suggests, is static, so it doesn't belong to the dynamic, interactive, reactive webapps we make every day.
 
-State, as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow. You only need those when certain events happen, so you're able to respond.
-After that, everything should go to sleep, incl your CPU to keep your laptop cool, until the next UI event occurs. Meantime, you still don't care what's the value of "x" after 3 seconds.
+State, as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow. You only need those when certain events happen, so you can respond.
+After that everything should go quiet, including your CPU, to keep your laptop cool until the next UI event occurs. Meantime, you still don't care what's the value of "x" whilst you're busy reading FRP docs.
 
-This is, in summary, the _discrete-functional-reactive_ paradigm behind Observables and RxJS (as opposed to the original functional-reactive paradigm in which state is almost like a continuous flow of data).
+This is, in summary, the _discrete-functional-reactive_ paradigm behind Observables and RxJS (as opposed to the original functional-reactive paradigm in which state is more like a continuous flow of data).
 
 Event-driven reactivity as modelled by Observables is therefore the perfect way to describe state as it changes through the lifetime of an application at the occurrence of various discrete UI events.
 
@@ -90,6 +86,10 @@ The reason why other libraries and frameworks have many lifecycle events is beca
 With the declarative and functional approach supported by Rimmel, this becomes unnecessary, since you can almost always declare changes as a sink of streams. This way, Rimmel can take care of subscriptions and memory cleanup for you.
 
 _(Psst: we've still included a few lifecycle events to help you integrate third-party imperative-js modules or libraries that really, really want an HTML node to attach to, so don't panic!)._
+
+## Easily scalable
+With Rimmel you make extensive use of _components_ — plain old functions that return a string, a "RML template" (just a normal template literal tagged with `rml`).
+However, those components are just an architectural abstraction to help you organise code for large applications.
 
 
 ## Get Started
@@ -120,6 +120,19 @@ Rimmel supports event listeners from all DOM elements.
 Static values are treated as non-observable values and no data-binding will be created.
 Observers such as Subjects and BehaviorSubjects will receive events as emitted by the DOM.
 
+Examples:
+
+```ts
+// Observable Subjects
+const stream = new Subject<MouseEvent>();
+target.innerHTML = rml`<button onclick="${stream}></button>`;
+
+// Plain functions
+const fn = (e: MouseEvent) => console.log('hover');
+target.innerHTML = rml`<a onmouseover="${fn}></button>`;
+```
+
+
 ## Data Sinks
 (or just Sinks)
 
@@ -140,6 +153,31 @@ Dynamic sinks can emit any of the above and will be evaluated at runtime.
 Best suited for cases when flexibility is preferred over raw performance.
 
 You can create and use your custom sinks to have fine-grained control over the rendering of particular pieces of data (E.G.: Data Collections, generic vector graphics to map or render on SVG or canvas, 3D models to translate to WebGL)
+
+Examples:
+
+```ts
+// InnerHTML
+const stream = new Subject<HTMLString>();
+target.innerHTML = rml`<div>${stream}</div>`;
+
+// Class
+const stream = new Subject<CSSClassObject>();
+target.innerHTML = rml`<div class="${stream}"></div>`;
+
+// Style
+const stream = new Subject<CSSStyleObject>();
+target.innerHTML = rml`<div style="${stream}"></div>`;
+
+// Data Attribute
+const stream = new Subject<string>();
+target.innerHTML = rml`<div data-attribute="${stream}"></div>`;
+
+// Generic Attribute
+const stream = new Subject<string>();
+target.innerHTML = rml`<div some-attribute="${stream}"></div>`;
+
+```
 
 ## Mixins
 Mixins are an exciting by-product of dynamic sinks, which allow you to inject pretty much anything at any time (event listeners, classes, attributes, etc) into a target "host" element by means of simply emitting a "DOM Object" ­­­— a plain-old object whose properties and methods represent DOM attributes and event listeners.
@@ -194,9 +232,9 @@ bun test
 ```
 
 ## Roadmap
-- Completion handlers (what should happen when an observable completes?)
-- Error sinks (and if it throws?)
-- Performance benchmarks (we know it's fast, but... how much, exactly?)
+- Completion handlers (what should happen when observables complete?)
+- Error sinks (and if they throw?)
+- Performance benchmarks (we know it's fast, but... how much?)
 - SSR (Transferable Promises, Transferable Observables)
 - Scheduler support for real-time apps (trading front-ends, ad-tech, gaming, ...)
 - Support text node and HTML comment sinks
@@ -206,7 +244,7 @@ bun test
 - Compiled Templates (because it's never fast enough, right?)
 - Plugin support
 - Sink pipelines (just like you have rendering pipelines in computer graphics)
-- RML Security (leverage pipelines to weed off XSS and other dirt)
+- RML Security (leverage pipelines to weed out XSS and other dirt)
 
 ## Web Standards alignment
 There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and the more recent [WICG Observable](https://github.com/WICG/observable).

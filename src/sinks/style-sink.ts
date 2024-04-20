@@ -1,4 +1,4 @@
-import type { CSSDeclaration, CSSValue } from "../types/css";
+import type { CSSDeclaration, CSSValue } from "../types/style";
 import type { Sink } from "../types/sink";
 
 /**

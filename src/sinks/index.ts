@@ -9,18 +9,18 @@ import { ValueSink } from "./value-sink";
 
 // TODO: Add option to register custon sinks
 export const DOMSinks: Map<string, Sink<any>> = new Map(<[string, Sink<any>][]>[
-	['appendHTML',   AppendHTMLSink],
-	['attribute',    AttributeSink],
-	['attributeset', AttributeObjectSink],
-	['class',        ClassSink],
-	['dataset',      DatasetSink],
-	['innerHTML',    InnerHTMLSink],
-	['innerText',    InnerTextSink],
-	['datasetobject',DatasetObjectSink],
-	['removal',      RemovalSink],
-	['style',        StyleObjectSink],
-	['textContent',  TextContentSink],
-	['value',        ValueSink],
+	['appendHTML',      AppendHTMLSink],
+	['attribute',       AttributeSink],
+	['attributeobject', AttributeObjectSink],
+	['class',           ClassSink],
+	['dataset',         DatasetSink],
+	['datasetobject',   DatasetObjectSink],
+	['innerHTML',       InnerHTMLSink],
+	['innerText',       InnerTextSink],
+	['removal',         RemovalSink],
+	['style',           StyleObjectSink],
+	['textContent',     TextContentSink],
+	['value',           ValueSink],
 	// ['termination',  terminationSink],
 ]);
 

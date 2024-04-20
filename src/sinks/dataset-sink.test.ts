@@ -1,5 +1,5 @@
 import { MockElement } from '../test-support';
-import { DatasetSink, DatasetMultiSink } from './dataset-sink';
+import { DatasetSink, DatasetObjectSink } from './dataset-sink';
 
 describe('dataset Sink', () => {
 
@@ -23,7 +23,7 @@ describe('Dataset Object Sink', () => {
 
         it('sets data on sink', () => {
             const el = MockElement();
-            const sink = DatasetMultiSink(<HTMLElement>el);
+            const sink = DatasetObjectSink(<HTMLElement>el);
 
             sink({
                 key1: 'value1',
@@ -40,7 +40,7 @@ describe('Dataset Object Sink', () => {
                     key2: 'value2',
                 }
             });
-            const sink = DatasetMultiSink(<HTMLElement>el);
+            const sink = DatasetObjectSink(<HTMLElement>el);
 
             sink({
                 key2: undefined,

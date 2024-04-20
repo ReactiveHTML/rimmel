@@ -4,10 +4,11 @@
  */
 export type SinkFunction = (values?: any) => void;
 
+
 /**
- * A module responsible to display data (e.g.: the DOM, the console, etc)
+ * A module responsible to display data coming from a stream
+ * @param T The type of HTML element the sink can be applied to
  */
-// export type Sink<T> = (node: T, ...args: SinkParams[]) => SinkFunction;
 export interface Sink<T extends Element | HTMLElement | HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | HTMLButtonElement> extends Function {
     (node: T, ...args: any[]): SinkFunction;
     sink?: string;

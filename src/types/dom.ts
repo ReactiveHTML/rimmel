@@ -1,3 +1,12 @@
+import { ClassAttribute } from "./class";
+import { DatasetObject } from "./dataset";
+import { EventObject } from "./event-listener";
+import { GenericAttribute } from "./attribute";
+import { StyleObject } from "./style";
+import { ValueAttribute } from "./value";
+import { ContentAttribute } from "./content";
+import { MaybeFuture } from "./futures";
+
 type RemovePrefix<TPrefix extends string, TString extends string> = TString extends `${TPrefix}${infer T}` ? T : never;
 
 /**
@@ -35,8 +44,27 @@ interface EventListenerFunction {
     (e: Event): void;
 }
 
+/**
+ * Any HTMLElement that can have child elements
+ */
+export type HTMLContainerElement = HTMLElementTagNameMap[keyof HTMLElementTagNameMap];
+
 interface EventListenerObject {
     handleEvent(e: Event): void;
 }
 
 export type EventListener = EventListenerFunction | EventListenerObject | undefined;
+
+// export type DOMObject<E extends HTMLElement> = EventObject & ClassAttribute & DatasetObject & StyleObject & ValueAttribute<E> & ContentAttribute & GenericAttribute;
+
+export interface DOMObject extends EventObject, GenericAttribute {
+    style?: StyleObject;
+    dataset?: DatasetObject;
+    class?: ClassAttribute;
+
+    innerHTML?: MaybeFuture<HTMLString>;
+    innerText?: MaybeFuture<HTMLString>;
+    textContent?: MaybeFuture<HTMLString>;
+
+    value?: string | MaybeFuture<string>;
+};

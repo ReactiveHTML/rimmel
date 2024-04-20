@@ -18,17 +18,17 @@ interface JSONObject {
 /**
  * An internal Rimmel representation of a RML template argument
  */
-export type Handler = Sink<any> | {
+export interface Handler<T extends Element> extends Sink<T> {
 	type: string;
-	handler: Function | Promise<unknown> | Observable<unknown> | Observer<unknown> | EventListenerOrEventListenerObject;
+	handler: Sink<T> | Promise<unknown> | Observable<unknown> | Observer<unknown> | EventListenerOrEventListenerObject;
 	eventName?: RMLEventName;
 	attribute?: any;
 	error?: EventListener;
 	termination?: EventListener;
 };
 
-export type InlineAttributeHandler = Handler & {
+export type InlineAttributeHandler = Handler<HTMLElement> & {
 	handler: JSONObject;
 }
 
-export type MaybeHandler = Handler | MaybeFuture<unknown>;
+export type MaybeHandler = Handler<HTMLElement> | MaybeFuture<unknown>;

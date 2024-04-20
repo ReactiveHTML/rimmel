@@ -17,3 +17,16 @@ export const DatasetObjectSink: Sink<HTMLElement> = (node: HTMLElement) => {
         }
     };
 };
+
+
+// // with maybe future support
+// export const ___DatasetObjectSink: Sink<HTMLElement> = (node: HTMLElement) => {
+//     const { dataset } = node;
+//     const doNow = (key, str) => str === undefined ? delete dataset[key] : dataset[key] = str
+//     return (data: Record<DatasetKey, string | undefined>) => {
+//         for (const [key, str] of Object.entries(data ?? {})) {
+//             const doLater = doNow.bind(null, key)
+//             str?.then?.(doLater) ?? str?.subscribe?.(doLater) ?? doNow(key, str);
+//         }
+//     };
+// };

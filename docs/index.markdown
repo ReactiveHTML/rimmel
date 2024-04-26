@@ -1,8 +1,3 @@
-# Rimmel.js
-_A Functional-Reactive UI library for the Rx.Observable Universe_
-
-<br>
-
 Rimmel treats Observables and Promises as fist-class citizens.<br />
 
 \- When a DOM event fires an Observer reacts.<br />

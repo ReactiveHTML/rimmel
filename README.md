@@ -1,5 +1,7 @@
-# Rimmel.js
+<img src="docs/assets/github-hero.png" alt="Rimmel.js" style="text-align: start; max-width: 30%;">
+
 _A Functional-Reactive UI library for the Rx.Observable Universe_
+
 
 <br>
 
@@ -7,10 +9,11 @@ Rimmel treats Observables and Promises as fist-class citizens.<br />
 
 \- When a DOM event fires an Observer reacts.<br />
 \- When an Observable emits the DOM renders.<br />
-\- When you connect `DOM => [ an observable stream ] => DOM`, you have a reactive UI
+\- When you connect `DOM => Observable => DOM`, you have a reactive UI
 
-No need for JSX, HyperScript, Virtual DOM, Babel, Webpack, React.<br>
-No need to "set up" or "tear down" observables in your components so you can keep them pure, no need to unsubscribe or dispose of observers, no need to perform any manual memory cleanup.
+No need for JSX, Virtual DOM, Babel, HyperScript, Webpack, React.<br>
+No need to "set up" or "tear down" observables in your components, so you can keep them pure.
+No need to unsubscribe or dispose of observers or perform any manual memory cleanup.
 
 Rimmel works with standard JavaScript/TypeScript template literals tagged with `rml` and it works out of the box.
 
@@ -18,33 +21,35 @@ Rimmel works with standard JavaScript/TypeScript template literals tagged with `
 
 ## Hello World
 The modern "Hello World" for reactive interfaces is the click counter: one button, one text box.<br>
-<img src="docs/assets/click-counter-diagram.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
+This is how it works:<br>
+<img src="docs/assets/how-rimmel-works.png" alt="How RimmelJS Works">
 
-<img src="docs/assets/how-rimmel-works-6.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
+The `click` event is "sourced" into `counter`, which is an Observable Subject that takes `Event` objects and emits numbers.<br>
+The result is then "sinked" into the `<span>` element at the end.
 
-The `onclick` above is "sourced" into `counter`, an RxJS Subject that takes `Event` objects in and spits numbers out.
+<br>
 
-The result is wired back to the `<span>` by means of a `Sink`.
+Want to play? Try [Rimmel Hello World](https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111) on Codepen.
 
 <br>
 
 ## Imperative-Reactive? No
-Most other reactive or non-reactive JavaScript templating solutions out there are designed for the imperative programming paradigm. Occasionally they may support a few aspects of functional programming. Third-party adapters can also help with it, but the truth is that FRP was just an afterhthought, severely limiting its use in practice.
+Most other reactive or non-reactive JavaScript UI libraries and frameworks out there are designed for the imperative programming paradigm. Occasionally they may support a few aspects of functional programming. Third-party adapters can also help with it, but the truth is that FRP was just an afterhthought and its use is severely limited in practice.
 
 Rimmel is different in that it does primarily focus on the functional-reactive paradigm (FRP, for short).
-Although some imperative-reactive patterns work, supporting them is not the main goal of this work.
+Although some imperative-reactive patterns work, supporting them is not the main purpose of this project.
 
 <br>
 
 ## Functional-Reactive? Yes
-What makes Rimmel functional-reactive is that you can treat everything as observable streams, like event handlers and data sinks.
+What makes Rimmel functional-reactive is that you can treat everything as an Observable stream, in particular event handlers and data sinks.
 
-This means you never really write code that changes the status of something, as in:<br />
+This means you never really write code that changes the status of something else, as in:<br />
 ```
 target.property = value;
 ```
 
-What you do instead, is you _declare_ which stream should your changes come from, straight in your templates:
+What you do instead, is you _declare_ the stream your changes come from and what better place for that if not your templates?
 
 ```
 <target property="${source}">
@@ -54,46 +59,35 @@ What you do instead, is you _declare_ which stream should your changes come from
 
 ## Hello World "Plus"
 Want a more involved example?<br>
-Let's make a component featuring a Red, Green and Blue gauge that get transformed into a full RGB colour string sinked back into a text box and the colour of an SVG circle:
-
+Let's make a component featuring a Red, Green and Blue gauge that get transformed into a full RGB colour string displayed in a text box and the colour of an SVG circle:
 <img src="docs/assets/how-rimmel-works-5.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
-
 Here is the corresponding code:
 
 ```javascript
 const toHex = n => n.toString(16).padStart(2, '0');
 const toRGBString = rgbArr => `#${rgbArr.map(toHex).join('')}`;
+const toNumericStream = x => new Subject().pipe(
+  map(e=>parseInt(e.target.value, 10)),
+  startWith(x),
+);
 
 const ColorPicker = (initial = [0, 0, 0]) => {
-  const [R, G, B] = initial.map(x=>
-    new Subject().pipe(
-      map(e=>parseInt(e.target.value, 10)),
-      startWith(x),
-    ),
-  );
-
+  const [R, G, B] = initial.map(toNumericStream);
   const RGB = combineLatest([R, G, B]).pipe(
     map(toRGBString),
   );
 
   return rml`
-    R:
-    <input type="range" min="0" max="255" value="${initial[0]}" oninput="${R}">
-    <span>${R}</span>
-    <br>
+    R: <input type="range" value="${initial[0]}" oninput="${R}">
+       <span>${R}</span>
 
-    G:
-    <input type="range" min="0" max="255" value="${initial[1]}" oninput="${G}">
-    <span>${G}</span>
-    <br>
+    G: <input type="range" value="${initial[1]}" oninput="${G}">
+       <span>${G}</span>
 
-    B:
-    <input type="range" min="0" max="255" value="${initial[2]}" oninput="${B}">
-    <span>${B}</span>
-    <br>
+    B: <input type="range" value="${initial[2]}" oninput="${B}">
+       <span>${B}</span>
 
     Current <span>${RGB}</span>
-    <br>
 
     <svg viewbox="0 0 40 40" width="40" height="40">
       <circle fill="${RGB}" cx="20" cy="20" r="20" />
@@ -138,14 +132,6 @@ _(Psst: we've still included a few lifecycle events to help you integrate third-
 
 <br>
 
-
-## Get Started
-```
-import { rml } from 'rimmel';
-```
-
-<br>
-
 ## Sources vs. Sinks
 There are two key concepts used by Rimmel: sources and sinks.
 
@@ -166,8 +152,6 @@ RxJS comes with a comprehensive set of utility functions to transform data strea
 <br>
 
 ## Event Sources
-(or just Sources)
-
 Rimmel supports event listeners from all DOM elements.
 Static values are treated as non-observable values and no data-binding will be created.
 Observers such as Subjects and BehaviorSubjects will receive events as emitted by the DOM.
@@ -186,13 +170,18 @@ target.innerHTML = rml`<button onclick="${stream}></button>`;
 // Plain functions
 const fn = (e: MouseEvent) => alert('hover');
 target.innerHTML = rml`<a onmouseover="${fn}></button>`;
+
+
+// Simple static values
+const color = 'red';
+target.innerHTML = rml`<div style="color: ${color}; background: black;">
+  red on black
+</div>`;
 ```
 
 <br>
 
 ## Data Sinks
-(or just Sinks)
-
 Rimmel supports two types of sinks: specialised and dynamic sinks.
 Specialised sinks are the simplest and most intuitive ones: those you define in a template from which the data binding can be easily inferred.<br />
 
@@ -290,13 +279,14 @@ Whenever the `classes` stream emits, you will be able to set/unset class names i
 <br>
 
 
-## Drag'n'drop with Mixins
-One use case for mixins is drag'n'drop, as an isolate, reusable piece of functionality.
+## A simple, "Draggable" mixin
+A simple use case for mixins is drag'n'drop, in the form of an isolated, reusable piece of functionality.
 <img src="docs/assets/how-rimmel-works-7.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
 
 The code above is a simple function that performs its business and returns a DOM object.
 Whatever it contains is merged into the host element.
-Static key-values (e.g.: `class`) are merged on the spot, Promises or Observables whenever they resolve/emit.
+Static key-values (e.g.: `class`) are merged on the spot, before mounting.
+Promises and Observables get merged whenever they resolve/emit.
 
 Play with a [Draggable Mixin](https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010) on Codepen.
 
@@ -307,22 +297,20 @@ Play with a [Draggable Mixin](https://codepen.io/fourtyeighthours/pen/YzMgXoL?ed
 
 Performance is always key, isn't it?
 
-Well, depends... some studies<sup>1</sup> show that a little bit of waiting in certain conditions can actually improve the overall user experience. (You thought waiting 15m for Windows 95 to start up was just your PC "being slow"? ;)
+Well, it depends. Some studies<sup>1</sup>, in fact, show that a little bit of waiting in certain conditions can actually improve the overall user experience!
 
-<sup>1</sup>Studies by Bryant &amp; Veroff, Kahneman &amp; Tversky, Brickman &amp; Campbell, Schultz
+Anyway, Rimmel is fast. You can slow it down with the `Rx.delay()` operator if you want, but if you don't, it's fast and here's why:<br>
 
-<br>
+1 - It doesn't use a Virtual DOM. If you ever believed the story that the DOM is slow and re-running your components' code every time you blink an eye is the fast and good thing to do, you may have been victim of a scam.<br>
 
-Anyway. Rimmel is fast. You can slow it down with the `Rx.delay()` operator if you want, but if you don't, it's fast and here's why:<br>
+2 - Rimmel updates the DOM using "precharged" Sinks,which are just some little element-bound functions that won't need to perform any lookup, but are just ready to update the DOM as fast as possible.<br>
+As a result, your updates in certain cases may happen even faster than the normal `document.getElementById(target).style.color = newColor`.<br>
 
-1 - It doesn't use a Virtual DOM. If you ever believed the story that the DOM is slow and re-running all your components' code every time you blink an eye is the fast thing to do, you may have been victim of a scam.<br>
+We call this the **Vanilla+ Speed**.
 
-2 - Rimmel updates the DOM using "precharged" Sinks, little bound functions, so the result is your updates in certain cases may happen faster than the normal `document.getElementById(target).style.color = newColor`.<br>
-We call it the **Vanilla+ Speed**.
+3 - Lightweight bundle size. V1 was just 2.5KB of code. Now it's a little more as we're sorting out a few things with specialised sinks and we are in a bit of a feature rush, but the aim is to fall back below 1KB with the launch of the new template compiler.
 
-3 - Light weight/bundle size. V1 was just 2.5KB of code. Now it's a little bit more as we're sorting out a few things with specialised sinks and we are in a bit of a feature rush, but the aim is to fall back below 1KB with the launch of the new template compiler.
-
-4 - The rest is on you. Rimmel is a minimalistic UI library. The reason it's so powerful is really due to RxJS behind its reactivity.
+4 - The rest is on you. Rimmel is a minimalistic UI library, but the reason it's so powerful is RxJS being behind its reactivity.
 
 <br>
 
@@ -332,9 +320,8 @@ Do you have a Combobox with 1M rows?<br>
 A large spreadsheet with 1k x 10k reactive cells?<br>
 An HFT stock ticker with 10000 subscriptions?<br>
 
-These are obviously edge cases and need more than just "fast updates" to be handled.<br>
-Rimmel can help implementing your custom logic in an ergonomic, functional-reactive way that's easy to test.
-
+These are obviously edge cases where "fast updates" are obviously irrelevant.<br>
+However, Rimmel can still help implementing your custom logic and optimisation patterns in an ergonomic, functional-reactive style that's easy to test and keep well organised.
 
 <br>
 

@@ -65,15 +65,16 @@ const toHex = n => n.toString(16).padStart(2, '0');
 const toRGBString = rgbArr => `#${rgbArr.map(toHex).join('')}`;
 
 const ColorPicker = (initial = [0, 0, 0]) => {
-	const [R, G, B] = initial.map(x=>
-		new BehaviorSubject(x).pipe(
-			map(e=>parseInt(e?.target?.value ?? x, 10)),
-		),
-	);
-  
-	const RGB = combineLatest([R, G, B]).pipe(
-		map(toRGBString),
-	);
+  const [R, G, B] = initial.map(x=>
+    new Subject().pipe(
+      map(e=>parseInt(e.target.value, 10)),
+      startWith(x),
+    ),
+  );
+
+  const RGB = combineLatest([R, G, B]).pipe(
+    map(toRGBString),
+  );
 
   return rml`
     R:
@@ -128,12 +129,12 @@ All Rimmel does is binding your observable streams to the UI with a seamless int
 
 <br>
 
-## Lifecycle Events are an anti-pattern
-The reason why other libraries and frameworks have many lifecycle events is because they only support the imperative paradigm, so with those you often need a reference to a target element (even if it doesn't exist yet, how weird) to make changes to it and there is just no other way to do many, many things.
+## Lifecycle Events are redundant
+The reason why other libraries and frameworks need to expose many lifecycle events is because they only support the imperative paradigm, so with those you often need a reference to a target element (even if it doesn't exist yet) if you want to make certain types of changes.
 
 With the declarative and functional approach supported by Rimmel, this becomes unnecessary, since you can almost always declare changes as a sink of streams. This way, Rimmel can take care of subscriptions and memory cleanup for you.
 
-_(Psst: we've still included a few lifecycle events to help you integrate third-party imperative-js modules or libraries that really, really want an HTML node to attach to, so don't panic!)._
+_(Psst: we've still included a few lifecycle events to help you integrate third-party imperative-js modules or libraries that really, really need a DOM node to attach to, so don't panic!)._
 
 <br>
 
@@ -288,28 +289,42 @@ Whenever the `classes` stream emits, you will be able to set/unset class names i
 
 <br>
 
+
+## Drag'n'drop with Mixins
+One use case for mixins is drag'n'drop, as an isolate, reusable piece of functionality.
+<img src="docs/assets/how-rimmel-works-7.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
+
+The code above is a simple function that performs its business and returns a DOM object.
+Whatever it contains is merged into the host element.
+Static key-values (e.g.: `class`) are merged on the spot, Promises or Observables whenever they resolve/emit.
+
+Play with a [Draggable Mixin](https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010) on Codepen.
+
+
+<br>
+
 ## Performance
 
-Performance is always key, isn't it? Well, depends!<br>
+Performance is always key, isn't it?
 
-Some psychological studies<sup>1</sup> show that a little bit of waiting in certain conditions can actually improve the overall user experience. (You thought waiting 15m for Windows 95 to start up was just your PC "being slow"? ;)
+Well, depends... some studies<sup>1</sup> show that a little bit of waiting in certain conditions can actually improve the overall user experience. (You thought waiting 15m for Windows 95 to start up was just your PC "being slow"? ;)
+
+<sup>1</sup>Studies by Bryant &amp; Veroff, Kahneman &amp; Tversky, Brickman &amp; Campbell, Schultz
+
+<br>
 
 Anyway. Rimmel is fast. You can slow it down with the `Rx.delay()` operator if you want, but if you don't, it's fast and here's why:<br>
 
-<br>
-
 1 - It doesn't use a Virtual DOM. If you ever believed the story that the DOM is slow and re-running all your components' code every time you blink an eye is the fast thing to do, you may have been victim of a scam.<br>
 
-2 - Rimmel updates the DOM using "precharged" Sinks, little functions bound and optimised for memory or speed (which sounds like an obscure predictive AI doing woodoo from your tensor cores, but it's not, it's truly the dummiest of all things haha), so the result is your updates in certain cases happen faster than the normal `document.getElementById(target).style.color = newColor`.<br>
-We call that the **Vanilla+ Speed**.
+2 - Rimmel updates the DOM using "precharged" Sinks, little bound functions, so the result is your updates in certain cases may happen faster than the normal `document.getElementById(target).style.color = newColor`.<br>
+We call it the **Vanilla+ Speed**.
 
 3 - Light weight/bundle size. V1 was just 2.5KB of code. Now it's a little bit more as we're sorting out a few things with specialised sinks and we are in a bit of a feature rush, but the aim is to fall back below 1KB with the launch of the new template compiler.
 
-4 - The rest is on you. Rimmel is a minimalistic barebones UI library with minimal intrusiveness. The reason it's so powerful is really due to the power of RxJS and a decent architecture.
+4 - The rest is on you. Rimmel is a minimalistic UI library. The reason it's so powerful is really due to RxJS behind its reactivity.
 
 <br>
-
-<sup>1</sup>Studies by Bryant &amp; Veroff, Kahneman &amp; Tversky, Brickman &amp; Campbell, Schultz
 
 
 ### Special cases
@@ -317,7 +332,7 @@ Do you have a Combobox with 1M rows?<br>
 A large spreadsheet with 1k x 10k reactive cells?<br>
 An HFT stock ticker with 10000 subscriptions?<br>
 
-These are obviously edge cases and are to be handled with more than just fast updates, with any library or framework.
+These are obviously edge cases and need more than just "fast updates" to be handled.<br>
 Rimmel can help implementing your custom logic in an ergonomic, functional-reactive way that's easy to test.
 
 

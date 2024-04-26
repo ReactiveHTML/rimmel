@@ -1,173 +1,379 @@
----
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+# Rimmel.js
+_A Functional-Reactive UI library for the Rx.Observable Universe_
 
-# layout: home
-#   layout: home
-# title: Rimmel.js
-# permalink: /
----
+<br>
 
-It's 2024
+Rimmel treats Observables and Promises as fist-class citizens.<br />
 
-Rimmel lets you create async templates using promises and in-out observable streams with convenience.
+\- When a DOM event fires an Observer reacts.<br />
+\- When an Observable emits the DOM renders.<br />
+\- When you connect `DOM => [ an observable stream ] => DOM`, you have a reactive UI
 
-No need to create and manage subscriptions. No need to unsubscribe. No need for JSX, React, Babel or transpilers. Works out-of-the-box in any HTML/JavaScript setup.
+No need for JSX, HyperScript, Virtual DOM, Babel, Webpack, React.<br>
+No need to "set up" or "tear down" observables in your components so you can keep them pure, no need to unsubscribe or dispose of observers, no need to perform any manual memory cleanup.
 
-# Hello World
-This is a library for async functional-reactive interactivity, so we'd rather start in the deep water, rather than printing _Hello World_.
+Rimmel works with standard JavaScript/TypeScript template literals tagged with `rml` and it works out of the box.
 
-The following is a simple component that makes use of an RxJS Observable stream for state management, counts the clicks you made on a button.
-The stream is connected to a `<button>` in input and a `<span>` element in output.
+<br>
 
+## Hello World
+The modern "Hello World" for reactive interfaces is the click counter: one button, one text box.<br>
+<img src="./assets/click-counter-diagram.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
 
-```js
-const counter = new BehaviorSubject(0).pipe(
-    scan(a => a+1) // Emits 0, 1, 2, 3, ...
-);
+<img src="./assets/how-rimmel-works-6.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
 
-document.body.innerHTML = rml`
-    <button type="button" onclick="${counter}"> Click me </button>
-    You clicked the button <span>${counter}</span> times.
-`;
+The `onclick` above is "sourced" into `counter`, an RxJS Subject that takes `Event` objects in and spits numbers out.
+
+The result is wired back to the `<span>` by means of a `Sink`.
+
+Try it on [Codepen](https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111)
+
+<br>
+
+## Imperative-Reactive? No
+Most other reactive or non-reactive JavaScript templating solutions out there are designed for the imperative programming paradigm. Occasionally they may support a few aspects of functional programming. Third-party adapters can also help with it, but the truth is that FRP was just an afterhthought, severely limiting its use in practice.
+
+Rimmel is different in that it does primarily focus on the functional-reactive paradigm (FRP, for short).
+Although some imperative-reactive patterns work, supporting them is not the main goal of this work.
+
+<br>
+
+## Functional-Reactive? Yes
+What makes Rimmel functional-reactive is that you can treat everything as observable streams, like event handlers and data sinks.
+
+This means you never really write code that changes the status of something, as in:<br />
+```
+target.property = value;
 ```
 
-Try it on [Codepen](https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111){:target="_blank"}
+What you do instead, is you _declare_ which stream should your changes come from, straight in your templates:
 
-And this is a more visual view of the above
-![Rimmel Sources and Sinks](./assets/click-counter-diagram.png)
-
-"onclick" is treated as an event source, wired to a state machine that takes hits in input and emits counts in output, in the form of an Observable stream, and all is wired as an HTML Sink in a `span` element.
-
-
-
-# Sources and Sinks
-There are two exciting aspects of Rimmel templates: sources and sinks.
-
-**Data Sources** are things that generate data. They take input events, typically from the DOM, but also websockets or other browser or non-browser events. They are turned into streams for you to transform and consume.
-Data sources can be:
-- Any DOM events such as `onclick` or `onmousemove`
-- Promises
-- Calls to the `fetch()` API
-- Observable Streams
-
-Data sources are automatically exposed as Observables, if Rimmel detects you're using any. They are not a mandatory requirement, though.
-
-**Data Sinks** are connections to the DOM, the console, web sockets or wherever you want to output your data.
-
-There are several specialised sinks in Rimmel that allow you to only change what you want, when you want it, so no unwanted or unexpected render ever happens.
-- HTML Sink
-- Class Sink
-- Style Sink
-- Dataset Sink
-- Attribute Sink
-
-Rimmel guesses which data sinks you want to use. In the following example it's obvious you want to set class and content:
-
-```js
-const stream1 = getSomeClassesStream();
-const stream2 = getSomeContentStream();
-
-const template = rml`
-	<div class="${stream1}">${stream2}</div>
-`;
-
-target.innerHTML = template;
+```
+<target property="${source}">
 ```
 
+<br>
 
-# Other Scenarios
-Various observable streams can be organised in one or more view-models and be mixed and matched together, feeding each-other,
-a bit like wires in elecric circuits.
-![Rimmel Sources and Sinks](./assets/how-rimmel-works-3.png){:class="img-responsive"}
+## Hello World "Plus"
+Want a more involved example?<br>
+Let's make a component featuring a Red, Green and Blue gauge that get transformed into a full RGB colour string sinked back into a text box and the colour of an SVG circle:
 
+<img src="./assets/how-rimmel-works-5.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
 
-## Using Promises
-Standard promises can only emit data, can't be fed from the outside, so they can only be treated as data sources.
+Here is the corresponding code:
+
 ```javascript
-const remoteDataComponent = () => {
-    const data = fetch('https://example.com').then(data => data.text());
+const toHex = n => n.toString(16).padStart(2, '0');
+const toRGBString = rgbArr => `#${rgbArr.map(toHex).join('')}`;
 
-    return rml`
-        <div>${data}</div>
-    `;
-};
+const ColorPicker = (initial = [0, 0, 0]) => {
+  const [R, G, B] = initial.map(x=>
+    new Subject().pipe(
+      map(e=>parseInt(e.target.value, 10)),
+      startWith(x),
+    ),
+  );
 
-document.body.innerHTML = remoteDataComponent();
+  const RGB = combineLatest([R, G, B]).pipe(
+    map(toRGBString),
+  );
+
+  return rml`
+    R:
+    <input type="range" min="0" max="255" value="${initial[0]}" oninput="${R}">
+    <span>${R}</span>
+    <br>
+
+    G:
+    <input type="range" min="0" max="255" value="${initial[1]}" oninput="${G}">
+    <span>${G}</span>
+    <br>
+
+    B:
+    <input type="range" min="0" max="255" value="${initial[2]}" oninput="${B}">
+    <span>${B}</span>
+    <br>
+
+    Current <span>${RGB}</span>
+    <br>
+
+    <svg viewbox="0 0 40 40" width="40" height="40">
+      <circle fill="${RGB}" cx="20" cy="20" r="20" />
+    </svg>
+  `;
+}
+
+document.getElementById('rimmel-root').innerHTML = ColorPicker([255, 128, 64])
+```
+Playground: [Hello World Plus, on Codepen](https://codepen.io/fourtyeighthours/pen/ExJOObG)
+<br>
+
+As you can see, there are three main streams, one for each colour gauge in the HTML.
+When they emit, their values are merged together through `combineLatest`, which passes them through as an array to `toRGBString` which will retutn the string as we need it.
+
+Finally, we have two sinks where the data ends up; one as the innerHTML of the <span>, ther other as the fill colour of the SVG shape.
+
+<br>
+
+## State doesn't exist: it's a Stream.
+"State", as the word itself suggests, is static, so it doesn't belong to the dynamic, interactive, reactive webapps we make every day.
+
+State, as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow. You only need those when certain events happen, so you can respond.
+After that everything should go quiet, including your CPU, to keep your laptop cool until the next UI event occurs. Meantime, you still don't care what's the value of "x" whilst you're busy reading about FRP frameworks.
+
+This is, in summary, the _discrete-functional-reactive_ paradigm behind Observables and RxJS (as opposed to the original functional-reactive paradigm in which state is more like a continuous flow of data).
+
+Event-driven reactivity as modelled by Observables is therefore the perfect way to describe state as it changes through the lifetime of an application at the occurrence of various discrete UI events.
+
+Modelling your state as observable streams will give you fine-grained control over async events and their coordination, thanks to the full range of RxJS operators you can use.
+
+All Rimmel does is binding your observable streams to the UI with a seamless integration that will result in improved code quality, scale, testability and performance.
+
+<br>
+
+## Lifecycle Events are redundant
+The reason why other libraries and frameworks need to expose many lifecycle events is because they only support the imperative paradigm, so with those you often need a reference to a target element (even if it doesn't exist yet) if you want to make certain types of changes.
+
+With the declarative and functional approach supported by Rimmel, this becomes unnecessary, since you can almost always declare changes as a sink of streams. This way, Rimmel can take care of subscriptions and memory cleanup for you.
+
+_(Psst: we've still included a few lifecycle events to help you integrate third-party imperative-js modules or libraries that really, really need a DOM node to attach to, so don't panic!)._
+
+<br>
+
+
+## Get Started
+```
+import { rml } from 'rimmel';
+```
+
+<br>
+
+## Sources vs. Sinks
+There are two key concepts used by Rimmel: sources and sinks.
+
+Sources are things that generate data which you can optionally process and transform along the way. What remains goes somewhere. That _somewhere_ is usually referred to as a sink.
+
+Sources typically include any DOM events such as `onclick` or `onmousemove`, `fetch()` calls, just like promises in general, async functions and, most notably, Observables.
+
+Sinks are most often the place where you want to display any information in the UI. Your main document, some HTML element, etc.
+
+With RML/Rimmel you can treat most DOM elements as sources, sinks, or both.
+
+<br>
+
+## Stream Processing
+Sources normally emit raw data, not meant to display in a UI (e.g.: a `ScrollEvent` or a `MouseEvent`), so what we do is to process and format them.
+RxJS comes with a comprehensive set of utility functions to transform data streams.
+
+<br>
+
+## Event Sources
+(or just Sources)
+
+Rimmel supports event listeners from all DOM elements.
+Static values are treated as non-observable values and no data-binding will be created.
+Observers such as Subjects and BehaviorSubjects will receive events as emitted by the DOM.
+
+<br>
+
+
+Examples:
+
+```ts
+// Observable Subjects
+const stream = new Subject<MouseEvent>();
+target.innerHTML = rml`<button onclick="${stream}></button>`;
+
+
+// Plain functions
+const fn = (e: MouseEvent) => alert('hover');
+target.innerHTML = rml`<a onmouseover="${fn}></button>`;
+```
+
+<br>
+
+## Data Sinks
+(or just Sinks)
+
+Rimmel supports two types of sinks: specialised and dynamic sinks.
+Specialised sinks are the simplest and most intuitive ones: those you define in a template from which the data binding can be easily inferred.<br />
+
+These include:
+- Class
+- Dataset
+- Value
+- Style
+- Attribute (any generic HTML attribute not listed above)
+- InnerHTML, InnerText, TextContent
+- Higher-Order Sinks (dynamic sinks that emit other sinks)
+- Custom Sinks
+
+Dynamic sinks can emit any of the above and will be evaluated at runtime.
+Best suited for cases when flexibility is preferred over raw performance.
+
+You can create and use your custom sinks to have fine-grained control over the rendering of particular pieces of data (E.G.: Data Collections, generic vector graphics to map or render on SVG or canvas, 3D models to translate to WebGL)
+
+<br>
+
+Examples:
+
+```ts
+// InnerHTML
+const stream = new Subject<HTMLString>();
+target.innerHTML = rml`<div>${stream}</div>`;
+
+// Class
+const stream = new Subject<CSSClassObject>();
+target.innerHTML = rml`<div class="${stream}"></div>`;
+
+// Style
+const stream = new Subject<CSSStyleObject>();
+target.innerHTML = rml`<div style="${stream}"></div>`;
+
+// Data Attribute
+const stream = new Subject<string>();
+target.innerHTML = rml`<div data-attribute="${stream}"></div>`;
+
+// Generic Attribute
+const stream = new Subject<string>();
+target.innerHTML = rml`<div some-attribute="${stream}"></div>`;
 
 ```
-Try on [Promises, Codepen](https://codepen.io/fourtyeighthours/pen/mdzMYPd??editors=0111)
+
+<br>
+
+## Mixins
+Mixins are an exciting by-product of dynamic sinks, which allow you to inject pretty much anything at any time (event listeners, classes, attributes, etc) into a target "host" element by means of simply emitting a "DOM Object" ­­­— a plain-old object whose properties and methods represent DOM attributes and event listeners.
+
+<br>
+
+```javascript
+const mixin = () => {
+  const onmouseover = () => console.log('mouseover')
+
+  const onclick = new Subject()
+
+  // Emit 'clickable' first,
+  // then 'clicked' afterwards
+  const classes = onclick.pipe(
+    mapTo('clicked-class'),
+    startWith('clickable'),
+  );
+
+  // <! -----------------------------
+  // The following DOM Object will be
+  // "merged" into the target element
+  // <! -----------------------------
+  return {
+    onclick,
+    onmouseover,
+    class: classes,
+    'data-new-attribute': 'some value',
+  }
+}
 
 
-## Async Mixins
-We played with basic promises and observables. However, Rimmel allows you to emit structured data from your promises or observables to eventually activate additional behavior in your compoments (think activating logged-in status without refreshing the page, activating an "edit" mode, etc). All in proper functional-reactive, highly testable style. (examples to follow)
-
-
-## Stuck with jQuery?
-There's no clash between Rimmel and jQuery. You can start adding RML templates in your jQuery apps now. [Codepen](https://codepen.io/fourtyeighthours/pen/mdzMYPd)
-
-## Testing
-We created [Leaping Bunny](https://github.com/hellomenu/leaping-bunny) an rx-marbles based library to make testing Rimmel components straight forward, especially when async and complex interactions are involved.
-A working playground is available [LeapingBunny on StackBlitz](https://stackblitz.com/edit/rimmel-testing-with-vitest-and-leaping-bunny?file=README.md)
-
-## Example code
-See and interact with various examples:
-  [Examples, Codepen](https://codepen.io/fourtyeighthours/collections/)
-
-
-# Motivation?
-Rimmel is for you if you've tried other reactive JavaScript frameworks but you weren't satisfied or if you find other pseudo-observable implementations like signals and hooks very limiting, plus you wouldn't mind any of the following:
-
-- Light weight
-- No virtual DOM, no DOM diff
-- No unwanted/unexpected re-rendering storms. A component does never actually re-renders the way it happens in other frameworks.
-- The DOM updates when you say so, so you're in full control.
-- DOM updates can run at "vanilla+" speed in certain cases.
-- State can grow as complex as you need it RxJS skills when paired with Observales
-- Functional-Reactive: support for most DOM sources and sinks
-- Great unit-testability, especially in complex and/or async interaction scenarios
-
-
-# Performance
-Rimmel doesn't need a Virtual DOM. What it does, instead, is mounting some high-throughput DOM sinks, which can give you vanilla+ performance in _certain_ use cases.<br />
-That means even faster than the usual:
-
+// ----------------------------
+// And this is how you call it:
+// ----------------------------
+const component = () => {
+  return rml`
+    <div ...${mixin()}></div>
+  `;
+}
 ```
-document.getElementById('target').style.color = 'blue';
+
+<br>
+
+When the above component is rendered on the page, the mixin will inject everything else into it, including the `onclick` and the `onmouseover` event handlers, a statically defined `data-new-attribute` and a "merge-in" observable stream, `classes` to set classes dynamically!
+
+Whenever the `classes` stream emits, you will be able to set/unset class names in the component.
+
+<br>
+
+
+## Drag'n'drop with Mixins
+One use case for mixins is drag'n'drop, as an isolate, reusable piece of functionality.
+<img src="./assets/how-rimmel-works-7.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
+
+The code above is a simple function that performs its business and returns a DOM object.
+Whatever it contains is merged into the host element.
+Static key-values (e.g.: `class`) are merged on the spot, Promises or Observables whenever they resolve/emit.
+
+Play with a [Draggable Mixin](https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010) on Codepen.
+
+
+<br>
+
+## Performance
+
+Performance is always key, isn't it?
+
+Well, depends... some studies<sup>1</sup> show that a little bit of waiting in certain conditions can actually improve the overall user experience. (You thought waiting 15m for Windows 95 to start up was just your PC "being slow"? ;)
+
+<sup>1</sup>Studies by Bryant &amp; Veroff, Kahneman &amp; Tversky, Brickman &amp; Campbell, Schultz
+
+<br>
+
+Anyway. Rimmel is fast. You can slow it down with the `Rx.delay()` operator if you want, but if you don't, it's fast and here's why:<br>
+
+1 - It doesn't use a Virtual DOM. If you ever believed the story that the DOM is slow and re-running all your components' code every time you blink an eye is the fast thing to do, you may have been victim of a scam.<br>
+
+2 - Rimmel updates the DOM using "precharged" Sinks, little bound functions, so the result is your updates in certain cases may happen faster than the normal `document.getElementById(target).style.color = newColor`.<br>
+We call it the **Vanilla+ Speed**.
+
+3 - Light weight/bundle size. V1 was just 2.5KB of code. Now it's a little bit more as we're sorting out a few things with specialised sinks and we are in a bit of a feature rush, but the aim is to fall back below 1KB with the launch of the new template compiler.
+
+4 - The rest is on you. Rimmel is a minimalistic UI library. The reason it's so powerful is really due to RxJS behind its reactivity.
+
+<br>
+
+
+### Special cases
+Do you have a Combobox with 1M rows?<br>
+A large spreadsheet with 1k x 10k reactive cells?<br>
+An HFT stock ticker with 10000 subscriptions?<br>
+
+These are obviously edge cases and need more than just "fast updates" to be handled.<br>
+Rimmel can help implementing your custom logic in an ergonomic, functional-reactive way that's easy to test.
+
+
+<br>
+
+## Use with LLMs
+We are creating a few experimental AI assistants like [RimmelGPT.js](https://chat.openai.com/g/g-L01pb60It-rimmelgpt-js), to help you convert existing components, create new ones or just get started and have fun. 
+
+(Please note these are still highly experimental and various forms of hallucination can happen under different circumstances — YMMV)
+
+<br>
+
+## Building and testing
+```bash
+bun install
+bun run build
+bun test
 ```
+<br>
 
-# Further documentation
-A number of articles are being published on state management, state as a stream, structured state, examples, challenges, components, etc. Just search for "rimmel.js", search engines are your friends.
-
-# Use with AI
-We created an experimental [RimmelGPT.js](https://chat.openai.com/g/g-L01pb60It-rimmelgpt-js), a custom ChatGPT based coding assistant you can use to convert existing components or to create new ones.
-
-# Current State
-Rimmel is created and maintained by Hello Menu, is being used in production on our advanced and complex web platform.
-We had some insane fun developing it, we created complex and advanced async front-end architectures that became ridiculously simple and short to implement, easily testable, performing greatly, so now we're sharing it with the world as an independent spin-off project.
-
-It's not to be considered a "mature" library yet and it certainly has a few minor bugs and gotchas that can all be worked around but it's ready for early adopters and FRP enthusiasts to create webapps of any size and complexity.
-
-Although not necessary, it becomes especially powerful if paired with RxJS or possibly with other Observable libraries (we haven't tried those).
-
-
-# Roadmap
-- Observable completion handlers
-- Observable error sinks
-- Performance benchmarks
-- SSR
+## Roadmap
+- Completion handlers (what should happen when observables complete?)
+- Error sinks (what if they throw?)
+- Performance benchmarks (we know it's fast, but... how much?)
+- SSR (Transferable Promises, Transferable Observables)
 - Scheduler support for real-time apps (trading front-ends, ad-tech, gaming, ...)
 - Support text node and HTML comment sinks
-- Support for the EventEmitter type as source and sink
+- Possible support for the EventEmitter both as a source and a sink
 - Separate memory-optimised and speed-optimised sinks.
-- Compiled Templates
-- Rendering pipelines
+- Pre-Transformed Data Sources (so you don't even have to do that)
+- Compiled Templates (because it's never fast enough, right?)
 - Plugin support
-- Micro frontend support
-- RML Security
-- JSX/ESX support
+- Sink pipelines (just like you have rendering pipelines in computer graphics)
+- Source pipelines (we just realised how convenient they can be)
+- RML Security (leverage pipelines to weed out XSS and other dirt)
 
-## Web Standards alignment
-There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and [WICG Observable](https://github.com/WICG/observable).
+<br>
 
-Rimmel.js follows and aims to align with these efforts as they develop.
+## Web Standards?
+There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and the more recent [WICG Observable](https://github.com/WICG/observable).
+
+Rimmel follows and aims to align with these initiatives as they develop.

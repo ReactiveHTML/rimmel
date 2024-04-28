@@ -13,9 +13,9 @@ Rimmel works with standard JavaScript/TypeScript template literals tagged with `
 
 ## Hello World
 The modern "Hello World" for reactive interfaces is the click counter: one button, one text box.<br>
-<img src="./assets/click-counter-diagram.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
+<img src="./assets/how-rimmel-works.png" alt="How Rimmel Works">
 
-<img src="./assets/how-rimmel-works-6.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
+<img src="./assets/how-rimmel-works-6.png" alt="Rimmel Sources and Sinks">
 
 The `onclick` above is "sourced" into `counter`, an RxJS Subject that takes `Event` objects in and spits numbers out.
 

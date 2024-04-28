@@ -6,57 +6,57 @@
 body { font-size: 18px; line-height: 26px; }
 
 h1, h2, h3 {
-    margin-top: 3rem;
+	margin-top: 3rem;
 }
 
 header { background: #ac4142; }
 
 @media print, screen and (max-width: 720px) {
-    header p {
-        display: block;
-    }
+	header p {
+		display: block;
+	}
 }
 
 #banner {
-    border-radius: 0px 2px .6rem 0px;
+	border-radius: 0px 2px .6rem 0px;
 }
 
 section {
-    padding: 1rem;
-    margin-top: 170px;
+	padding: 1rem;
+	margin-top: 170px;
 }
 
 section img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 100%;
 }
 
 
 @media print, screen and (max-width: 720px) {
-    #banner {
-        top: 115px;
-    }
+	#banner {
+		top: 115px;
+	}
 
-    #banner .fork {
-        float: none;
-        display: inline-block;
-        position: static;
-        margin-left: 1rem;
-    }
+	#banner .fork {
+		float: none;
+		display: inline-block;
+		position: static;
+		margin-left: 1rem;
+	}
 }
 
 @media print, screen and (max-width: 480px) {
-    #banner {
-        position: static;
-        display: block;
-    }
+	#banner {
+		position: static;
+		display: block;
+	}
 
-    section {
-        position: static;
-        margin-top: 0px;
-    }
+	section {
+		position: static;
+		margin-top: 0px;
+	}
 }
 
 #banner #logo {
@@ -68,17 +68,45 @@ section img {
 code { font-family: monospace; font-size: 12px; }
 
 code>* {
-    margin: 0;
-    padding: 0;
-    line-height: normal;
+	margin: 0;
+	padding: 0;
+	line-height: normal;
 }
 
 ul{ list-style-type: disclosure-closed; list-style-image: none; }
 ::marker{ color: #ac4142; }
 
 footer {
-    position: static;
-    width: auto;
-    margin-left: 0;
+	position: static;
+	width: auto;
+	margin-left: 0;
+}
+
+h1, h2, h3 {
+	margin-block-start: 4rem;
+	color: #aa0033ff;
+}
+
+img {
+	width: 100%;
+}
+
+.playground-link {
+	margin-block: 3rem;
+	margin-inline: 0 1rem;
+	font-size: 125%;
+	white-space: nowrap;
+}
+
+.playground-link::before {
+	display: inline-block;
+	margin-inline: 0 2rem;
+	padding: .6rem 1rem;
+	background: #aa0033ff;
+	color: gold;
+	border-top-right-radius: .4rem;
+	border-bottom-right-radius: .4rem;
+	border-spacing: 4px;
+	content: "Try it ⮞"
 }
 

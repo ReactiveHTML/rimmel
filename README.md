@@ -93,9 +93,11 @@ const ColorPicker = (initial = [0, 0, 0]) => {
 
 document.getElementById('rimmel-root').innerHTML = ColorPicker([255, 128, 64])
 ```
+
 <div class="playground-link">
   <a href="https://codepen.io/fourtyeighthours/pen/ExJOObG">Hello World Plus</a> on Codepen
 </div>
+
 
 As you can see, there are three main streams, one for each colour gauge in the HTML.
 When they emit, their values are merged together through `combineLatest`, which passes them through as an array to `toRGBString` which will retutn the string as we need it.
@@ -272,7 +274,9 @@ Promises and Observables get merged whenever they resolve/emit.
 
 Performance is always key, isn't it?
 
-Actually, it depends. Some studies<sup>1</sup>, in fact, show that a little bit of waiting in _certain conditions_ can actually improve the overall user experience!
+Actually, it depends. Some studies, in fact, show that a little bit of waiting in _certain conditions_ can actually improve the overall user experience!<br>
+_(Bryant&amp;Veroff, Kahneman&amp;Tversky, Brickman&amp;Campbell, Schultz)_
+
 
 Anyway, Rimmel is fast. You can slow it down with the `Rx.delay()` operator if you want, but if you don't, it's fast and here's why:<br>
 
@@ -280,13 +284,12 @@ Anyway, Rimmel is fast. You can slow it down with the `Rx.delay()` operator if y
 
 - Rimmel updates the DOM using "precharged" Sinks,which are just some little element-bound functions that won't need to perform any lookup, but are just ready to update the DOM as fast as possible.<br>
 As a result, your updates in certain cases may happen even faster than the normal `document.getElementById(target).style.color = newColor`.<br>
-We call this the **Vanilla+ Speed**.
+
+We call it the **Vanilla+ Speed**.
 
 - Lightweight bundle size. V1 was just 2.5KB of code. Now it's a little more as we're sorting out a few things with specialised sinks and we are in a bit of a feature rush, but the aim is to fall back below 1KB with the launch of the new template compiler.
 
 - The rest is on you. Rimmel is a minimalistic UI library, but the reason it's so powerful is RxJS being behind its reactivity.
-
-<sup>1</sup>Studies by Bryant &amp; Veroff, Kahneman &amp; Tversky, Brickman &amp; Campbell, Schultz
 
 ### Special cases
 Do you have a Combobox with 1M rows?<br>

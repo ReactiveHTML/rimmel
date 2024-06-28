@@ -12,3 +12,4 @@ export const terminationHandler: Sink<Element> = () =>
     () => {
         // console.debug('Rimmel: NOOP termination sink called', data);
     }
+;

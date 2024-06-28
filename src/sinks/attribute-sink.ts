@@ -1,43 +1,53 @@
 import { isFunction } from '../utils/is-function';
-import { DOMSinks } from '.';
 import { MaybeFuture, Observable, Observer } from '../types/futures';
 import { Sink, SinkFunction } from '../types/sink';
 import { RMLEventAttributeName } from '../types/dom';
-import { DatasetObjectSink } from './dataset-sink';
-
-export const AttributeSink: Sink<HTMLElement> = (node: HTMLElement, attributeName: string) => {
-    const setAttribute = node.setAttribute.bind(node, attributeName);
-    return (value: string) => {
-        setAttribute(value);
-    };
-};
-
-const asap = (fn: SinkFunction, arg: MaybeFuture<unknown>) => {
-    (<Observable<unknown>>arg).subscribe?.(fn) ??
-    (<Promise<unknown>>arg).then?.(fn) ??
-    fn(arg);
-};
-
-const SinkAnything = (node: HTMLElement, sinkType: string, v: MaybeFuture<unknown>) => {
-    // Fall back to 'attribute' unless it's any of the others
-    // when someone emits an object called 'dataset' they mean a dataset object kvp for a DatasetObjectSink
-    const sink = sinkType == 'dataset' ? DatasetObjectSink : DOMSinks.get(sinkType) ?? AttributeSink;
-    asap(sink(node, sinkType), v);
-};
+import { AnySink } from './any-sink';
+import { AttributeObject } from '../types/internal';
 
 type EventListenerDeclarationWithOptions = [Function, EventListenerOptions];
 
 const isSource = (k: RMLEventAttributeName, v: MaybeFuture<unknown> | EventListenerObject | EventListenerDeclarationWithOptions) =>
     k.substring(0, 2) == 'on' && (isFunction((<Observer<unknown>>v).next ?? v) || isFunction((<EventListenerDeclarationWithOptions>v)[0]));
 
-export const AttributeObjectSink: Sink<HTMLElement> = (node: HTMLElement) =>
-    (attributeobject: MaybeFuture<Record<string, unknown>>) => {
+
+export const FixedAttributeSink: Sink<Element> = (node: Element, attributeName: string) =>
+    data => node.setAttribute(attributeName, data)
+    //node.setAttribute.bind(node, attributeName)
+;
+
+export const FixedAttributePreSink = (attributeName: string): Sink<Element> =>
+    (node: Element) =>
+        data => node.setAttribute(attributeName, data)
+        // node.setAttribute.bind(node, attributeName)
+;
+
+
+export const DOMAttributeSink: Sink<Element> =
+	(node: Element, attributeName: string) =>
+		(value: boolean) => node[attributeName] = !!value
+;
+
+/**
+ * A sink for all boolean DOM attributes (the ones that can be set via node[attr] = value
+ * which also support "false" for disabled
+ **/
+export const DOMAttributePreSink = (attributeName: string): Sink<Element> =>
+    (node: Element) =>
+        (value: boolean) => node[attributeName] = value
+;
+
+
+
+export const AttributeObjectSink: Sink<Element> = (node: Element) =>
+    (attributeobject: AttributeObject) => {
         (Object.entries(attributeobject) ?? [])
             .forEach(([k, v]) =>
-                // TODO: toggle/remove event listener, if matches /^on/
-                v == false || typeof v == 'undefined' ? node.removeAttribute(k)
-                : k.substring(0, 2) == 'on' && isFunction(v.next ?? v.then ?? v) ? node.addEventListener(k.substring(2), (v.next || v.then)?.bind(v) ?? v, {capture: true})
-                : SinkAnything(node, k, v)
+                // TODO: toggle/remove event listener, if matches /^on/ (or /^off/ maybe?)
+                // N.B.: keep v === false || v == 'false' for transpilers changing it to v == '0' || v == 0
+                v == null || v === false || v == 'false' || typeof v == 'undefined' ? node.removeAttribute(k)
+                : k.startsWith('on') && isFunction(v.next ?? v.then ?? v) ? node.addEventListener(k.substring(2), (v.next ?? v.then)?.bind(v) ?? v, {capture: true})
+                : AnySink(node, k, v)
             );
     };
 

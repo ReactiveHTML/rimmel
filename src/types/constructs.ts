@@ -1,4 +1,4 @@
-import { DOMObject, HTMLString } from "./dom";
+import { DocumentObject, HTMLString } from "./dom";
 
 /**
  * A Mixin is a function returning a DOM Object that can
@@ -6,11 +6,11 @@ import { DOMObject, HTMLString } from "./dom";
  * with attributes, classes, dataset, styles and event
  * handlers to provide extra functionality
  * @example () => ({
- *     onmousemove: () => doSomething,
- *     class: classStream
+ *   onmousemove: () => doSomething,
+ *   class: classStream
  * })
  **/
-export type Mixin = (args?: any) => DOMObject;
+export type Mixin = (args?: any) => DocumentObject;
 
 /**
  * A RML component returns template literals tagged with rml

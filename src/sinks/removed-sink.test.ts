@@ -1,14 +1,14 @@
 import { MockElement } from '../test-support';
-import { RemovalSink } from './removal-sink';
+import { RemovedSink } from './removed-sink';
 
-describe('Removal Sink', () => {
+describe('Removed Sink', () => {
 
     describe('Given an element', () => {
 
         it('removes the element on sink', () => {
             const el = MockElement();
             el.remove = jest.fn();
-            const sink = RemovalSink(<HTMLElement>el);
+            const sink = RemovedSink(<HTMLElement>el);
 
             sink(true);
             expect(el.remove).toHaveBeenCalled();

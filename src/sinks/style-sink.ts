@@ -2,9 +2,9 @@ import type { CSSDeclaration, CSSValue } from "../types/style";
 import type { Sink } from "../types/sink";
 
 /**
- * Applies a given CSS value to a specified CSS property of an HTMLElement.
+ * Applies a given CSS value to a specified CSS property of an Element.
  *
- * @param {HTMLElement} node - The HTML element to which the CSS property will be applied.
+ * @param {Element} node - The HTML element to which the CSS property will be applied.
  * @param {CSSProperty} key - The CSS property that will be set on the element.
  * @returns {Function} A function that takes a CSS value (specific to the CSS property)
  *                     and applies it to the element's style.

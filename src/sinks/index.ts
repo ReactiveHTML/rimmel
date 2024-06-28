@@ -1,37 +1,64 @@
 import { Sink } from "../types/sink";
-import { AttributeSink, AttributeObjectSink } from "./attribute-sink";
-import { ClassSink } from "./class-sink";
+import { CheckedSink } from "./checked-sink";
+import { DisabledSink } from "./disabled-sink";
+import { ClosedSink } from "./closed-sink";
+import { ClassObjectSink } from "./class-sink";
 import { DatasetSink, DatasetObjectSink } from "./dataset-sink";
-import { AppendHTMLSink, InnerHTMLSink, InnerTextSink, TextContentSink } from "./content-sink";
-import { RemovalSink } from "./removal-sink";
+import { InsertAdjacentHTMLSink, InnerHTMLSink, InnerTextSink, TextContentSink } from "./content-sink";
+import { RemovedSink } from "./removed-sink";
+import { ReadonlySink } from "./readonly-sink";
 import { StyleObjectSink } from "./style-sink";
 import { ValueSink } from "./value-sink";
+import { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
 
-// TODO: Add option to register custon sinks
-export const DOMSinks: Map<string, Sink<any>> = new Map(<[string, Sink<any>][]>[
-	['appendHTML',      AppendHTMLSink],
-	['attribute',       AttributeSink],
-	['attributeobject', AttributeObjectSink],
-	['class',           ClassSink],
-	['dataset',         DatasetSink],
-	['datasetobject',   DatasetObjectSink],
+export const sinkByAttributeName = new Map([
+	['appendHTML',      InsertAdjacentHTMLSink],
+	['rml:removed',     RemovedSink],
+	['rml:closed',      ClosedSink],
+	['checked',         CheckedSink],
+//  ['rml:checked',    DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
+	['disabled',        DisabledSink],
+//  ['rml:disabled',    DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
+	['class',           ClassObjectSink],
 	['innerHTML',       InnerHTMLSink],
 	['innerText',       InnerTextSink],
-	['removal',         RemovalSink],
+	['readonly',        ReadonlySink],
+//  ['rml:readonly',    ReadonlySink], // Can make this one act as a boolean attribute that understands "false" and other values...
 	['style',           StyleObjectSink],
 	['textContent',     TextContentSink],
 	['value',           ValueSink],
-	// ['termination',  terminationSink],
+	['rml:dataset',     DatasetObjectSink],
+	['dataset',         DatasetObjectSink], // Shall we include this, too?
+	['data-',           DatasetSink],
+	// ['termination',  terminationSink], // a sink that runs when an observable completes... will we ever need this?
 ]);
 
-/**
- * Force a custom Sink through to a template
- * @param sink 
- * @param data 
- * @returns Sink
- */
-export const SinkSpecifier = (sink: Sink<any>, data: unknown) => ({
-	type: 'custom',
-	sink,
-	data,
-});
+// /**
+//  * Force a custom Sink through to a template
+//  * @param sink 
+//  * @param data 
+//  * @returns Sink
+//  */
+// export const SinkSpecifier = (source: MaybeFuture<unknown>, sink: Sink<any>, data: unknown) => ({
+// 	type: 'custom',
+// 	pattern: (string, resultPlusString, result) => /custom-stuff=/.test(string), // ..................
+// 	sink,
+// 	data,
+// });
+
+export const PreSink = <T extends HTMLElement>(sink: Sink<T>, source: RMLTemplateExpressions.Any, args: any) => {
+	const fn = (node: T) => {
+		return sink.bind(null, node, args);
+	};
+	return <SinkBindingConfiguration<HTMLElement>>{
+        type: 'sink',
+        source,
+        sink,
+    };
+};
+
+
+export { AttributeObjectSink } from "./attribute-sink";
+export { AnyContentSink, AppendHTML, InnerHTML, InnerText, TextContent, InnerHTMLSink } from "./content-sink";
+export { Removed } from "./removed-sink";
+export { Signal } from './signal-sink';

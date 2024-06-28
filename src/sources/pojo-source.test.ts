@@ -1,5 +1,5 @@
 import { MockElement } from '../test-support';
-import { isPOJOSource, POJOSource, POJOSourceHandler } from './pojo-source';
+import { isPOJOSource, POJOSource, POJOSourceExpression } from './pojo-source';
 
 describe('Object Source', () => {
 
@@ -8,7 +8,7 @@ describe('Object Source', () => {
         it('Creates an Object Source', () => {
             const object: any = {};
             const testAttribute = 'someAttribute';
-            const data = <POJOSourceHandler>[object, testAttribute];
+            const data = <POJOSourceExpression>[object, testAttribute];
             const newData = 'new value';
 
             const el = MockElement({
@@ -23,7 +23,7 @@ describe('Object Source', () => {
         it('Creates an Array Source', () => {
             const arr = [0, 1, 2, 3, 4];
             const testAttribute = 2;
-            const data = <POJOSourceHandler>[arr, testAttribute];
+            const data = <POJOSourceExpression>[arr, testAttribute];
             const newData = 'new value';
 
             const el = MockElement({

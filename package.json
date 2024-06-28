@@ -1,11 +1,15 @@
 {
   "name": "rimmel",
-  "version": "1.1.1",
+  "version": "1.2.0-rc25",
   "description": "Reactive template engine for webapps",
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
+  "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
+  "paths": {
+    "rimmel/types/*": ["dist/types/*"],
+    "rimmel/sinks": ["dist/sinks/index"],
+    "rimmel/sinks/*": ["dist/sinks/*"]
+  },
   "sideEffect": false,
   "scripts": {
     "build": "rimraf dist && rollup --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",

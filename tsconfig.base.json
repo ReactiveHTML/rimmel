@@ -6,6 +6,9 @@
     "module": "ESNext",
     "target": "ESNext",
     "types": [ "node", "jest" ],
+    "paths": {
+      "rimmel": ["./src/index"]
+    },
     "strict": true,
     "sourceMap": true,
     "removeComments": true,
@@ -17,5 +20,6 @@
     "noImplicitThis": false,
     "typeRoots": [ "node_modules/@types" ]
   },
-  "exclude": [ "node_modules" ]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "build"]
 }

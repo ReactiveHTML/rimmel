@@ -1,43 +1,59 @@
-export type ObserverFunction<T> = (value: T) => unknown;
+import type { BehaviorSubject, Subject, Subscribable } from 'rxjs';
+export type { BehaviorSubject, OperatorFunction, Subject } from 'rxjs';
+
+// export type Subject<T> = {
+//     subscribe: (observer: ObserverFunction<T>) => Subscription;
+//     pipe: (value: T) => void;
+//     next: (value: T) => void;
+//     error?: (error: unknown) => void;
+//     complete?: () => void;
+// };
+
+// export type BehaviorSubject<T> = Subject<T> & {
+//     getValue: () => T;
+//     value: T;
+// };
+
+// export type OperatorFunction<T, R> = (source: Observable<T>) => Observable<R>;
+
+export type ObserverFunction<T> = (value: T) => void;
+export type ObserverErrorFunction = (e: Error) => void;
+export type ObserverCompleteFunction = () => void;
+
+export type Observable<T> = {
+    subscribe: (observer: Observer<T> | ObserverFunction<T>, error?: ObserverErrorFunction, complete?: ObserverCompleteFunction) => Subscription;
+};
 
 export interface Observer<I> {
-    next: (value: I) => void;
-    error?: (error: unknown) => void;
-    complete?: () => void;
+    next: ObserverFunction<I>;
+    error?: ObserverErrorFunction;
+    complete?: ObserverCompleteFunction;
 };
+
+export const isObserver = (x: any): x is Observer<any> =>
+    !!x?.next;
 
 export type Subscription = {
     unsubscribe: () => void;
 };
+
+/**
+ * An in-out stream, also known as an Observable Subject
+ * that's both an Observable and an Observer
+ */
+export type Stream<I, O=I> = Observer<I> & Observable<O>;
+// export interface Stream<I, O=I> extends Observable<I>, Observer<O> {};
 
 // A whole pass-through pipeline
 export type Transformer<I, O> = Observer<I> & {
     subscribe: (observer: ObserverFunction<O>) => Subscription;
 };
 
-export type Observable<T> = {
-    subscribe: (observer: ObserverFunction<T>) => Subscription;
-};
-
 export const isObservable = (x: any): x is Observable<any> =>
-    !!x.subscribe;
+    !!x?.subscribe;
 
 export const isPromise = (x: any): x is Promise<any> =>
-    !!x.then;
-
-export type Subject<T> = {
-    subscribe: (observer: ObserverFunction<T>) => Subscription;
-    next: (value: T) => void;
-    error?: (error: unknown) => void;
-    complete?: () => void;
-};
-
-export type BehaviorSubject<T> = Subject<T> & {
-    getValue: () => T;
-    value: T;
-};
-
-export type Operator<T, R> = (source: Observable<T>) => Observable<R>;
+    !!x?.then;
 
 export type MaybePromise<T> = Partial<Promise<T>>;
 export type MaybeObserver<I> = Partial<Observer<I>>;

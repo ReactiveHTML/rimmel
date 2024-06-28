@@ -2,16 +2,20 @@
 
 _A Functional-Reactive UI library for the Rx.Observable Universe_
 
-Rimmel treats Observables and Promises as fist-class citizens.<br />
+Rimmel lets you create a whole new world of powerful HTML templates and webapps using Observables and Promises as first-class citizens.<br />
+
+```
+<div>  ${ anObservable }  </div>
+```
 
 - When a DOM event is triggered an Observer reacts
-- When an Observable emits the DOM is rendered
+- When an Observable emits the DOM gets updated
 
 No need for JSX, Virtual DOM, Babel, HyperScript, Webpack, React.<br>
 No need to "set up" or "tear down" observables in your components, so you can keep them pure.
 No need to unsubscribe or dispose of observers or perform any manual memory cleanup.
 
-Rimmel works with standard JavaScript/TypeScript template literals tagged with `rml` and it works out of the box.
+Rimmel works with standard JavaScript/TypeScript template literals tagged with `rml` out of the box.
 
 ## Hello World
 The modern "Hello World" for reactive interfaces is the click counter: one button, one text box.<br>
@@ -26,7 +30,7 @@ The result is then "sinked" into the `<span>` element at the end.
 <img src="docs/assets/how-rimmel-works-6.png" alt="How RimmelJS Works">
 
 <div class="playground-link">
-<a href="https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111">Rimmel Hello World</a> on Codepen.
+<a href="https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111"><img src="docs/assets/try-it-button.png" valign="middle" height="40"> Rimmel Hello World</a> on Codepen.
 </div>
 
 
@@ -95,16 +99,17 @@ document.getElementById('rimmel-root').innerHTML = ColorPicker([255, 128, 64])
 ```
 
 <div class="playground-link">
-  <a href="https://codepen.io/fourtyeighthours/pen/ExJOObG">Hello World Plus</a> on Codepen
+  <a href="https://codepen.io/fourtyeighthours/pen/ExJOObG"><img src="docs/assets/try-it-button.png" valign="middle" height="40"> Hello World Plus</a> on Codepen
 </div>
 
+<br>
 
 As you can see, there are three main streams, one for each colour gauge in the HTML.
 When they emit, their values are merged together through `combineLatest`, which passes them through as an array to `toRGBString` which will retutn the string as we need it.
 
 Finally, we have two sinks where the data ends up; one as the innerHTML of the <span>, ther other as the fill colour of the SVG shape.
 
-## State doesn't exist — it's a Stream.
+## State doesn't exist (it's a Stream)
 "State", as the word itself suggests, is static, so it doesn't belong to the dynamic, interactive, reactive webapps we make every day.
 
 State, as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow. You only need those when certain events happen, so you can respond.
@@ -118,12 +123,6 @@ Modelling your state as observable streams will give you fine-grained control ov
 
 All Rimmel does is binding your observable streams to the UI with a seamless integration that will result in improved code quality, scale, testability and performance.
 
-## Lifecycle Events? Redundant
-The reason why many other libraries and frameworks need to expose many lifecycle events is because they only support the imperative paradigm, so with those you often need a reference to a target element (even if it doesn't exist yet) if you want to make certain types of changes.
-
-With the declarative and functional approach supported by Rimmel, this becomes unnecessary: you can nearly always declare changes as a sink of streams. This way, Rimmel can take care of subscriptions and memory cleanup for you.
-
-_(Psst: we've still included a few lifecycle events to help you integrate third-party imperative-js modules or libraries that really, really need a DOM node to attach to, so don't panic!)._
 
 # Sources vs. Sinks
 There are two key concepts used by Rimmel: sources and sinks.
@@ -164,6 +163,15 @@ target.innerHTML = rml`<div style="color: ${color}; background: black;">
   red on black
 </div>`;
 ```
+
+### Event Mappers
+In normal circumstances your event handlers receive a DOM Event object, such as MouseEvent, PointerEvent, etc.
+To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Mappers to feed your event handlers with the raw data you need, rather than Event objects.
+Do you want the [x, y] mouse coordinates when hovering an element?
+Use <div onmousemove="${PointerXY(handler)}">
+
+Do you want the last typed character when handling keyboard events?
+Use <input oninput="${Key(handler)}">
 
 ## Data Sinks
 Rimmel supports two types of sinks: specialised and dynamic sinks.
@@ -206,6 +214,18 @@ target.innerHTML = rml`<div data-attribute="${stream}"></div>`;
 // Generic Attribute
 const stream = new Subject<string>();
 target.innerHTML = rml`<div some-attribute="${stream}"></div>`;
+
+// A "Bridge" Sink (add a final step, before calling the actual sink)
+const Sanitize = input => {
+    type: 'sink',
+    source: input.pipe(
+        map(strHTML => strHTML.replace(/</g, '&lt;'))
+    ),
+    sink: InnerHTMLSink
+};
+
+const stream = new Subject<HTMLString>();
+target.innerHTML = rml`<div>${Sanitize(stream)}</div>`;
 
 ```
 
@@ -256,7 +276,7 @@ When the above component is rendered on the page, the mixin will inject everythi
 
 Whenever the `classes` stream emits, you will be able to set/unset class names in the component.
 
-### A simple, "Draggable" mixin
+### A simple drag'n'drop mixin
 A simple use case for mixins is drag'n'drop, in the form of an isolated, reusable piece of functionality.
 
 <img src="docs/assets/how-rimmel-works-7.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
@@ -267,7 +287,7 @@ Static key-values (e.g.: `class`) are merged on the spot, before mounting.
 Promises and Observables get merged whenever they resolve/emit.
 
 <div class="playground-link">
-  <a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010">Draggable Mixin</a> on Codepen
+  <a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010"><img src="docs/assets/try-it-button.png" valign="middle" height="40"> Draggable Mixin</a> on Codepen
 </div>
 
 ## Performance
@@ -299,7 +319,28 @@ An HFT stock ticker with 10000 subscriptions?<br>
 These are obviously edge cases where "fast updates" are obviously irrelevant.<br>
 However, Rimmel can still help implementing your custom logic and optimisation patterns in an ergonomic, functional-reactive style that's easy to test and keep well organised.
 
-## Use with LLMs
+## Memory management
+If you come from some other libraries or frameworks, including RxJS, you know you're somewhat responsible of cleaning up memory. The indiscriminate use of Observable subscriptions can cause memory leaks in certain scenarios.
+
+Using Observables with Rimmel is trivial. All DOM subscriptions and event listeners are handled by the library behind the scenes. Registered when a component is mounted and unregistered when it's removed.
+
+## "Suspense" for free, out of the box
+Do you have async data like an API call and a placeholder to display whilst waiting? We have good news: a BehaviorSubject is all you need.
+The BehaviorSubject, since it has an initial, "current" value, is the perfect candidate for this, and as such, it receives a special treatment from Rimmel in that its initial value will be rendered immediately, synchronously, whilst subsequent emissions will replace it as normal.
+```javascript
+const WaitingComponent = () => {
+  const stream = new BehaviorSubject('loading...').pipe(
+    switchMap(fetch('https://api.example.com/data))
+  );
+
+  return rml`
+    <div>${stream}</div>
+  `
+}
+```
+
+
+## Use with AI assistants/LLMs
 We are creating a few experimental AI assistants like [RimmelGPT.js](https://chat.openai.com/g/g-L01pb60It-rimmelgpt-js), to help you convert existing components, create new ones or just get started and have fun. 
 
 (Please note these are still highly experimental and various forms of hallucination can happen under different circumstances — YMMV)
@@ -320,14 +361,13 @@ bun test
 - Support text node and HTML comment sinks
 - Possible support for the EventEmitter both as a source and a sink
 - Separate memory-optimised and speed-optimised sinks.
-- Pre-Transformed Data Sources (so you don't even have to do that)
 - Compiled Templates (because it's never fast enough, right?)
 - Plugin support
 - Sink pipelines (just like you have rendering pipelines in computer graphics)
-- Source pipelines (we just realised how convenient they can be)
 - RML Security (leverage pipelines to weed out XSS and other dirt)
 
 ## Web Standards
 There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and the more recent [Observable DOM](https://github.com/WICG/observable).
 
 Rimmel is closely following these initiatives and aims to align with them as they develop.
+

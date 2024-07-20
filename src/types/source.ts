@@ -1,6 +1,6 @@
-import { RMLEventName } from "./dom";
+import { EventListenerFunction } from "./dom";
 import { EventListenerOrEventListenerAdapter } from "./event-listener";
-import type { Observer, Subject } from "./futures";
+import type { Observer } from "./futures";
 import { BindingConfiguration } from "./internal";
 
 /**
@@ -21,6 +21,6 @@ export interface SourceDescriptor<E extends Event, R> {
  * @returns A Subject that will receive the actual DOM events
  * @example SourceStream(target)
  */
-export type Source<E extends Event, T=E> = (target: Observer<T>) => Subject<E>;
+export type Source<I extends Event, O> = (target: Observer<O>) => (Observer<I> | EventListenerFunction<I>);
 
 export const isSource = (x: BindingConfiguration) => x.type == 'source'

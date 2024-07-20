@@ -1,6 +1,6 @@
 import type {RMLEventName} from '../types/dom';
 
-export const NON_BUBBLING_DOM_EVENTS: Set<RMLEventName> = new Set([
+export const NON_BUBBLING_DOM_EVENTS: Set<RMLEventName> = new Set<RMLEventName>([
     'abort',
     'canplay',
     'canplaythrough',

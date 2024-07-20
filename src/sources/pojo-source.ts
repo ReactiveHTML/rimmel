@@ -1,8 +1,12 @@
-import { RMLTemplateExpression } from "../types/internal";
+import { EventListenerFunction } from "../types/dom";
+import type { RMLTemplateExpression } from "../types/internal";
+import type { Source } from "../types/source";
 
-//export type POJOSourceExpression = Record<string, string> //[target: object | Array<string | number | object>, key: string | number];
-export type POJOSourceExpression = [target: object | Array<string | number | object | Function>, key: string | number];
-export const isPOJOSource = (expression: RMLTemplateExpression): expression is POJOSourceExpression =>
+//export type ObjectSourceExpression = Record<string, string> //[target: object | Array<string | number | object>, key: string | number];
+export type TargetObject = object | Array<string | number | object | Function>; // Record<string, unknown>;
+export type ObjectSourceExpression<T extends TargetObject> = [target: T, key: keyof T];
+
+export const isObjectSource = <T extends TargetObject>(expression: RMLTemplateExpression): expression is ObjectSourceExpression<T> =>
     Array.isArray(expression) && expression.length == 2;
 
 /**
@@ -11,21 +15,25 @@ export const isPOJOSource = (expression: RMLTemplateExpression): expression is P
  * @param expression an [object, 'property'] or [array, index] pair to update
  * @returns A data source
  * @example <input oninput="${[obj, 'property']}">
- * @example <input oninput="${POJOSource([obj, 'property'])}">
- * @example <input oninput="${POJOSource([arr, 4])}">
+ * @example <input oninput="${ObjectSource([obj, 'property'])}">
+ * @example <input oninput="${ObjectSource([arr, 4])}">
  */
-export const POJOSource = (expression: POJOSourceExpression) => function() {
-    // Only <input> elements are supported for this source
-    const valueSource = this.type == 'checkbox' ? this.checked : this.value;
+export const ObjectSource = <E extends Event, T extends TargetObject>(expression: ObjectSourceExpression<T>) =>
+    <EventListenerFunction<E>>function () {
+        // Only <input> elements are supported for this source
+        const valueSource = this.type == 'checkbox' ? this.checked : this.value;
+        const [target, key] = expression;
+        target[key] = valueSource;
+    }
+;
 
-    const [target, key] = expression;
-    target[key] = valueSource;
-};
-
-export const xUpdate = (object: Record<string, any>, property: string) => ({
-	next: (data: any) => object[property] = data
-})
-
-export const Update = (object: Record<string, any>, property: string) =>
-	POJOSource([object, property])
+/**
+ * A data source that updates an object's property from an <input> element when
+ * a certain event occurs
+ * @param object The object to update
+ * @param property A property to update in the given object
+ * @returns An event handler stream
+ */
+export const Update = <E extends Element, T extends TargetObject, I extends Event, O extends never>(object: T, property: keyof T): EventListenerFunction<I> =>
+    ObjectSource<I, T>([object, property])
 ;

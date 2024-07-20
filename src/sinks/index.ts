@@ -1,8 +1,9 @@
 import { Sink } from "../types/sink";
 import { CheckedSink } from "./checked-sink";
 import { DisabledSink } from "./disabled-sink";
+import { FixedAttributePreSink } from "./attribute-sink";
 import { ClosedSink } from "./closed-sink";
-import { ClassObjectSink } from "./class-sink";
+import { ClassName, ClassObjectSink, ToggleClass } from "./class-sink";
 import { DatasetSink, DatasetObjectSink } from "./dataset-sink";
 import { InsertAdjacentHTMLSink, InnerHTMLSink, InnerTextSink, TextContentSink } from "./content-sink";
 import { RemovedSink } from "./removed-sink";
@@ -11,12 +12,13 @@ import { StyleObjectSink } from "./style-sink";
 import { ValueSink } from "./value-sink";
 import { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
 
-export const sinkByAttributeName = new Map([
+export const sinkByAttributeName = new Map(<Iterable<readonly [string, Sink<any>]>>[
 	['appendHTML',      InsertAdjacentHTMLSink],
+	['contenteditable', FixedAttributePreSink('contenteditable')],
 	['rml:removed',     RemovedSink],
 	['rml:closed',      ClosedSink],
 	['checked',         CheckedSink],
-//  ['rml:checked',    DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
+//  ['rml:checked',     DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
 	['disabled',        DisabledSink],
 //  ['rml:disabled',    DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
 	['class',           ClassObjectSink],
@@ -57,8 +59,8 @@ export const PreSink = <T extends HTMLElement>(sink: Sink<T>, source: RMLTemplat
     };
 };
 
-
 export { AttributeObjectSink } from "./attribute-sink";
 export { AnyContentSink, AppendHTML, InnerHTML, InnerText, TextContent, InnerHTMLSink } from "./content-sink";
+export { ClassName, ToggleClass } from './class-sink';
 export { Removed } from "./removed-sink";
 export { Signal } from './signal-sink';

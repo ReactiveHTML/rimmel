@@ -1,16 +1,38 @@
 import type { HTMLString, Mixin } from '../../src/index';
 
-import { BehaviorSubject, Subject, interval, map, of, scan, startWith, switchMap, take, throwError, withLatestFrom } from 'rxjs';
+import { BehaviorSubject, Subject, interval, map, of, scan, startWith, switchMap, take, tap, throwError, withLatestFrom } from 'rxjs';
 import { AppendHTML, InnerText, InnerHTML, InnerHTMLSink, Removed, TextContent, Update, rml } from '../../src/index';
-import { Value, ValueAsNumber, Dataset, EventData, Key, MouseCoords, Numberset, pipeIn } from '../../src/index';
+import { Value, ValueAsDate, ValueAsNumber, Dataset, EventData, Key, ClientXY, Numberset, pipeIn } from '../../src/index';
+import { char } from '../../src/types/basic';
+import { DefineCustomElement } from '../../src/custom-element';
+
+const xxx = (e)=>console.log('something', e);
+
+DefineCustomElement('custom-element', ({ title, content, oninput, onsomething }) => {
+	const mount = function(e: Event) {
+		// debugger;
+		this.dispatchEvent(new CustomEvent('something'), { value: 'something' });
+		// onsomething?.();
+	}
+
+	return rml`
+		<div class="cls1" rml:onmount="${mount}">
+			<h3>${title}</h3>
+			<p>${content}</p>
+			Custom Element Works<br>
+			<input type="text" onmousemove="${xxx}">
+			<input type="text" oninput="${xxx}">
+		</div>
+	`;
+});
 
 // const defer = (...x: any) => new Promise<typeof x>((resolve, reject) => setTimeout(resolve, 5000, ...x));
-const defer = <T>(x: T): Promise<T> => new Promise<T>(resolve => setTimeout(resolve, 500, x));
+const defer = <T>(x: T, timeout: number = 500): Promise<T> => new Promise<T>(resolve => setTimeout(resolve, timeout, x));
 
 ////////////////////////////////////////////////
 
 const sources = {
-	UpdateSourceImplicit: () => {
+	ObjectSourceImplicit: () => {
 		const stream = new Subject();
 
 		const data = {
@@ -23,15 +45,14 @@ const sources = {
 		`;
 	},
 
-	UpdateSourceExplicit: () => {
+	ObjectSourceExplicit: () => {
 		const stream = new Subject();
 		const data = {
 			prop1: undefined
 		}
 
-		window.data = data;
-
 		return  rml`
+			Updating a non-reactive property of an object<br>
 			<input type="text" onchange="${Update(data, 'prop1')}"><br>
 
 			<button onclick="${()=>stream.next(data.prop1)}">check</button>
@@ -49,7 +70,7 @@ const sources = {
 
 	ValueAsNumberSource: () => {
 		const stream = new Subject<number>().pipe(
-			map(x=>2*x)
+			map(x=> isNaN(x) ? '' : 2*x)
 		);
 
 		return  rml`
@@ -58,25 +79,42 @@ const sources = {
 		`;
 	},
 
-	DatasetSource: () => {
-		const stream = new Subject<string>();
+	ValueAsDateSource: () => {
+		const stream = new Subject<Date | null>().pipe(
+			map(d=> {
+				d?.setDate(d.getDate() + 1);
+				return d?.toDateString() ?? '';
+			})
+		);
 
 		return  rml`
-			<button data-foo="bar" onclick="${Dataset(stream, 'foo')}">click me</button>
+			Today is: <input type="date" oninput="${ValueAsDate(stream)}" autofocus><br>
+			Tomorrow: <span>${stream}</span>
+		`;
+	},
+
+	DatasetSource: () => {
+		const stream = new Subject<string>();
+		const JustFoo = Dataset('foo');
+
+		return  rml`
+			<button data-foo="bar" onclick="${JustFoo(stream)}">click me</button>
 			<br>
 			data-foo = <span>${stream}</span>
 		`;
 	},
 
 	NumbersetSource: () => {
+		const JustTheAmount = Numberset('amount');
 		const count = <Subject<number>>new BehaviorSubject(0).pipe(
-			scan((a, b)=>a+b, 0)
+			scan((a, b)=>a+b)
 		);
 
+
 		return rml`
-			<button onclick="${Numberset(count, 'amount')}" data-amount="-1"> - </button>
+			<button onclick="${JustTheAmount(count)}" data-amount="-1"> - </button>
 			<input type="text" value="${count}" size="3">
-			<button onclick="${Numberset(count, 'amount')}" data-amount="1" > + </button>
+			<button onclick="${JustTheAmount(count)}" data-amount="1" > + </button>
 		`;
 	},
 
@@ -87,7 +125,7 @@ const sources = {
 		);
 
 		return rml`
-			<div onmousemove="${MouseCoords(stream)}" style="background-color: #ffff80; padding: 3rem;">
+			<div onmousemove="${ClientXY(stream)}" style="background-color: #ffff80; padding: 3rem;">
 				<div>Mouse me over!</div>
 				<div>Coords: <span>${stream}</span></div>
 			</div>
@@ -107,8 +145,17 @@ const sources = {
 		const stream = new Subject<char>();
 
 		return rml`
-			<input oninput="${Key(stream)}" style="background-color: #ffff80; padding: 3rem;">
+			<input onkeydown="${Key(stream)}" style="background-color: #ffff80; padding: 3rem;">
 			<div>Last key pressed: <span>${stream}</span></div>
+		`;
+	},
+
+	UndefinedSource: () => {
+		const empty = undefined;
+
+		return  rml`
+			Handler is undefined — nothing should happen.<br>
+			<button onclick="${empty}">click me</button>
 		`;
 	},
 
@@ -131,25 +178,71 @@ const sinks = {
 		return  rml`<button onclick="${()=>alert('clicked')}">click me</button>`
 	},
 
-	StyleValueSink: () => {
-		const bg = 'green';
+	ClassSink: () => {
+		const cls1 = 'cls1';
+		const cls2 = defer('cls2', 1000);
+		const cls3 = defer('cls3', 2000);
+		const cls4 = defer('cls4', 3000);
 
 		return  rml`
-			Should be red
-			<div style="background: ${bg}; color: white; padding: 1rem;">
-				just some text
-			</button>
+			<style>
+				.cls1 .cls1 {
+					text-shadow: 0px 0px 2px goldenrod;
+				}
+				.cls2 .cls2 {
+					color: limegreen;
+				}
+				.cls3 .cls3 {
+					font-weight: bold;
+				}
+				.cls4 .cls4 {
+					font-style: italic;
+				}
+				.cls5 .cls5 {
+					text-decoration: underline;
+				}
+			</style>
+			<div class="cls1">
+				should be <span class="cls1">glowing</span>
+			</div>
+			<div class="${cls2}">
+				should go <span class="cls2">green</span>
+			</div>
+			<div class="cls1 ${cls2} cls3 ${cls4} cls5">
+				should turn <span class="cls1">glowing</span>, <span class="cls2">green</span>, <span class="cls3">bold</span>, <span class="cls4">italic</span>, then <span class="cls5">underlined</span>
+			</div>
 		`;
 	},
 
-	AsyncStyleValueSink: () => {
-		const bg = defer('red');
+	CustomElement: () => {
+		const notify = (key: char) => void console.log(key);
+		const titleStream = interval(1000).pipe(
+			map(i => `title ${i}`),
+		);
 
 		return  rml`
-			Should become red
-			<div style="background: ${bg}; color: white; padding: 1rem;">
-				just some text
-			</button>
+			Should be a custom element
+			<custom-element title="${titleStream}" content="hello" foo="bar" oninput="${EventData(notify)}" onsomething="${notify}" />
+		`;
+	},
+
+	StyleValueSync: () => {
+		const bg = 'green';
+
+		return  rml`
+			<div style="background: red; color: ${bg}; padding: 1rem;">
+				Should be green
+			</div>
+		`;
+	},
+
+	StyleValueAsync: () => {
+		const bg = defer('green');
+
+		return  rml`
+			<div style="background: red; color: ${bg}; padding: 1rem;">
+				Should turn green
+			</div>
 		`;
 	},
 
@@ -161,21 +254,64 @@ const sinks = {
 		`;
 	},
 
-	UndefinedSource: () => {
-		const empty = undefined;
+	Mixin1: () => {
+		const counter = new BehaviorSubject(0).pipe(
+			scan(x=>x+1),
+		);
 
-		return  rml`
-			Handler is undefined — nothing should happen.<br>
-			<button onclick="${empty}">click me</button>
-		`;
+		const mixin1: Mixin = (args?: any) => {
+			const dataset = {
+				foo: 'foo',
+				bar: defer('bar'),
+			};
+
+			const classObject = {
+				class1: defer(true),
+				class2: false,
+			};
+
+			const style = {
+				color: 'red',
+				font: defer('32px monospace', 1000),
+			};
+
+			const events = {
+				onmouseover: () => console.log('mouseover'),
+				onmouseout: () => console.log('mouseout'),
+			};
+
+			return {
+				dataset,
+				'data-deferred': defer('deferred'),
+				class: classObject,
+				style,
+				...events,
+			};
+		};
+
+		return rml`
+			<style>
+				.mx::before {
+					content: attr(data-hello);
+				}
+				.mx::after {
+					content: attr(data-foo);
+				}
+			</style>
+			<div class="mx" ...${mixin1()}>
+				with mixin1()
+				<button type="button" onclick="${counter}"> Click me </button><br>
+				You clicked the button <span>${counter}</span> times.
+			</div>
+		`
 	},
 
-	Mixin1: () => {
+	MixinPromise: () => {
 		const counter = new Subject().pipe(
 			scan(x=>x+1, 0),
 		);
 
-		const mixin1: Mixin = (args?: any) => {
+		const mixin1: Mixin = async (args?: any) => {
 			const dataset = {
 				hello: 'world',
 				// test: () => 123, // TS error ;)
@@ -198,6 +334,8 @@ const sinks = {
 				onmouseout: () => console.log('mouseout'),
 			};
 
+			await defer(1000);
+
 			return {
 				dataset,
 				'data-deferred': defer('deferred'),
@@ -213,7 +351,7 @@ const sinks = {
 				<button type="button" onclick="${counter}"> Click me </button><br>
 				You clicked the button <span>${counter}</span> times.
 			</div>
-		`
+		`;
 	},
 
 	Mixin2: () => {
@@ -275,7 +413,7 @@ const sinks = {
 		const removed = new Subject<Event>();
 
 		return rml`
-			<div rml:debugger rml:removed="${Removed(removed)}">
+			<div rml:removed="${Removed(removed)}">
 				Removed (Explicit) sink
 				<button onclick="${removed}">Remove</button>
 			</div>
@@ -370,7 +508,7 @@ const sinks = {
 		const disabled = false;
 
 		return rml`
-			<button disabled="${disabled}">non-disabled</button>
+			<button disabled="${disabled}">disabled=false</button>
 		`;
 	},
 
@@ -463,11 +601,11 @@ const sinks = {
 	},
 
 	ExplicitInnerHTML_Higher_Order_Observable: () => {
-		const incrementor = interval(1000).pipe(
+		const incrementor = interval(500).pipe(
 			map(i=> <HTMLString>`INTERVAL => ${i}`)
 		);
 
-		const HOO = interval(500).pipe(
+		const HOO = interval(2000).pipe(
 			switchMap(_=> incrementor)
 		);
 
@@ -548,9 +686,13 @@ const sinks = {
 		return rml`
 			doesn't work if the button comes first?
 			<button onclick="${stream2}">click</button>
-			<div>
+			<div style="white-space: pre-line">
+				Hello
+
 				Timer: ${stream}
-				Count: ${stream2}
+				Count: ${stream2}${stream2} ${stream2} :-: ${stream2}
+
+				Bye
 			</div>
 		`;
 	},
@@ -575,7 +717,8 @@ const sinks = {
 		const Animate = input => ({
 			type: 'sink',
 			source: input,
-			sink: node => data => {
+			sink: node => {
+				debugger;
 				node.animate([
 					{ transform: "rotate(0) scale(1)" },
 					{ transform: "rotate(1turn) scale(0)" },
@@ -594,7 +737,6 @@ const sinks = {
 				<div ...${Animate(stream)}>Hohoho</div>
 			</div>
 
-			<div>${stream}</div>
 			<button onclick="${stream}">animate</button>
 		`;
 	},
@@ -653,12 +795,22 @@ const component = () => {
 				font-size: 18px;
 			}
 
+			body {
+				font-size: 8px;
+			}
+
 			code {
 				display: block;
 				background-color: #e0e0e0;
 				padding: 1rem;
+				max-height: 20vh;
 				white-space: pre;
 				tab-size: 2;
+			}
+
+			.rendered {
+				background-color: #e0e0f0;
+				padding: 1rem;
 			}
 
 			@media(prefers-color-scheme: dark) {
@@ -673,8 +825,29 @@ const component = () => {
 				}
 			}
 
+			.twocol {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 1rem;
+			}
+
+			.output {
+				position: fixed;
+				left: 0;
+				bottom: 0;
+				width: 100%;
+				margin: 0;
+				padding: 0;
+				background-color: white;
+				border: 2px solid;
+			}
+
+			fieldset {
+				max-width: 100%;
+			}
+
 			li {
-				margin-block: 1rem;
+				margin-block: .2rem;
 			}
 
 			.class1::before {
@@ -694,43 +867,44 @@ const component = () => {
 			}
 		</style>
 
-		<button onclick="${()=>alert('clicked')}">click me</button><br>
-		<button onclick="${logger}">click me</button>
+		<div class="output">
+			<div class="selector">
+				<fieldset>
+					<legend>Sources</legend>
+					<ul style="max-height: 50vh; overflow: auto; column-count: 2; list-style-type: none;">
+					${
+						Object.keys(sources).map((t, i, tests)=>rml`
+							<li><button title="${Tooltip(tests[t])}" onclick="${pipeIn(map(()=>[sources, t]))(chosen)}">${t}</button></li>
+						`).join('')
+					}
+					</ul>
+				</fieldset>
 
-		<hr>
-
-		<fieldset>
-			<legend>Sources</legend>
-			<ul style="max-height: 50vh; overflow: auto; column-count: 2; list-style-type: none;">
-			${
-				Object.keys(sources).map((t, i, tests)=>rml`
-					<li><button title="${Tooltip(tests[t])}" onclick="${pipeIn(chosen, map(()=>[sources, t]))}">${t}</button></li>
-				`).join('')
-			}
-			</ul>
-		</fieldset>
-
-		<fieldset>
-			<legend>Sinks</legend>
-			<ul style="max-height: 50vh; overflow: auto; column-count: 2; list-style-type: none;">
-			${
-				Object.keys(sinks).map((t, i, tests)=>rml`
-					<li><button title="${Tooltip(tests[t])}" onclick="${pipeIn(chosen, map(()=>[sinks, t]))}">${t}</button></li>
-				`).join('')
-			}
-			</ul>
-		</fieldset>
-
-
-		<hr>
-		Code:
-		<code>${InnerText(chosenSource)}</code>
-
-		<hr>
-		Rendered:
-		<section style="margin-block: 2rem;">
-			${chosenComponent}
-		</section>
+				<fieldset>
+					<legend>Sinks</legend>
+					<ul style="max-height: 50vh; overflow: auto; column-count: 2; list-style-type: none;">
+					${
+						Object.keys(sinks).map((t, i, tests)=>rml`
+							<li><button title="${Tooltip(tests[t])}" onclick="${pipeIn(map(()=>[sinks, t]))(chosen)}">${t}</button></li>
+						`).join('')
+					}
+					</ul>
+				</fieldset>
+			</div>
+			<hr>
+			<div class="twocol">
+				<div>
+					Rendered:
+					<div class="rendered" style="margin-block: 2rem;">
+						${chosenComponent}
+					</div>
+				</div>
+				<div style="overflow: auto;">
+					Code:
+					<code>${InnerText(chosenSource)}</code>
+				</div>
+			</div>
+		</div>
 
 	`;
 }

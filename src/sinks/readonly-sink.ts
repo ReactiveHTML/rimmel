@@ -1,11 +1,7 @@
 import type { Sink } from "../types/sink";
-const READONLY = 'readonly';
 
-export const ReadonlySink: Sink<Element> = (node: Element) => {
-    // const set = node.setAttribute.bind(node, READONLY, READONLY);
-    // const clear = node.removeAttribute.bind(node, READONLY);
-    return (value?: unknown) => {
+export const ReadonlySink: Sink<HTMLInputElement> = (node: HTMLInputElement) => {
+    return (value: boolean) => {
 		node.readOnly = value;
-        // value ? set() : clear();
     };
 };

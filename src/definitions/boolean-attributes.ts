@@ -3,7 +3,7 @@
 // E.G.: <input disabled="false"> is still disabled, which is unintuitive.
 // <input disabled="${stream}"> should really set or unset the disabled state depending on the stream's last emitted value!
 
-export const BOOLEAN_ATTRIBUTES = new Set([
+export const BOOLEAN_ATTRIBUTES = new Set<string>([
     'async',
     'autofocus',
     'autoplay',
@@ -25,4 +25,7 @@ export const BOOLEAN_ATTRIBUTES = new Set([
     'required',
     'reversed',
     'selected'
-]);
+] as const);
+
+// export type BooleanAttribute = typeof BOOLEAN_ATTRIBUTES extends Set<infer T> ? T : never;
+export type BooleanAttribute = (typeof BOOLEAN_ATTRIBUTES)['values'] extends () => Iterator<infer T> ? T : never;

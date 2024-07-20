@@ -1,11 +1,15 @@
-import { POJOSourceExpression } from "../sources/pojo-source";
+import type { BooleanAttribute } from "../definitions/boolean-attributes";
+
+import { ObjectSourceExpression, TargetObject } from "../sources/pojo-source";
 import { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString  } from "./dom";
-import { RMLEventName } from "./dom";
+import { RMLEventName, RMLEventAttributeName } from "./dom";
 import { Future, MaybeFuture, Observable, Observer, Subject } from "./futures";
 import { isFunction } from "../utils/is-function";
 import { isObserverSource } from "../sources/observer-source";
 import { Sink } from "./sink";
-import { CSSClassName, CSSObject, CSSValue } from "./style";
+import type { CSSClassName, CSSObject, CSSValue } from "./style";
+
+type ErrorHandler = (e: Error) => void;
 
 /**
  * Data binding configuration for event sources or data sinks
@@ -34,24 +38,32 @@ export interface SinkBindingConfiguration<E extends Element> extends BindingConf
 	source: Future<unknown>;
 	sink: Sink<E>;
 	params?: any;
-	error?: EventListener;
-	termination?: EventListener;
+	error?: ErrorHandler;
+	termination?: () => void;
 }
 
-	// export type Empty = MaybeFuture<undefined | null | ''>;
+// export type Empty = MaybeFuture<undefined | null | ''>;
 // export type BindingConfigurationType<T> = T extends SinkBindingConfiguration<infer Q> ? SinkBindingConfiguration<Q> : SourceBindingConfiguration<infer Z>;
-export const isSinkBindingConfiguration = (b: BindingConfiguration): b is SinkBindingConfiguration<any> => b.type == 'sink';
-export const isSourceBindingConfiguration = (b: BindingConfiguration): b is SourceBindingConfiguration<any> => b.type == 'source';
+export const isSinkBindingConfiguration = (b: unknown): b is SinkBindingConfiguration<any> => (b as SinkBindingConfiguration<any>).type == 'sink';
+export const isSourceBindingConfiguration = (b: unknown): b is SourceBindingConfiguration<any> => (b as SourceBindingConfiguration<any>).type == 'source';
 
-export const isSourceExpression = <T>(e: unknown): e is SourceExpression<T> => isFunction(e) || isObserverSource(e);
+export const isSourceExpression = <T>(e: unknown): e is RMLTemplateExpressions.SourceExpression<T> => isFunction(e) || isObserverSource(e);
 /**
  * An Object's property or an Array's index
  */
 export type property = string | number | symbol;
 
-export type AttributeName = string;
-export type AttributeValue = boolean | string | number | Function | Promise<any> | Observable<any>;
-export type AttributeObject = Record<AttributeName, AttributeValue>;
+export type SourceAttributeName = RMLEventAttributeName;
+export type SinkAttributeName<T = string> = T extends RMLEventAttributeName ? never : string;
+export type AttributeName = SourceAttributeName | SinkAttributeName;
+
+export type SinkAttributeValue = boolean | string | number | Promise<any> | Observable<any>;
+export type SourceAttributeValue = Observer<any> | Function;
+export type AttributeValue = SinkAttributeValue | SourceAttributeValue;
+export type AttributeObject = {
+  [K in string]: K extends SourceAttributeName ? SourceAttributeValue : SinkAttributeValue;
+};
+
 
 export namespace RMLTemplateExpressions {
 	/**
@@ -65,20 +77,26 @@ export namespace RMLTemplateExpressions {
 	/**
 	 * The value of a boolean HTML attribute
 	 */
-	export type BooleanAttributeValue = MaybeFuture<boolean | unknown>;
+	// export type BooleanAttributeValue = MaybeFuture<boolean | 'true' | (typeof BOOLEAN_ATTRIBUTES extends Set<infer T> ? T : never)>;
+	// export type BooleanAttributeValue<T extends keyof typeof BOOLEAN_ATTRIBUTES> = MaybeFuture<boolean | T | 'true'>;
+	// export type BooleanAttributeValue<T extends keyof typeof BOOLEAN_ATTRIBUTES> = MaybeFuture<boolean | T | 'true'>;
+	// export type BooleanAttributeValue = BooleanAttribute;
+	export type BooleanAttributeValue<T extends BooleanAttribute> = MaybeFuture<boolean | T | 'true'>;
+
+
 	/**
 	 * One or more class names
 	 */
-	export type ClassName = MaybeFuture<CSSClassName | CSSClassName[] | Record<CSSClassName, boolean>>;
+	export type ClassName = MaybeFuture<CSSClassName | CSSClassName[]>;
 	/**
 	 * A Record of class names to set or clear
 	 */
 	export type ClassObject = MaybeFuture<Record<CSSClassName, boolean>>;
 
-	export type HTML = MaybeFuture<HTMLString>;
-	export type Text = MaybeFuture<string>;
+	export type HTMLText = MaybeFuture<HTMLString>;
+	export type TextString = MaybeFuture<string>;
 
-	export type POJO = POJOSourceExpression;
+	export type POJO<T extends TargetObject> = ObjectSourceExpression<T>;
 	/**
 	 * A CSS declaration "property: value;" string
 	 */
@@ -89,9 +107,9 @@ export namespace RMLTemplateExpressions {
 	export type GenericHandler = BindingConfiguration;
 
 	// Implicit Source
-	export type SourceExpression<T> = Observable<T> | Observer<T> | Subject<T> | ((t: T) => any);
+	export type SourceExpression<T> = Observer<T> | ((t: T) => void);
 
-	export type SinkExpression = Sink<Element>;
+	export type SinkExpression = Sink<Element | Text>;
 	// export type Empty = MaybeFuture<undefined | null | ''>;
 
 	/**
@@ -106,11 +124,11 @@ export namespace RMLTemplateExpressions {
 	export type Any =
 		| Node
 		| AttributeValue
-		| BooleanAttributeValue
+		| BooleanAttributeValue<any>
 		| ClassName
 		| ClassObject
 		| CSSStyleDeclaration
-		| CSSStyleValue
+		// | CSSStyleValue
 		| Mixin
 		| EventHandler
 		| POJO
@@ -119,14 +137,14 @@ export namespace RMLTemplateExpressions {
 
 export type RMLTemplateExpression =
 	| RMLTemplateExpressions.AttributeValue
-	| RMLTemplateExpressions.BooleanAttributeValue
+	| RMLTemplateExpressions.BooleanAttributeValue<any>
 	| RMLTemplateExpressions.ClassName
 	| RMLTemplateExpressions.ClassObject
 	| RMLTemplateExpressions.CSSStyleDeclaration
 	// | RMLTemplateExpressions.CSSStyleValue<T extends keyof CSSStyleDeclaration>
 	| RMLTemplateExpressions.EventHandler
-	| RMLTemplateExpressions.HTML
-	| RMLTemplateExpressions.Text
+	| RMLTemplateExpressions.HTMLText
+	| RMLTemplateExpressions.TextString
 	| RMLTemplateExpressions.Mixin
 	| RMLTemplateExpressions.Node
 	| RMLTemplateExpressions.POJO
@@ -141,7 +159,7 @@ export type Handler<E extends Element, T extends RMLEventName=any> =
 	| number
 	| string
 	| boolean
-	| POJOSourceExpression
+	| ObjectSourceExpression
 	| Record<AttributeName, AttributeValue>
 	| CSSClassName
 	| Function

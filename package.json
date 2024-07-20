@@ -1,14 +1,21 @@
 {
   "name": "rimmel",
-  "version": "1.2.0-rc25",
+  "version": "1.2.0-rc33",
   "description": "Reactive template engine for webapps",
   "type": "module",
+  "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/types/index.d.ts",
   "paths": {
-    "rimmel/types/*": ["dist/types/*"],
-    "rimmel/sinks": ["dist/sinks/index"],
-    "rimmel/sinks/*": ["dist/sinks/*"]
+    "rimmel/types/*": [
+      "dist/types/*"
+    ],
+    "rimmel/sinks": [
+      "dist/sinks/index"
+    ],
+    "rimmel/sinks/*": [
+      "dist/sinks/*"
+    ]
   },
   "sideEffect": false,
   "scripts": {
@@ -59,7 +66,7 @@
     "rollup": "^4.9.5",
     "ts-node": "^10.9.2",
     "tslib": "^2.6.2",
-    "typescript": "^5.3.3",
+    "typescript": "^5.5.3",
     "vite": "^5.2.9"
   },
   "peerDependencies": {

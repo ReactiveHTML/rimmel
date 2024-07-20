@@ -1,18 +1,15 @@
-import {tap} from 'rxjs';
+import type { RMLEventName } from "../types/dom";
 
-import { tracing } from "../debug";
-import { subscribe } from "../lib/drain";
-import { errorHandler } from "../sinks/error-sink";
-import { EventListenerFunction, RMLEventName } from "../types/dom";
-import { delegatedEventHandlers, subscriptions, waitingElementHanlders } from "../internal-state";
-import { HTMLEventName } from "../types/dom";
-import { isFunction } from "../utils/is-function";
 import { NON_BUBBLING_DOM_EVENTS } from "../definitions/non-bubbling-events";
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_SELECTOR, RML_DEBUG } from "../constants";
-import { Observer } from "../types/futures";
-import { RMLTemplateExpression, BindingConfiguration, isSinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
-import { Source } from "../types/source";
+
+import { delegatedEventHandlers, subscriptions, waitingElementHanlders } from "../internal-state";
+import { errorHandler } from "../sinks/error-sink";
+import { isSinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
+import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
+import { tracing } from "../debug";
+import { of } from "rxjs";
 
 const elementNodes = (n: Node): n is Element => n.nodeType == 1;
 
@@ -20,7 +17,51 @@ const elementNodes = (n: Node): n is Element => n.nodeType == 1;
 
 export const Rimmel_Bind_Subtree = (node: Element): void => {
 	const intermediateInteractiveNodes: Node[] = []; // Text nodes in a tag;
-	([...node.attributes] || [])
+
+	// const hasInteractiveTextNodes = node.innerHTML.includes(INTERACTIVE_NODE_START);
+	const hasInteractiveTextNodes = [...node.childNodes].some(n => {
+		return n.nodeType == 3 && n.nodeValue?.includes(INTERACTIVE_NODE_START);
+	});
+
+	// Interactive text nodes
+	//const splat = hasRef && node.innerHTML.split(value as string) || []; // FIXME: it's unsafe to split by #REFn, as the same text may legitimately be in the page. Use some invisible unprintable codes
+	if(hasInteractiveTextNodes) {
+		const nodes = <(Node | string)[]>[];
+		for (const n of node.childNodes) {
+			if(n.nodeType == 3) {
+				const nodeValue: string = n.nodeValue!;
+				const interactiveRE = new RegExp(`[${INTERACTIVE_NODE_START}${INTERACTIVE_NODE_END}]`);
+				const interleaved = nodeValue.split(interactiveRE);
+				const il = interleaved.length;
+				for(var i=0; i<il; i+=2) {
+					const txt = interleaved[i];
+					nodes.push(txt);
+
+					const value = interleaved[i +1];
+					if(value != undefined) {
+						const tn = document.createTextNode(value); // or "value"?
+						intermediateInteractiveNodes.push(tn); // do we have an initial value we can add straight away?
+						nodes.push(tn);
+					}
+				}
+
+				// const [txt, interactiveNode] = nodeValue.split(INTERACTIVE_NODE_START);
+				// nodes.push(txt);
+				// if(interactiveNode) {
+				// 	const tn = document.createTextNode(interactiveNode ?? ''); // or "value"?
+				// 	intermediateInteractiveNodes.push(tn); // do we have an initial value we can add straight away?
+				// 	nodes.push(tn);
+				// }
+			} else {
+				nodes.push(n);
+			}
+		}
+		node.innerHTML = '';
+		node.append(...nodes);
+	}
+
+
+	([...node.attributes as unknown as Attr[]] || [])
 		.forEach(attr => {
 			const key = attr.nodeName;
 			const value = attr.nodeValue;
@@ -31,34 +72,17 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 			const eventName = <RMLEventName>key.replace(/^(rml:)?on/, '$1'); // TODO: based on the convention onsomething = on::something. Is this 100% ok?
 			const isOnMount = /^(?:rml:)?onmount$/.test(key);
 			const isEventSource = eventName !== key;
-			const isRef = value.includes(REF_TAG);
-			const hasInteractiveTextNodes = node.innerHTML.includes(INTERACTIVE_NODE_START);
-			// Interactive text nodes
-			//const splat = isRef && node.innerHTML.split(value as string) || []; // FIXME: it's unsafe to split by #REFn, as the same text may legitimately be in the page. Use some invisible unprintable codes
-			if(hasInteractiveTextNodes) {
-				const splat = node.innerHTML.split(INTERACTIVE_NODE_START) || []; // FIXME: it's unsafe to split by #REFn, as the same text may legitimately be in the page. Use some invisible unprintable codes
-				const nodes = <string[]>[splat.shift()];
-				for (const sx of splat) {
-					const [interactiveNode, txt] = sx.split(INTERACTIVE_NODE_END);
-					const tn = document.createTextNode(interactiveNode ?? ''); // or "value"?
-					intermediateInteractiveNodes.push(tn); // do we have an initial value we can add straight away?
-					nodes.push(tn, txt);
-					//node.insertAdjacentHTML('beforeend', splat[1]);
-				}
-				node.innerHTML = '';
-				node.append(...nodes);
-			}
+			const hasRef = value.includes(REF_TAG);
 
-			// if (isRef || isOnMount || isEventSource) {
-			if (isRef) {
+			// if (hasRef || isOnMount || isEventSource) {
+			if (hasRef) {
 				node.removeAttribute(key);
 				(waitingElementHanlders.get(value) ?? [])
 					.forEach(function Rimmel_Bind_Element(bindingConfiguration) {
 
 						const debugThisNode = node.hasAttribute(RML_DEBUG);
 						if(tracing && debugThisNode) {
-							// Mounted, binding data
-							debugger;
+							debugger; /* Stopped binding data */
 						}
 
 						if (isSinkBindingConfiguration(bindingConfiguration)) {
@@ -92,13 +116,6 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 								console.groupEnd();
 							}
 							// #ENDIF
-
-							// The source that's going to feed the current sink
-							// const sourceStream =
-							// 	isSource
-							// 	?? ((bindingConfiguration.attribute?.then ?? bindingConfiguration.attribute?.subscribe) && bindingConfiguration.attribute)
-							// 	?? bindingConfiguration.handler
-							// ;
 
 							const sourceStream = bindingConfiguration.source;
 
@@ -145,12 +162,13 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 export const removeListeners = (node: Element) => {
 	// FIXME: what if someone (e.g.: JQuery's .css()) was just moving the element across the DOM?
 	// We lose the subscriptions/data binding...
-	[...node.children]
+	[...node.children as unknown as Element[]]
 		.forEach(node => removeListeners(node))
 	;
 
 	// TODO: add AbortController support for cancelable promises?
 	subscriptions.get(node)?.forEach(l => {
+		// FIXME: HACK — destination is not a supported API for Subscription...
 		l?.destination?.complete(); // do we need this?
 		l.unsubscribe?.()
 	});

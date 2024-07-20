@@ -12,5 +12,4 @@ export const RML_DEBUG='rml:debugger';
 // Special, non-printable Unicode characters to wrap interactive text nodes
 // letting Rimmel know they'll need to be rendered as Text Nodes in the DOM, for updates
 export const INTERACTIVE_NODE_START = '\u200B';
-export const INTERACTIVE_NODE_END   = '\u200C';
-
+export const INTERACTIVE_NODE_END   = '\u200C'; // FIXME: can't use this

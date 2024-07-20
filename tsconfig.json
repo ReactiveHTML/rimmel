@@ -2,10 +2,10 @@
   "extends": "./tsconfig.base",
   "compilerOptions": {
     "target": "esnext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["dom", "dom.iterable", "esnext", "ESNext"],
     "declaration": true,
     "declarationDir": "./dist/types",
-    "noEmit": true,
+    "noEmit": true
   },
   "include": ["rollup.config.ts"],
 }

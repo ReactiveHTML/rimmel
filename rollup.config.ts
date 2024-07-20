@@ -7,7 +7,7 @@ import terser from '@rollup/plugin-terser';
 
 const terserOptions = {
   compress: {
-    pure_funcs: ['debugger'],
+    drop_debugger: false,
   },
 };
 
@@ -58,7 +58,6 @@ export default [
       typescript({
         tsconfig: './tsconfig.build.json',
         sourceMap: true,
-        // inlineSourceMap: true,
         declarationDir: './dist/types',
       }),
       terser(terserOptions),
@@ -74,7 +73,6 @@ export default [
       typescript({
         tsconfig: './tsconfig.build.json',
         sourceMap: true,
-        // inlineSourceMap: true,
         outDir: preserveModules.dir,
         declaration: false,
       }),

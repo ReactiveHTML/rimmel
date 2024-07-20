@@ -1,5 +1,5 @@
 import { MockElement } from '../test-support';
-import { InnerHTMLSink, InnerTextSink, TextContentSink } from './content-sink';
+import { InsertAdjacentHTMLSink, InnerHTMLSink, InnerTextSink, TextContentSink } from './content-sink';
 
 describe('innerHTML Sink', () => {
 
@@ -36,7 +36,7 @@ describe('appendHTML Sink', () => {
             const str2 = '<div>hello</div>';
 
             const el = MockElement({ innerHTML: str1 });
-            const sink = AppendHTMLSink(<HTMLElement>el);
+            const sink = InsertAdjacentHTMLSink(<HTMLElement>el, 'beforeend');
 
             sink(str2);
             expect(el.innerHTML).toEqual(str1 +str2);

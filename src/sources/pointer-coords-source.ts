@@ -1,21 +1,19 @@
-import type { RMLTemplateExpressions } from "../types/internal";
-import type { HTMLFieldElement} from "../types/dom";
-import { isNumericFieldElement } from "../types/dom";
+import { pipeIn } from "../utils/input-pipe";
+import { map } from "rxjs";
+
+export type Coords = [number, number];
 
 /**
  * An Event Source emitting the "[event.clientX, event.clientY]" mouse coordinates
- * @param handler A handler function or observer to send events to
- * @returns EventSource<string>
+ * @returns EventSource<Coords>
  */
-export const MouseCoords = <T extends Element>(target: RMLTemplateExpressions.SourceExpression<[number, number]>) => {
-	const nextFn = target?.next?.bind(target) ?? target?.then?.bind(target) ?? target;
-	return (e: PointerEvent) => {
-		nextFn([e.clientX, e.clientY]);
-	};
-};
+export const ClientXY = pipeIn<PointerEvent, Coords>(
+	map(e => <Coords>[e.clientX, e.clientY])
+);
 
-
-// MouseXY
-// ClientXY
-// LayerXY
-
+export const LastTouchXY = pipeIn<TouchEvent, Coords>(
+	map(e => {
+		const t = [...e.touches].at(-1);
+		return <Coords>[t?.clientX, t?.clientY];
+	})
+);

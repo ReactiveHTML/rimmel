@@ -1,9 +1,12 @@
+import type { Sink } from '../types/sink';
+import type { AttributeObject } from '../types/internal';
+import { DatasetItemPreSink, DatasetObjectSink } from './dataset-sink';
+import type { MaybeFuture, Observer } from '../types/futures';
+import type { RMLEventAttributeName } from '../types/dom';
+
+import { asap } from '../lib/drain';
 import { isFunction } from '../utils/is-function';
-import { MaybeFuture, Observable, Observer } from '../types/futures';
-import { Sink, SinkFunction } from '../types/sink';
-import { RMLEventAttributeName } from '../types/dom';
-import { AnySink } from './any-sink';
-import { AttributeObject } from '../types/internal';
+import { sinkByAttributeName } from '.';
 
 type EventListenerDeclarationWithOptions = [Function, EventListenerOptions];
 
@@ -12,20 +15,30 @@ const isSource = (k: RMLEventAttributeName, v: MaybeFuture<unknown> | EventListe
 
 
 export const FixedAttributeSink: Sink<Element> = (node: Element, attributeName: string) =>
-    data => node.setAttribute(attributeName, data)
-    //node.setAttribute.bind(node, attributeName)
+    // data => node.setAttribute(attributeName, data)
+    node.setAttribute.bind(node, attributeName)
 ;
 
 export const FixedAttributePreSink = (attributeName: string): Sink<Element> =>
     (node: Element) =>
-        data => node.setAttribute(attributeName, data)
-        // node.setAttribute.bind(node, attributeName)
+        // data => node.setAttribute(attributeName, data)
+        node.setAttribute.bind(node, attributeName)
 ;
 
+/**
+ * Set a boolean attribute via direct DOM property
+ **/
+export const BooleanAttributeSink: Sink<Element> =
+	(node: Element, attributeName: string) =>
+		(value: boolean) => node[attributeName] = value
+;
 
+/**
+ * Set an attribute via direct DOM property, rather than setAttribute
+ **/
 export const DOMAttributeSink: Sink<Element> =
 	(node: Element, attributeName: string) =>
-		(value: boolean) => node[attributeName] = !!value
+		(value: unknown) => node[attributeName] = value
 ;
 
 /**
@@ -34,24 +47,28 @@ export const DOMAttributeSink: Sink<Element> =
  **/
 export const DOMAttributePreSink = (attributeName: string): Sink<Element> =>
     (node: Element) =>
-        (value: boolean) => node[attributeName] = value
+        (value: unknown) => node[attributeName] = value
 ;
 
 
-
-export const AttributeObjectSink: Sink<Element> = (node: Element) =>
+export const AttributeObjectSink: Sink<HTMLElement | SVGElement | MathMLElement> = (node: HTMLElement | SVGElement | MathMLElement) =>
     (attributeobject: AttributeObject) => {
         (Object.entries(attributeobject) ?? [])
-            .forEach(([k, v]) =>
+            .forEach(([k, v]) => {
                 // TODO: toggle/remove event listener, if matches /^on/ (or /^off/ maybe?)
                 // N.B.: keep v === false || v == 'false' for transpilers changing it to v == '0' || v == 0
-                v == null || v === false || v == 'false' || typeof v == 'undefined' ? node.removeAttribute(k)
-                : k.startsWith('on') && isFunction(v.next ?? v.then ?? v) ? node.addEventListener(k.substring(2), (v.next ?? v.then)?.bind(v) ?? v, {capture: true})
-                : AnySink(node, k, v)
-            );
-    };
+                // which is no good, because 0 is no special value for non-boolean attributess. value="0"
+                if(v == null || v === false || v == 'false' || v == undefined) {
+                  node.removeAttribute(k)
+                } else if(k.startsWith('on') && isFunction((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then ?? v)) {
+                  node.addEventListener(k.substring(2), ((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then)?.bind(v) ?? v, {capture: true})
+                } else {
+                    const sink = k == 'dataset' ? DatasetObjectSink
+                    :  k.startsWith('data-') ? DatasetItemPreSink(k.substring(5))
+                    : sinkByAttributeName.get(k)
+                    ?? DOMAttributeSink;
 
-    // if(k.substring(0, 2) == 'on' && typeof (v.next ?? v) == 'function') {
-    //     console.log('EVENTXXXXX', k, v)
-    //     node.addEventListener(k.substring(2), v.next?.bind(v) ?? v, {capture: true})
-    // }
+                    asap(sink(node, k), v); // TODO: use drain()
+                }
+            });
+    };

@@ -34,6 +34,7 @@ export * from './sinks/index';
 
 // Utilities (Will take them out to the framework)
 export type { Component, Mixin } from './types/constructs';
+export type { RMLTemplateExpressions } from './types/internal';
 
 // Main entries
 export const render = rml;  // Deprecated, always use rml instead. Compat only. Will be removed shortly.

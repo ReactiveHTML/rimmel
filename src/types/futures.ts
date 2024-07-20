@@ -1,4 +1,4 @@
-import type { BehaviorSubject, Subject, Subscribable } from 'rxjs';
+import type { BehaviorSubject, Subject } from 'rxjs';
 export type { BehaviorSubject, OperatorFunction, Subject } from 'rxjs';
 
 // export type Subject<T> = {
@@ -34,6 +34,7 @@ export const isObserver = (x: any): x is Observer<any> =>
     !!x?.next;
 
 export type Subscription = {
+	destination: any; // FIXME HACK: an internal RxJS property, not to be relied upon
     unsubscribe: () => void;
 };
 

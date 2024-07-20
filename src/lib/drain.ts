@@ -1,7 +1,13 @@
-import { AnySink } from "../sinks/any-sink";
+import type { SinkFunction } from "../types/sink";
 import { isObservable, isPromise, MaybeFuture, Observable, Present } from "../types/futures";
-import { isFunction } from "../utils/is-function";
+
 import { subscriptions } from "../internal-state";
+
+export const asap = (fn: SinkFunction, arg: MaybeFuture<unknown>) => {
+    (<Observable<unknown>>arg).subscribe?.(fn) ??
+    (<Promise<unknown>>arg).then?.(fn) ??
+    fn(arg);
+};
 
 /**
  * Call the given fn() with data, either now, or on subscription if it's a future.
@@ -26,7 +32,6 @@ export const consecute = <T>(fn: (t: T) => void, source: MaybeFuture<T>) => {
 	return subscription;
 };
 
-
 /**
  * Connect a source to a sink through a compatible interface
  * @param node The current node on which the binding is set
@@ -35,7 +40,7 @@ export const consecute = <T>(fn: (t: T) => void, source: MaybeFuture<T>) => {
  * @param catchFn? An error handler on the sink side
  * @param endFn? a finalisation function
  */
-export const subscribe = <T>(node: Element, source: MaybeFuture<T>, nextFn: (t: T) => any, catchFn?: (e: Error) => void, endFn?: () => void) => {
+export const subscribe = <T>(node: Node, source: MaybeFuture<T>, nextFn: (t: T) => any, catchFn?: (e: Error) => void, endFn?: () => void) => {
 	if (isObservable(source)) {
 		// TODO: should we handle promise cancellations (cancellable promises?) too?
 		// TODO: should we handle function cancellations (removeEventListener) too?

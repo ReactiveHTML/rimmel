@@ -1,9 +1,11 @@
 import type { AttributeObject, BindingConfiguration, RMLTemplateExpression, RMLTemplateExpressions, SourceBindingConfiguration } from "../types/internal";
 import type { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
 
+import { isSinkBindingConfiguration } from "../types/internal";
+
 import { waitingElementHanlders } from "../internal-state";
 import { isFunction } from "../utils/is-function";
-import { BehaviorSubject, Observable } from "../types/futures";
+import { BehaviorSubject, isObservable, MaybeFuture, Observable } from "../types/futures";
 import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
 import { NON_BUBBLING_DOM_EVENTS } from "../definitions/non-bubbling-events";
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUTE, RML_DEBUG } from "../constants";
@@ -11,34 +13,20 @@ import { delegateEvent } from "../lifecycle/event-delegation";
 
 import { PreSink, sinkByAttributeName } from "../sinks/index";
 import { DOMAttributePreSink, FixedAttributePreSink } from "../sinks/attribute-sink";
-import { errorHandler } from "../sinks/error-sink";
-import { terminationHandler } from "../sinks/termination-sink";
 import { Mixin } from "../sinks/mixin-sink";
-import { POJOSource, isPOJOSource } from "../sources/pojo-source";
+import { ObjectSource, isObjectSource } from "../sources/pojo-source";
 import { ObserverSource, isObserverSource } from "../sources/observer-source";
-import { isSink } from "../types/sink";
 
-import { isObserver, isPromise } from '../types/futures';
+import { isPromise } from '../types/futures';
 
 import { skip } from 'rxjs';
 import { InnerHTML, TextContent } from "../sinks/content-sink";
-
-// Deprecated
-const sinkSpecifierPattern = /\s*<!--\s*SINK:\s*(\w+)\s*-->\s*$/;
+import { ClassRecord } from "../sinks/class-sink";
 
 // FIXME: add a unique prefix to prevent collisions with different dupes of the library running in the same context/app
 let refCount = 0;
 
-const addRef = <E extends Element, F extends E>(ref: string, data: BindingConfiguration) => {
-	// const h = data?.handler;
-	// if(isFunction(h)) {
-	// 	data.handler = function Source(...args: any[]) { return h(...args)}
-	// } else if(isObservable(h)) {
-	// 	debugger;
-	// 	// data.handler = h.pipe(
-	// 	// 	tap(x=>console.log(x))
-	// 	// )
-	// }
+const addRef = (ref: string, data: BindingConfiguration) => {
 	waitingElementHanlders.get(ref)?.push(data) ?? waitingElementHanlders.set(ref, [data]);
 };
 
@@ -60,6 +48,7 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 		const eventName = getEventName(string as RMLEventAttributeName);
 		// const r = (resultPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*(?:\s*>\s*)?$/);
 		// include the above, plus <!--SINK markers--> Needed for custom content sinks
+		// TODO: remove <!-- SINK --> patterns, if any left...
 //		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*>\s*(?:<!--[^>]+>\s*|[^<]*)*$/);
 //		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*>\s*(?:[^<]*|<!--[^>]*>\s*)*$/);
 //		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*>\s*(?:[^<]*?(?:<!--[^>]*>\s*)*)*$/);
@@ -73,14 +62,18 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 		//	: /(?<attribute>[a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(resultPlusString) ? 'attribute'
 
 		if(string.includes(RML_DEBUG)) {
-			// Parsing
-			debugger;
+			const nl = (str: string) => str.replace(/\t/g, '  ');
+			const currentTemplate = strings.reduce((str, next, j) => str.concat((j>0?'}':'') +nl(j==i ? next.replace(RML_DEBUG, `%c${RML_DEBUG}%c`) : next) +(j<=strlen-1?'${':''), j==i && next.includes(RML_DEBUG) ? ['color: red', ''] : [],(j<strlen ? expressions[j] : []) ), <string[]>[]);
+			console.log(...currentTemplate);
+			debugger; /* Stopped parsing a RML template */
 		}
 
-		if(expression == undefined) {
+		if(expression == undefined || expression === '') {
 			// remove nullish values except 0, "0", false and "false"
 			// acc = accPlusString +(expression==0 || expression==false ? expression : '');
 			acc = accPlusString;
+		} else if(expression.lazy) {
+			acc = accPlusString +expression.toString();
 		} else if(eventName) {
 			// Event Source
 			// so feed it to an Rx Subject | Observer | Handler Function | POJO | Array
@@ -96,7 +89,7 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 
 			const listener = isFunction(expression) ? expression
 				: isObserverSource(expression) ? ObserverSource(expression)
-				: isPOJOSource(expression) ? POJOSource(expression)
+				: isObjectSource(expression) ? ObjectSource(expression)
 				: null // We allow it to be empty. If so, ignore, and don't connect any source. Perhaps add a warning in debug mode?
 			;
 
@@ -123,10 +116,12 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 
 			// // } else if(typeof ((<Observable<unknown>>expression).subscribe ?? (<Promise<unknown>>expression).then)  == 'function' && i<strings.length -1 || typeof expression == 'object') {
 			// } else if(
-			if(
-				((<Observable<any>>expression)?.subscribe || (<Promise<any>>expression)?.then) // && i<strings.length -1 (TODO: can we safely remove this part?)
-				 || typeof expression == 'object'
-				 || !expression) {
+			if(['string', 'number'].includes(typeof expression)) {
+
+				// Static expressions, no data binding. Just concatenate
+				acc = accPlusString +expression;
+			} else {
+				// what if  !expression?
 
 				// expression is a future or an object
 
@@ -136,7 +131,7 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 				if(isAttribute) {
 
 					const quotationMarks = isAttribute.groups!.quote;
-					if(new RegExp(`^(?:[^>${quotationMarks}]*)${quotationMarks}`).test(nextString)) {
+					if(new RegExp(`^(?:[^>${quotationMarks}]*)${quotationMarks}?`).test(nextString)) {
 
 						// Attribute Sink
 						// Use Cases:
@@ -146,7 +141,7 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 
 						const attributeName = isAttribute.groups!.attribute;
 						const isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attributeName);
-						const sink = sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(attributeName)) ?? FixedAttributePreSink(attributeName);
+						const sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(attributeName))) || FixedAttributePreSink(attributeName);
 						const handler = PreSink(sink, expression, attributeName);
 
 						// addRef(ref, <RMLTemplateExpressions.GenericHandler>{ handler: expression, type: attributeType, attribute: attributeName });
@@ -158,6 +153,18 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 							? accPlusString.replace(new RegExp(`${attributeName}=['"]+$`), `_${attributeName}="`) // TODO: or maybe clean it up completely?
 							: accPlusString
 						;
+
+						// acc += (<ClassRecord[]>[]).concat(<ClassRecord>expression)
+						// 	.flatMap(cls =>
+						// 		typeof cls == 'string'
+						// 			? cls
+						// 			: Object.entries(cls ?? {})
+						// 				.filter(([, v]) => typeof v != 'string')
+						// 				.map(([k]) => k)
+						// 	)
+						// 	.join(' ')
+						// ;
+
 						acc = (prefix +(initialValue ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}
 				} else if(/<\S+(?:\s+[^=>]+(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+))?)*(?:\s+\.\.\.)?$/.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
@@ -182,27 +189,30 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 					acc = acc.replace(/<(\w[\w-]*)\s+([^<]*)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 
 				} else if(/>\s*$/.test(string) && /^\s*</.test(nextString)) {
-
 					// Content Sink
 					// Use Cases:
 					// <some-tag>${observable}</some-tag>
 					// <some-tag>${BehaviorSubject}</some-tag> // will synchronously set the initial value of the BehaviorSubject, then update the element on subsequent emissions (good for SSR and to reduce repaints)
 
+					const sinkExpression = <RMLTemplateExpressions.SinkExpression | RMLTemplateExpressions.HTMLText | RMLTemplateExpressions.TextString>expression;
 
 					// If we have an initialValue, we treat it as a BehaviorSubject,
 					// take its current .value, render is synchronously to avoid reflows
 					// and then subscribe to subsequent emissions
-					const _source  = initialValue
-						? (<BehaviorSubject<HTMLString>>expression).pipe?.( skip(1) )
-						: expression;
+					// FIXME: any chance an expression could be mistaken for a BehaviorSubject here? A Generator, or other stuff??? May want to have a better isBehaviorSubject check here...
+					const _source = <MaybeFuture<HTMLString>>(initialValue
+						? expression.pipe?.( skip(1) )
+						: sinkExpression
+					);
 
 					// addRef(ref, <RMLTemplateExpressions.GenericHandler>{ handler, type: sinkType, error: errorHandler, ...sinkType == 'collection' && {attribute: expression} || {} /*, termination: terminationHandler */ });
-					addRef(ref, isSink(expression) ? _source : InnerHTML(_source));
+					addRef(ref, isSinkBindingConfiguration(_source) ? _source : InnerHTML(_source));
 					acc = acc
 						+(existingRef ? string : string.replace(/\s*>\s*$/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`))
-						+(initialValue || '');
+						+(initialValue || '')
+					;
 
-				} else if(/>?\s*[^<]+$/m.test(string) && /^\s*[^<]*\s*<?/m.test(nextString)) {
+				} else if(/>?\s*[^<]*$/m.test(string) && /^\s*[^<]*\s*<?/m.test(nextString)) {
 
 					// TODO
 					// will set the textContent of the given textNode
@@ -210,7 +220,7 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 					// FIXME: tbd
 					// FIXME: are we adding the #REF multiple times?
 					//acc = existingRef?accPlusString:acc +string.replace(/\s*>/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`) +ref;
-					acc += string.replace(/\s*>/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`) +INTERACTIVE_NODE_START +(initialValue ?? '') +INTERACTIVE_NODE_END;
+					acc += (existingRef?string:string.replace(/\s*>(?=[^<]*$)/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`)) +INTERACTIVE_NODE_START +(initialValue ?? '') +INTERACTIVE_NODE_END;
 
 				} else {
 
@@ -218,35 +228,6 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 					// ???
 
 				}
-
-			} else if(/\.\.\.$/.test(string)) {
-
-				// TODO: we want to make "..." optional
-				// Mixins
-				// Use Cases:
-				// <some-tag ...${DocumentObject}>
-				// <some-tag ...${Promise<DocumentObject>}>
-				// <some-tag ...${Observable<DocumentObject>}>
-				// N.B: these will be merged post-mount.
-				// TODO: enable merging objects directly into the template string, too
-				console.debug('Mixin Sink', string, expression);
-				acc += string
-					.substr(0, string.length -3)
-					.replace(/\.\.\.$/, '');
-				if(isObserver(expression) || isPromise(expression)) {
-					// Promise or observable that will emit attributes later
-					addRef(ref, <RMLTemplateExpressions.GenericHandler>{ handler: expression, type: 'attributeobject', attribute: expression });
-				} else if(typeof expression == 'string') {
-					acc += expression;
-				} else {
-					// FIXME: spread properties and requeue them for re-processing, as if these came from the template
-					acc += Object.entries(expression || {}).map(([k, v])=>`${k}="${v}"`).join(' ');
-				}
-
-			} else {
-
-				// Static expressions, no data binding. Just concatenate
-				acc = accPlusString +expression;
 
 			}
 		}

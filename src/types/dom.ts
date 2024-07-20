@@ -6,9 +6,11 @@ import { StyleObject } from "./style";
 import { ValueAttribute } from "./value";
 import { ContentAttribute } from "./content";
 import { MaybeFuture } from "./futures";
+import { RMLTemplateExpressions } from "./internal";
+import { BOOLEAN_ATTRIBUTES, BooleanAttribute } from "../definitions/boolean-attributes";
 
-// type RemovePrefix<TPrefix extends string, TString extends string> = TString extends `${TPrefix}${infer T}` ? T : never;
-type RemovePrefix<TPrefix extends string, TString extends string> = TString extends `${TPrefix}${infer T}` ? T : TString extends `rml:${TPrefix}${infer T}` ? T : never;
+type RemovePrefix<TPrefix extends string, TString extends string> = TString extends `${TPrefix}${infer T}` ? T : TString extends `rml:${TPrefix}${infer T}` ? `rml:${T}` : never;
+
 
 /**
  * An HTML event name prefixed by 'on'
@@ -89,35 +91,34 @@ export interface EventListenerObject<E extends Event> {
 export type EventListener<E extends Event> = EventListenerFunction<E> | EventListenerObject<E>;
 export type EventListenerOrEventListenerObject<E extends Event> = EventListener<E>;
 
+
+export type BooleanAttributeValue<T extends BooleanAttribute> = MaybeFuture<boolean | T | 'true'>;
+
+type DisabledType = 'disabled';
+
+
 // export type DocumentObject<E extends HTMLElement> = EventObject & ClassAttribute & DatasetObject & StyleObject & ValueAttribute<E> & ContentAttribute & GenericAttribute;
 
 /**
  * An object that represents changes to apply to existing elements
  * 
  * properties of this object will be applied to the element
- * 
  * properties starting with on will be treated as event listeners
- * 
  * properties starting with data- will be treated as data attributes
- * 
  * the style property will be used to set the element's style
- * 
  * the class property will be used to set or clear class names
- * 
  * the value property will be treated as value
- * 
  * innerHTML, innerText, textContent and appendHTML properties will trigger corresponding functionality
- * 
 * all other properties will be treated as generic attributes 
  */
-export interface DocumentObject extends EventObject, GenericAttribute {
+export interface BaseDocumentObject {
     class?: ClassAttribute;
     dataset?: DatasetObject;
     style?: StyleObject;
 
-    disabled?: BooleanAttribute;
-    readonly?: BooleanAttribute;
-    open?: BooleanAttribute;
+    // disabled?: RMLTemplateExpressions.BooleanAttributeValue<'disabled'>;
+    // readonly?: RMLTemplateExpressions.BooleanAttributeValue<'readonly'>;
+    // open?: RMLTemplateExpressions.BooleanAttributeValue<'open'>;
 
     innerHTML?: MaybeFuture<HTMLString>;
     appendHTML?: MaybeFuture<HTMLString>;
@@ -127,3 +128,8 @@ export interface DocumentObject extends EventObject, GenericAttribute {
     value?: string | MaybeFuture<string>;
 };
 
+type BooleanAttributesMap = {
+    [K in BooleanAttribute]: RMLTemplateExpressions.BooleanAttributeValue<K>;
+};
+
+export type DocumentObject = BaseDocumentObject & EventObject & BooleanAttributesMap & GenericAttribute;

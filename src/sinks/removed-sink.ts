@@ -17,10 +17,10 @@ export const RemovedSink: Sink<Element> = (e: Element) =>
  * @example <dialog rml:close="${Removed(booleanValue)}">
  * @example <dialog ...${Removed(booleanValue)}>
  */
-export const Removed: ExplicitSink<'mixin'> = (source: RMLTemplateExpressions.Any) =>
+export const Removed: ExplicitSink<'mixin' | 'removed'> = (source: RMLTemplateExpressions.Any) =>
 	<SinkBindingConfiguration<Element>>({
 		type: 'sink',
 		source,
 		sink: RemovedSink,
-})
+	})
 ;

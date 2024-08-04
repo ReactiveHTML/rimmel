@@ -1,7 +1,7 @@
 import type { RMLTemplateExpressions } from "../types/internal";
 
 import { map } from 'rxjs';
-import { pipeIn } from '../utils/input-pipe';
+import { prepipe } from '../utils/input-pipe';
 import { Source } from "../types/source";
 
 /**
@@ -14,7 +14,7 @@ import { Source } from "../types/source";
  * @example <button data-foo="bar" onclick="${Dataset(rejectFn, 'foo')}"> ... </button>
 **/
 export const Dataset = <T extends HTMLElement, I extends Event, O extends RMLTemplateExpressions.SourceExpression<string | undefined>>(key: string): Source<I, O> =>
-	pipeIn<I, O>(
+	prepipe<I, O>(
 		map((e: I) => (<T>e.target).dataset[key])
 	)
 ;
@@ -29,7 +29,7 @@ export const Dataset = <T extends HTMLElement, I extends Event, O extends RMLTem
  * @example <button data-foo="123" onclick="${Numberset(rejectFn, 'foo')}"> ... </button>
 **/
 export const Numberset = <T extends HTMLElement, I extends Event, O extends RMLTemplateExpressions.SourceExpression<number>>(key: string): Source<I, O> =>
-	pipeIn<I, O>(
+	prepipe<I, O>(
 		map((e: Event) => Number((<T>e.target).dataset[key]))
 	)
 ;

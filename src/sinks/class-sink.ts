@@ -66,7 +66,6 @@ export const ExperimentalClassObjectSink: Sink<Element> = (node: Element) => {
 
 };
 
-
 /**
  * A specialised sink to toggle individual classes on a given element
  * @description Will toggle the specified class name on the specified element, whenever the source emits. The actual value of the source will be ignored, as it's the emissions which will cause the class toggling.
@@ -83,7 +82,6 @@ export const ToggleClass: ExplicitSink<'class'> = (source: RMLTemplateExpression
         sink: ToggleClassSink(className),
     })
 ;
-
 
 /**
  * A specialised sink for the "className" HTML attribute

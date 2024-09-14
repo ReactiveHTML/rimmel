@@ -71,7 +71,7 @@ export const InnerText: ExplicitSink<'content'> = (source: RMLTemplateExpression
  * @returns RMLTemplateExpression A text-node RML template expression
  * @example <div>${textContent(stream)}</div>
  */
-export const TextContent: ExplicitSink<'text'> = (source: RMLTemplateExpressions.TextString) =>
+export const TextContent: ExplicitSink<'text'> = (source: RMLTemplateExpressions.StringLike) =>
     <SinkBindingConfiguration<Element>>({
         type: 'sink',
         source: source,

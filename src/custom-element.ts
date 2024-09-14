@@ -1,4 +1,3 @@
-import { debug } from "console";
 import { RESOLVE_SELECTOR } from "./constants";
 import { Rimmel_Bind_Subtree, Rimmel_Mount } from "./lifecycle/data-binding";
 import { HTMLString } from "./types/dom";

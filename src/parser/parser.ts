@@ -46,12 +46,6 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 		const expression = expressions[i];
 		const initialValue = (expression as BehaviorSubject<unknown>)?.value; // if it's a BehaviorSubject, pick its initial/current value to render it synchronously
 		const eventName = getEventName(string as RMLEventAttributeName);
-		// const r = (resultPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*(?:\s*>\s*)?$/);
-		// include the above, plus <!--SINK markers--> Needed for custom content sinks
-		// TODO: remove <!-- SINK --> patterns, if any left...
-//		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*>\s*(?:<!--[^>]+>\s*|[^<]*)*$/);
-//		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*>\s*(?:[^<]*|<!--[^>]*>\s*)*$/);
-//		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*>\s*(?:[^<]*?(?:<!--[^>]*>\s*)*)*$/);
 		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*(?:>\s*[^<]*|[^>]*)$/);
 		const existingRef = r?.groups?.existingRef;
 		const ref = existingRef ?? `${REF_TAG}${refCount++}`;
@@ -63,7 +57,14 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 
 		if(string.includes(RML_DEBUG)) {
 			const nl = (str: string) => str.replace(/\t/g, '  ');
-			const currentTemplate = strings.reduce((str, next, j) => str.concat((j>0?'}':'') +nl(j==i ? next.replace(RML_DEBUG, `%c${RML_DEBUG}%c`) : next) +(j<=strlen-1?'${':''), j==i && next.includes(RML_DEBUG) ? ['color: red', ''] : [],(j<strlen ? expressions[j] : []) ), <string[]>[]);
+			const reducer = (str: string[], next: string, j: number) => str.concat(
+				(j>0?'}':'') +nl(j==i ? next.replace(RML_DEBUG, `%c${RML_DEBUG}%c`) : next),
+				j==i && next.includes(RML_DEBUG)
+					? ['color: red', '']
+					: [],
+				(j<=strlen-1?'${':'') +(j<strlen ? expressions[j] : [])
+			);
+			const currentTemplate = strings.reduce(reducer, <string[]>[]);
 			console.log(...currentTemplate);
 			debugger; /* Stopped parsing a RML template */
 		}
@@ -218,7 +219,7 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 					// will set the textContent of the given textNode
 					addRef(ref, TextContent(expression));
 					// FIXME: tbd
-					// FIXME: are we adding the #REF multiple times?
+					// FIXME: are we adding #REF multiple times?
 					//acc = existingRef?accPlusString:acc +string.replace(/\s*>/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`) +ref;
 					acc += (existingRef?string:string.replace(/\s*>(?=[^<]*$)/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`)) +INTERACTIVE_NODE_START +(initialValue ?? '') +INTERACTIVE_NODE_END;
 

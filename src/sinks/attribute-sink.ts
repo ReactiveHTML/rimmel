@@ -173,7 +173,7 @@ export const DOMAttributePreSink = (attributeName: string): Sink<Element> =>
 ;
 
 
-export const AttributeObjectSink: Sink<HTMLElement | SVGElement | MathMLElement> = (node: HTMLElement | SVGElement | MathMLElement) =>
+export const AttributeObjectSink = <T extends HTMLElement | SVGElement | MathMLElement>(node: T) =>
     (attributeobject: AttributeObject) => {
         (Object.entries(attributeobject) ?? [])
             .forEach(([k, v]) => {
@@ -186,9 +186,10 @@ export const AttributeObjectSink: Sink<HTMLElement | SVGElement | MathMLElement>
                   node.addEventListener(k.substring(2), ((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then)?.bind(v) ?? v, {capture: true})
                 } else {
                     const sink = k == 'dataset' ? DatasetObjectSink
-                    :  k.startsWith('data-') ? DatasetItemPreSink(k.substring(5))
+                    :  k.startsWith('data-') ? <Sink<T>>DatasetItemPreSink(k.substring(5))
                     : sinkByAttributeName.get(k)
-                    ?? DOMAttributeSink;
+                    ?? FixedAttributeSink;
+                    //?? DOMAttributeSink;
 
                     asap(sink(node, k), v); // TODO: use drain()
                 }

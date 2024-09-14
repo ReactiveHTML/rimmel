@@ -29,3 +29,4 @@ export const BOOLEAN_ATTRIBUTES = new Set<string>([
 
 // export type BooleanAttribute = typeof BOOLEAN_ATTRIBUTES extends Set<infer T> ? T : never;
 export type BooleanAttribute = (typeof BOOLEAN_ATTRIBUTES)['values'] extends () => Iterator<infer T> ? T : never;
+

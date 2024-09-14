@@ -24,3 +24,4 @@ export const NON_BUBBLING_DOM_EVENTS: Set<RMLEventName> = new Set<RMLEventName>(
     'waiting',
     'rml:mount',
 ]);
+

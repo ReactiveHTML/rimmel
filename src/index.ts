@@ -24,7 +24,7 @@ export type { Sink, SinkFunction } from './types/sink';
 export type { Stream } from './types/futures';
 export type { DocumentObject, HTMLContainerElement, HTMLString } from './types/dom';
 
-export { pipeIn } from './utils/input-pipe';
+export { pipeIn, reversePipe } from './utils/input-pipe';
 
 // Event Sources
 export * from './sources/index';

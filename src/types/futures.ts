@@ -1,5 +1,5 @@
-import type { BehaviorSubject, Subject } from 'rxjs';
-export type { BehaviorSubject, OperatorFunction, Subject } from 'rxjs';
+import type { BehaviorSubject, Observable, Observer, Subject, Subscription } from 'rxjs';
+export type { BehaviorSubject, Observable, Observer, OperatorFunction, Subject, Subscription } from 'rxjs';
 
 // export type Subject<T> = {
 //     subscribe: (observer: ObserverFunction<T>) => Subscription;
@@ -20,23 +20,23 @@ export type ObserverFunction<T> = (value: T) => void;
 export type ObserverErrorFunction = (e: Error) => void;
 export type ObserverCompleteFunction = () => void;
 
-export type Observable<T> = {
-    subscribe: (observer: Observer<T> | ObserverFunction<T>, error?: ObserverErrorFunction, complete?: ObserverCompleteFunction) => Subscription;
-};
+// export interface Observer<I> {
+//     next: ObserverFunction<I>;
+//     error?: ObserverErrorFunction;
+//     complete?: ObserverCompleteFunction;
+// };
 
-export interface Observer<I> {
-    next: ObserverFunction<I>;
-    error?: ObserverErrorFunction;
-    complete?: ObserverCompleteFunction;
-};
+// export type Observable<T> = {
+//     subscribe: (observer: Observer<T> | ObserverFunction<T>, error?: ObserverErrorFunction, complete?: ObserverCompleteFunction) => Subscription;
+// };
 
 export const isObserver = (x: any): x is Observer<any> =>
     !!x?.next;
 
-export type Subscription = {
-	destination: any; // FIXME HACK: an internal RxJS property, not to be relied upon
-    unsubscribe: () => void;
-};
+// export type Subscription = {
+// 	destination: any; // FIXME HACK: an internal RxJS property, not to be relied upon
+//     unsubscribe: () => void;
+// };
 
 /**
  * An in-out stream, also known as an Observable Subject

@@ -1,8 +1,6 @@
 import { EventListenerFunction } from "../types/dom";
 import type { RMLTemplateExpression } from "../types/internal";
-import type { Source } from "../types/source";
 
-//export type ObjectSourceExpression = Record<string, string> //[target: object | Array<string | number | object>, key: string | number];
 export type TargetObject = object | Array<string | number | object | Function>; // Record<string, unknown>;
 export type ObjectSourceExpression<T extends TargetObject> = [target: T, key: keyof T];
 

@@ -1,4 +1,5 @@
 import type { BooleanAttribute } from "../definitions/boolean-attributes";
+import type { Subscribable } from "rxjs";
 
 import { ObjectSourceExpression, TargetObject } from "../sources/pojo-source";
 import { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString  } from "./dom";
@@ -95,8 +96,9 @@ export namespace RMLTemplateExpressions {
 
 	export type HTMLText = MaybeFuture<HTMLString>;
 	export type TextString = MaybeFuture<string>;
+	export type StringLike = MaybeFuture<string | number | Array<string | number>>;
 
-	export type POJO<T extends TargetObject> = ObjectSourceExpression<T>;
+	export type POJO = ObjectSourceExpression<TargetObject>;
 	/**
 	 * A CSS declaration "property: value;" string
 	 */
@@ -107,7 +109,7 @@ export namespace RMLTemplateExpressions {
 	export type GenericHandler = BindingConfiguration;
 
 	// Implicit Source
-	export type SourceExpression<T> = Observer<T> | ((t: T) => void);
+	export type SourceExpression<T> = Observer<T> | Subscribable<T> | ((t: T) => void);
 
 	export type SinkExpression = Sink<Element | Text>;
 	// export type Empty = MaybeFuture<undefined | null | ''>;
@@ -159,7 +161,7 @@ export type Handler<E extends Element, T extends RMLEventName=any> =
 	| number
 	| string
 	| boolean
-	| ObjectSourceExpression
+	// | ObjectSourceExpression
 	| Record<AttributeName, AttributeValue>
 	| CSSClassName
 	| Function

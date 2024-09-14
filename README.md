@@ -17,7 +17,7 @@ No need to unsubscribe or dispose of observers or perform any manual memory clea
 
 Rimmel works with standard JavaScript/TypeScript template literals tagged with `rml` out of the box.
 
-## Hello World
+## Hello World (the click-counter component)
 The modern "Hello World" for reactive interfaces is the click counter: one button, one text box.<br>
 This is how it works:
 
@@ -54,6 +54,12 @@ What you do instead, is you _declare_ the stream your changes come from and what
 <target property="${source}">
 ```
 
+## Virtual DOM? No
+Rimmel doesn't make use of any Virtual DOM. That concept originates from the assumption that the DOM is slow. This might be the case with some frameworks that make a large number of unnecessary updates, but Rimmel never makes any when not needed. Only you control when an update should happen.
+
+Rimmel uses Sinks, which are direct DOM manipulation functions, attached to the Observable streams you provide. Whenever there is new data, it gets to the DOM immediately. You are in control of when or how often you emit data. You can throttle/sample/debounce as you see fit for your application.
+
+
 ## Hello World "Plus"
 Want a more involved example?<br>
 Let's make a component featuring a Red, Green and Blue slider that get transformed into an #RRGGBB colour string, displayed in a text box and used as the fill colour of an SVG circle:
@@ -66,7 +72,6 @@ Here is the corresponding code:
 const toHex = n => n.toString(16).padStart(2, '0');
 const toRGBString = rgbArr => `#${rgbArr.map(toHex).join('')}`;
 const toNumericStream = x => new Subject().pipe(
-
   map(e=>parseInt(e.target.value, 10)),
   startWith(x),
 );
@@ -110,18 +115,34 @@ When they emit, their values are merged together through `combineLatest`, which 
 Finally, we have two sinks where the data ends up; one as the innerHTML of the <span>, ther other as the fill colour of the SVG shape.
 
 ## State doesn't exist (it's a Stream)
-"State", as the word itself suggests, is static, so it doesn't belong to the dynamic, interactive, reactive webapps we make every day.
+"State", as the word itself suggests, is something static, so it doesn't belong to the dynamic, interactive, reactive webapps we make every day.
 
-State, as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow. You only need those when certain events happen, so you can respond.
-After that everything should go quiet, including your CPU, to keep your laptop cool until the next UI event occurs. Meantime, you still don't care what's the value of "x" whilst you're busy reading about FRP frameworks.
+The rationale is that "state", as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow. You only need those when certain events happen, in order to respond.
 
-This is, in summary, the _discrete-functional-reactive_ paradigm behind Observables and RxJS (as opposed to the original functional-reactive paradigm in which state is more like a continuous flow of data).
+After that everything should go quiet, including your CPU, to keep your laptop cool until the next UI event occurs.
+
+This is, in summary, the _discrete-functional-reactive_ paradigm behind Observables and RxJS (as opposed to the functional-reactive paradigm in general in which state is more like a continuous flow of data).
 
 Event-driven reactivity as modelled by Observables is therefore the perfect way to describe state as it changes through the lifetime of an application at the occurrence of various discrete UI events.
 
-Modelling your state as observable streams will give you fine-grained control over async events and their coordination, thanks to the full range of RxJS operators you can use.
+
+<img src="docs/assets/how-rimmel-works-9.png" alt="State doesn't exist" style="max-height: 100vh;">
+
+
+Modelling your state as one or more observable streams will give you fine-grained control over async events and their coordination, thanks to the full range of RxJS operators you can use.
 
 All Rimmel does is binding your observable streams to the UI with a seamless integration that will result in improved code quality, scale, testability and performance.
+
+
+## "Lifecycle Events" are gone (you have streams)
+Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless and redudant here. Streams get connected and disconnected automatically for you and that happens to be what you normally do in your init/onmount function.
+Using streams instead makes your code immensely cleaner and more testable.
+
+Rimmel still has a `rml:onmount` event, but its use is only left as a last resort to integrate imperative, non-Rimmel components (some old jQuery plugins, etc?)
+
+## Migration from/to other frameworks and libraries
+This might sound unusual, but Rimmel can actually coexist with other frameworks. Your Rimmel component can be embedded in a React component and have Vue.js children, even use jQuery plugins or sit inside a jQuery application, or the other way around.
+This will enable you to perform a progressive migration, one component at a time, from one framework to another.
 
 
 # Sources vs. Sinks
@@ -137,7 +158,7 @@ With RML/Rimmel you can treat most DOM elements as sources, sinks, or both.
 
 ## Stream Processing
 Sources normally emit raw data, not meant to display in a UI (e.g.: a `ScrollEvent` or a `MouseEvent`), so what we do is to process and format them.
-RxJS comes with a comprehensive set of utility functions to transform data streams.
+RxJS comes with a comprehensive set of utility functions to transform data streams, so Rimmel doesn't offer any. This enables you to choose any 
 
 ## Event Sources
 Rimmel supports event listeners from all DOM elements.
@@ -165,13 +186,14 @@ target.innerHTML = rml`<div style="color: ${color}; background: black;">
 ```
 
 ### Event Mappers
-In normal circumstances your event handlers receive a DOM Event object, such as MouseEvent, PointerEvent, etc.
-To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Mappers to feed your event handlers with the raw data you need, rather than Event objects.
-Do you want the [x, y] mouse coordinates when hovering an element?
-Use <div onmousemove="${PointerXY(handler)}">
+In normal circumstances your event handlers receive a native DOM Event object, such as `MouseEvent`, `PointerEvent`, etc.
+To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Mappers to feed your event handlers with the raw data you need, instead of DOM Event objects.
+
+Do you only need the `[x, y]` mouse coordinates when hovering an element?<br>
+Use `<div onmousemove="${PointerXY(handler)}">`
 
 Do you want the last typed character when handling keyboard events?
-Use <input oninput="${Key(handler)}">
+Use `<input oninput="${Key(handler)}">`
 
 ## Data Sinks
 Rimmel supports two types of sinks: specialised and dynamic sinks.
@@ -191,6 +213,10 @@ Dynamic sinks can emit any of the above and will be evaluated at runtime.
 Best suited for cases when flexibility is preferred over raw performance.
 
 You can create and use your custom sinks to have fine-grained control over the rendering of particular pieces of data (E.G.: Data Collections, generic vector graphics to map or render on SVG or canvas, 3D models to translate to WebGL)
+
+### Custom Sinks
+Do you have any more specific way to display your data? You can create and use your own custom sinks. They are the opposite of Event Mappers, in that they take a stream of data and render in on the page the way you like.
+
 
 ### Examples:
 
@@ -320,13 +346,14 @@ These are obviously edge cases where "fast updates" are obviously irrelevant.<br
 However, Rimmel can still help implementing your custom logic and optimisation patterns in an ergonomic, functional-reactive style that's easy to test and keep well organised.
 
 ## Memory management
-If you come from some other libraries or frameworks, including RxJS, you know you're somewhat responsible of cleaning up memory. The indiscriminate use of Observable subscriptions can cause memory leaks in certain scenarios.
+If you come from some other libraries or frameworks, including RxJS, you know you're somewhat responsible of cleaning up memory. The indiscriminate use of Observable subscriptions can cause memory leaks in various scenarios.
 
-Using Observables with Rimmel is trivial. All DOM subscriptions and event listeners are handled by the library behind the scenes. Registered when a component is mounted and unregistered when it's removed.
+Using Observables with Rimmel is trivial. All DOM subscriptions and event listeners are handled by the library behind the scenes, registered when a component is mounted and unregistered when it's removed.
 
 ## "Suspense" for free, out of the box
 Do you have async data like an API call and a placeholder to display whilst waiting? We have good news: a BehaviorSubject is all you need.
 The BehaviorSubject, since it has an initial, "current" value, is the perfect candidate for this, and as such, it receives a special treatment from Rimmel in that its initial value will be rendered immediately, synchronously, whilst subsequent emissions will replace it as normal.
+
 ```javascript
 const WaitingComponent = () => {
   const stream = new BehaviorSubject('loading...').pipe(
@@ -346,6 +373,8 @@ We are creating a few experimental AI assistants like [RimmelGPT.js](https://cha
 (Please note these are still highly experimental and various forms of hallucination can happen under different circumstances — YMMV)
 
 ## Building and testing
+Either with bun or other runtimes:
+
 ```bash
 bun install
 bun run build
@@ -354,14 +383,15 @@ bun test
 
 ## Roadmap
 - Completion handlers (what should happen when observables complete?)
-- Error sinks (what if they throw?)
-- Performance benchmarks (we know it's fast, but... how much?)
-- SSR (Transferable Promises, Transferable Observables)
+- Error sinks (what if streams throw?)
+- Performance benchmarks (we know it's fast, but, show the numbers!)
+- SSR, Server Components, Transferable Promises, Transferable Observables
 - Scheduler support for real-time apps (trading front-ends, ad-tech, gaming, ...)
 - Support text node and HTML comment sinks
-- Possible support for the EventEmitter both as a source and a sink
+- EventEmitter support?
 - Separate memory-optimised and speed-optimised sinks.
 - Compiled Templates (because it's never fast enough, right?)
+- JSX/ESX support?
 - Plugin support
 - Sink pipelines (just like you have rendering pipelines in computer graphics)
 - RML Security (leverage pipelines to weed out XSS and other dirt)
@@ -371,3 +401,9 @@ There are discussions going on around making HTML and/or the DOM natively suppor
 
 Rimmel is closely following these initiatives and aims to align with them as they develop.
 
+## Contributing
+
+[![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
+
+
+If you like Rimmel and would like to help the functional-reactive world grow in the JavaScript land, come say hi and let's talk.

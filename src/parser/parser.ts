@@ -1,4 +1,5 @@
 import type { AttributeObject, BindingConfiguration, RMLTemplateExpression, RMLTemplateExpressions, SourceBindingConfiguration } from "../types/internal";
+import type { Sink } from "../types/sink";
 import type { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
 
 import { isSinkBindingConfiguration } from "../types/internal";
@@ -11,7 +12,8 @@ import { NON_BUBBLING_DOM_EVENTS } from "../definitions/non-bubbling-events";
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUTE, RML_DEBUG } from "../constants";
 import { delegateEvent } from "../lifecycle/event-delegation";
 
-import { PreSink, sinkByAttributeName } from "../sinks/index";
+import { PreSink } from "../sinks/index";
+import { sinkByAttributeName } from '../parser/sink-map';
 import { DOMAttributePreSink, FixedAttributePreSink } from "../sinks/attribute-sink";
 import { Mixin } from "../sinks/mixin-sink";
 import { ObjectSource, isObjectSource } from "../sources/pojo-source";
@@ -176,17 +178,26 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 					// <some-tag some-attribute="some-value" ...${mixin}></some-tag>
 					// <some-tag some-attributes ...${mixin} other-stuff>...</some-tag>
 					// will bind multiple attributes and values
-					const attrs = <AttributeObject>expression;
+					let sink: Sink;
+					if(isSinkBindingConfiguration(expression)) {
+						acc = accPlusString;
+						sink = expression;
+					} else {
+						const attrs = <AttributeObject>expression;
 
-					acc += string.replace(/\.\.\.$/, '');
-					// Map static (string, number) properties of the mixin to attributes
-					acc += Object.entries(attrs || {})
-						.filter(([, v]) => typeof v == 'string' || typeof v == 'number')
-						.map(([k, v])=>`${k}="${v}"`)
-						.join(' ')
-					;
+						acc += string.replace(/\.\.\.$/, '');
+						// Map static (string, number) properties of the mixin to attributes
+						acc += Object.entries(attrs || {})
+							.filter(([, v]) => typeof v == 'string' || typeof v == 'number')
+							.map(([k, v])=>`${k}="${v}"`)
+							.join(' ')
+						;
+
+						sink = Mixin(attrs);
+					}
+
 					// TODO: should we care about cleaning up the sink object from static attributes?
-					addRef(ref, Mixin(attrs));
+					addRef(ref, sink);
 					acc = acc.replace(/<(\w[\w-]*)\s+([^<]*)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 
 				} else if(/>\s*$/.test(string) && /^\s*</.test(nextString)) {

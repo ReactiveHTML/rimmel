@@ -21,10 +21,11 @@ init();
 
 // Types
 export type { Sink, SinkFunction } from './types/sink';
+export type { SinkBindingConfiguration } from './types/internal';
 export type { Stream } from './types/futures';
 export type { DocumentObject, HTMLContainerElement, HTMLString } from './types/dom';
 
-export { pipeIn, reversePipe } from './utils/input-pipe';
+export { inputPipe, pipeIn } from './utils/input-pipe';
 
 // Event Sources
 export * from './sources/index';
@@ -40,7 +41,6 @@ export type { Component, Mixin } from './types/constructs';
 export type { RMLTemplateExpressions } from './types/internal';
 
 // Main entries
-export const render = rml;  // Deprecated, always use rml instead. Compat only. Will be removed shortly.
 export const html = rml;    // Shall we?
 export { default as rml } from './parser/parser';
 

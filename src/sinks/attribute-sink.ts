@@ -6,7 +6,7 @@ import type { RMLEventAttributeName } from '../types/dom';
 
 import { asap } from '../lib/drain';
 import { isFunction } from '../utils/is-function';
-import { sinkByAttributeName } from '.';
+import { sinkByAttributeName } from '../parser/sink-map';
 
 type EventListenerDeclarationWithOptions = [Function, EventListenerOptions];
 
@@ -145,6 +145,11 @@ export const FixedAttributePreSink = (attributeName: string): Sink<Element> =>
     (node: Element) =>
         // data => node.setAttribute(attributeName, data)
         node.setAttribute.bind(node, attributeName)
+;
+
+export const ToggleAttributePreSink = (attributeName: string): Sink<Element> =>
+    (node: Element) =>
+        node.toggleAttribute.bind(node, attributeName)
 ;
 
 /**

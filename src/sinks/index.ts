@@ -1,39 +1,5 @@
 import { Sink } from "../types/sink";
-import { CheckedSink } from "./checked-sink";
-import { DisabledSink } from "./disabled-sink";
-import { FixedAttributePreSink } from "./attribute-sink";
-import { ClosedSink } from "./closed-sink";
-import { ClassName, ClassObjectSink, ToggleClass } from "./class-sink";
-import { DatasetSink, DatasetObjectSink } from "./dataset-sink";
-import { InsertAdjacentHTMLSink, InnerHTMLSink, InnerTextSink, TextContentSink } from "./content-sink";
-import { RemovedSink } from "./removed-sink";
-import { ReadonlySink } from "./readonly-sink";
-import { StyleObjectSink } from "./style-sink";
-import { ValueSink } from "./value-sink";
 import { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
-
-export const sinkByAttributeName = new Map(<Iterable<readonly [string, Sink<any>]>>[
-	['appendHTML',      InsertAdjacentHTMLSink],
-	['contenteditable', FixedAttributePreSink('contenteditable')],
-	['rml:removed',     RemovedSink],
-	['rml:closed',      ClosedSink],
-	['checked',         CheckedSink],
-//  ['rml:checked',     DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
-	['disabled',        DisabledSink],
-//  ['rml:disabled',    DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
-	['class',           ClassObjectSink],
-	['innerHTML',       InnerHTMLSink],
-	['innerText',       InnerTextSink],
-	['readonly',        ReadonlySink],
-//  ['rml:readonly',    ReadonlySink], // Can make this one act as a boolean attribute that understands "false" and other values...
-	['style',           StyleObjectSink],
-	['textContent',     TextContentSink],
-	['value',           ValueSink],
-	['rml:dataset',     DatasetObjectSink],
-	['dataset',         DatasetObjectSink], // Shall we include this, too?
-	['data-',           DatasetSink],
-	// ['termination',  terminationSink], // a sink that runs when an observable completes... will we ever need this?
-]);
 
 // /**
 //  * Force a custom Sink through to a template

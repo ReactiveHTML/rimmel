@@ -1,4 +1,5 @@
-import { Observable } from 'rxjs';
+import type { Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 /**
  * Observable Suspence Sink — renders an initial value synchronously, then emits subsequent values of the given stream as normal
@@ -7,11 +8,18 @@ import { Observable } from 'rxjs';
  * @returns 
  */
 export default function Suspense<T>(initial: T, subsequent: Observable<T>): Observable<T> {
-    return new Observable((observer) => {
-        observer.next(initial);
-        subsequent.subscribe(observer);
-    });
+	const current = new BehaviorSubject(initial);
+	// TODO: store a reference for unsubscription?
+    subsequent.subscribe(current);
+	return current;
 };
+
+// export default function Suspense<T>(initial: T, subsequent: Observable<T>): Observable<T> {
+//     return new Observable((observer) => {
+//         observer.next(initial);
+//         subsequent.subscribe(observer);
+//     });
+// };
 
 // /**
 //  * 

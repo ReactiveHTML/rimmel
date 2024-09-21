@@ -11,14 +11,14 @@ type rxPipe<I, O> = (...pipeline: OperatorPipeline<I, O>) => (input: Observable<
  * Create an "input pipe" by prepending operators to the input of an Observer or a Subject
  * This works the opposite of RxJS's pipe(), which works on the output of an Observable.
 **/
-export const reversePipe =
+export const pipeIn =
 	<I, O=I>(target: RMLTemplateExpressions.SourceExpression<O>, ...pipeline: OperatorPipeline<I, O>): Observer<I> => {
 		const source = new Subject<I>();
 		source
 			.pipe(...(<[OperatorFunction<I, O>]>pipeline))
 			.subscribe(target)
 		;
-		// FIXME: will we need to unsubscribe?
+		// FIXME: will we need to unsubscribe? Then store a reference for unsubscription
 		// TODO: can we/should we delay subscription until mounted? Could miss the first events otherwise
 
 		return source;
@@ -27,13 +27,13 @@ export const reversePipe =
 /**
  * Create an "input pipe" by prepending operators to an Observer or a Subject
  * This works the opposite of the pipe() function in RxJS, which transforms the output of an observable.
- * whilst pipeIn transforms the input.
- * @example const p = pipeIn(...pipeline);
- *   const p2 = pipeIn(targetObserver);
+ * whilst inputPipe transforms the input.
+ * @example const p = inputPipe(...pipeline);
+ *   const p2 = inputPipe(targetObserver);
 **/
-export const pipeIn = <I, O=I>(...pipeline: OperatorPipeline<I, O>) =>
+export const inputPipe = <I, O=I>(...pipeline: OperatorPipeline<I, O>) =>
 	(target: RMLTemplateExpressions.SourceExpression<O>) =>
-		reversePipe(target, ...pipeline)
+		pipeIn(target, ...pipeline)
 ;
 
 

@@ -1,5 +1,4 @@
 import type { BooleanAttribute } from "../definitions/boolean-attributes";
-import type { Subscribable } from "rxjs";
 
 import { ObjectSourceExpression, TargetObject } from "../sources/pojo-source";
 import { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString  } from "./dom";
@@ -11,7 +10,6 @@ import { Sink } from "./sink";
 import type { CSSClassName, CSSObject, CSSValue } from "./style";
 
 type ErrorHandler = (e: Error) => void;
-
 /**
  * Data binding configuration for event sources or data sinks
  * Used to describe a binding between a source and a sink when mounting a template
@@ -109,7 +107,7 @@ export namespace RMLTemplateExpressions {
 	export type GenericHandler = BindingConfiguration;
 
 	// Implicit Source
-	export type SourceExpression<T> = Observer<T> | Subscribable<T> | ((t: T) => void);
+	export type SourceExpression<T> = Observer<T> | ((t: T) => void);
 
 	export type SinkExpression = Sink<Element | Text>;
 	// export type Empty = MaybeFuture<undefined | null | ''>;

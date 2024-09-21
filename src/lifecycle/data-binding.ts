@@ -133,7 +133,9 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 							// 	null
 							// ;
 
-							if (NON_BUBBLING_DOM_EVENTS.has(eventName)) {
+							if (NON_BUBBLING_DOM_EVENTS.has(eventName) || node.getRootNode() instanceof ShadowRoot) {
+								// We add an event listener for all those events who don't bubble by default (as we're delegating them to the top)
+								// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
 								node.addEventListener(eventName, listener, { capture: true });
 							}
 							// if it's an event source (like onclick, etc)

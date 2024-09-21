@@ -32,6 +32,9 @@ export * from './sources/index';
 // Data Sinks
 export * from './sinks/index';
 
+// Experimental Web Component support
+export { RegisterElement } from './custom-element';
+
 // Utilities (Will take them out to the framework)
 export type { Component, Mixin } from './types/constructs';
 export type { RMLTemplateExpressions } from './types/internal';
@@ -43,3 +46,4 @@ export { default as rml } from './parser/parser';
 
 // Experimental stuff
 // export { rml } from 'rml/scandal';
+

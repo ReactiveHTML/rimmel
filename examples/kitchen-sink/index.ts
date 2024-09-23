@@ -1,27 +1,28 @@
-import type { HTMLString, Mixin } from '../../src/index';
+import type { HTMLString, SinkBindingConfiguration } from '../../src/index';
 
-import { BehaviorSubject, Subject, interval, map, of, scan, startWith, switchMap, take, tap, throwError, withLatestFrom } from 'rxjs';
-import { AppendHTML, InnerText, InnerHTML, InnerHTMLSink, Removed, TextContent, Update, rml } from '../../src/index';
-import { Value, ValueAsDate, ValueAsNumber, Dataset, EventData, Key, ClientXY, Numberset, pipeIn } from '../../src/index';
+import { BehaviorSubject, Observable, Subject, interval, filter, map, of, scan, startWith, switchMap, take, tap, throwError, withLatestFrom } from 'rxjs';
+import { inputPipe, AppendHTML, InnerText, InnerHTML, InnerHTMLSink, Removed, TextContent, Update, rml } from '../../src/index';
+import { Value, ValueAsDate, ValueAsNumber, Dataset, EventData, Target, Key, OffsetXY, Numberset, pipeIn } from '../../src/index';
 import { char } from '../../src/types/basic';
-import { DefineCustomElement } from '../../src/custom-element';
+import { RegisterElement } from '../../src/custom-element';
 
 const xxx = (e)=>console.log('something', e);
 
-DefineCustomElement('custom-element', ({ title, content, oninput, onsomething }) => {
-	const mount = function(e: Event) {
-		// debugger;
-		this.dispatchEvent(new CustomEvent('something'), { value: 'something' });
-		// onsomething?.();
+RegisterElement('custom-element', ({ title, content, onbuttonclick, onput }) => {
+	const handle = e => {
+		console.log('Internal event', e);
+		onput.next(e);
 	}
 
+	const Foo = ;
+
 	return rml`
-		<div class="cls1" rml:onmount="${mount}">
+		<div class="cls1">
 			<h3>${title}</h3>
 			<p>${content}</p>
-			Custom Element Works<br>
-			<input type="text" onmousemove="${xxx}">
-			<input type="text" oninput="${xxx}">
+			Custom Element Works!<br>
+			<input type="text" onchange="${Value(handle)}">
+			<button type="button" data-foo="bar1" onclick="${Dataset('foo', handle)}">click me</button>
 		</div>
 	`;
 });
@@ -125,7 +126,7 @@ const sources = {
 		);
 
 		return rml`
-			<div onmousemove="${ClientXY(stream)}" style="background-color: #ffff80; padding: 3rem;">
+			<div onmousemove="${OffsetXY(stream)}" style="background-color: #ffff80; padding: 3rem;">
 				<div>Mouse me over!</div>
 				<div>Coords: <span>${stream}</span></div>
 			</div>
@@ -215,14 +216,65 @@ const sinks = {
 	},
 
 	CustomElement: () => {
-		const notify = (key: char) => void console.log(key);
-		const titleStream = interval(1000).pipe(
+		const notify = (key: string) => void console.log('Notify', key);
+
+		const titleStream = interval(100).pipe(
 			map(i => `title ${i}`),
 		);
 
-		return  rml`
+		return rml`
 			Should be a custom element
-			<custom-element title="${titleStream}" content="hello" foo="bar" oninput="${EventData(notify)}" onsomething="${notify}" />
+			<custom-element title="${titleStream}" content="hello" data-foo="bar2" oninput="${EventData(notify)}" onclick="${Dataset('foo')(notify)}" />
+		`;
+	},
+
+	CustomElement2: () => {
+		const notify = (key: string) => void console.log('Notify', key);
+		const Foo = Dataset('foo');
+
+		const titleStream = interval(100).pipe(
+			map(i => `title ${i}`),
+		);
+
+		return rml`
+			Should be a custom element
+			<custom-element title="${titleStream}" content="hello" data-foo="bar2" oninput="${EventData(notify)}" onclick="${Foo(notify)}" />
+		`;
+	},
+
+	CustomElement3: () => {
+		const notify = (key: string) => void console.log('Notify', key);
+
+		const titleStream = interval(100).pipe(
+			map(i => `title ${i}`),
+		);
+
+		return rml`
+			Should be a custom element
+			<custom-element title="${titleStream}" content="Hello, injected content" data-foo="bar2" onput="${notify}" onbuttonclick="${notify}" />
+		`;
+	},
+
+	Calculator: () => {
+		const state = new BehaviorSubject<number>(0).pipe(
+			scan((acc, input) => {
+				input +acc
+				return acc
+			}, 0)
+		);
+
+		const TargetButton = inputPipe<Event, number>(
+			map((e: Event) => Number((<HTMLElement>e.target).dataset.key)),
+			filter(x => x),
+		);
+
+		return rml`
+			<div onclick="${TargetButton(state)}">
+				<button data-key="1">1</button>
+				<button data-key="2">2</button>
+				<button data-key="3">3</button>
+			</div>
+			<div>${state}</div>
 		`;
 	},
 
@@ -230,7 +282,7 @@ const sinks = {
 		const bg = 'green';
 
 		return  rml`
-			<div style="background: red; color: ${bg}; padding: 1rem;">
+			<div style="background: clay; color: ${bg}; padding: 1rem;">
 				Should be green
 			</div>
 		`;
@@ -240,7 +292,7 @@ const sinks = {
 		const bg = defer('green');
 
 		return  rml`
-			<div style="background: red; color: ${bg}; padding: 1rem;">
+			<div style="background: clay; color: ${bg}; padding: 1rem;">
 				Should turn green
 			</div>
 		`;
@@ -259,7 +311,7 @@ const sinks = {
 			scan(x=>x+1),
 		);
 
-		const mixin1: Mixin = (args?: any) => {
+		const mixin1 = (args?: any) => {
 			const dataset = {
 				foo: 'foo',
 				bar: defer('bar'),
@@ -272,7 +324,7 @@ const sinks = {
 
 			const style = {
 				color: 'red',
-				font: defer('32px monospace', 1000),
+				font: defer('24px monospace', 1000),
 			};
 
 			const events = {
@@ -311,7 +363,7 @@ const sinks = {
 			scan(x=>x+1, 0),
 		);
 
-		const mixin1: Mixin = async (args?: any) => {
+		const mixin1 = async (args?: any) => {
 			const dataset = {
 				hello: 'world',
 				// test: () => 123, // TS error ;)
@@ -355,7 +407,7 @@ const sinks = {
 	},
 
 	Mixin2: () => {
-		const mixin2: Mixin = (args?: any) => {
+		const mixin2 = (args?: any) => {
 			const dataset = new Subject();
 			const classObject = new Subject();
 			const style = new Subject();
@@ -407,17 +459,6 @@ const sinks = {
 				<button onclick="${removed}">Remove</button>
 			</div>
 		`
-	},
-
-	'Removed (Explicit on self)': () => {
-		const removed = new Subject<Event>();
-
-		return rml`
-			<div rml:removed="${Removed(removed)}">
-				Removed (Explicit) sink
-				<button onclick="${removed}">Remove</button>
-			</div>
-		`;
 	},
 
 	'Removed (Implicit Mixin)': () => {
@@ -544,7 +585,7 @@ const sinks = {
 			<dialog open="${open$}">
 				<p>dialog content</p>
 			</dialog>
-			<button onclick="${open$}">open</button>
+			<button onclick="${open$}">toggle</button>
 		`;
 	},
 
@@ -626,11 +667,11 @@ const sinks = {
 		`;
 	},
 
-	OnMount: () => {
+	HTMLOnMount: () => {
 		const onmount = () => alert('mounted');
 
 		return rml`
-			<div onmount="${onmount}">do on mount</div>
+			<div onmount="${onmount}">do on mount (=nothing)</div>
 		`;
 	},
 
@@ -698,7 +739,7 @@ const sinks = {
 	},
 
 	Sanitize: () => {
-		const Sanitize = input => ({
+		const Sanitize = (input: Observable<string>) => ({
 			type: 'sink',
 			source: input.pipe(
 				map(strHTML => strHTML.replace(/</g, '&lt;'))
@@ -714,27 +755,30 @@ const sinks = {
 	},
 
 	CustomSink: () => {
-		const Animate = input => ({
+		const Animate: SinkBindingConfiguration<HTMLElement> = (input: Observable<any>) => ({
 			type: 'sink',
 			source: input,
-			sink: node => {
-				debugger;
-				node.animate([
-					{ transform: "rotate(0) scale(1)" },
-					{ transform: "rotate(1turn) scale(0)" },
-				],{
-					duration: 2000,
-					iterations: 1,
-				})
+			sink: (node: HTMLElement) => {
+				node.style.display = 'inline-block';
+				return (data: any) => {
+					node.style.transformOrigin = 'center center';
+					node.animate([
+						{ transform: "rotate(0turn) scale(1)" },
+						{ transform: "rotate(1turn) scale(0)" },
+					],{
+						duration: 1000,
+						iterations: 1,
+					});
+				};
 			}
 		});
 
-		const stream = new Subject();
+		const stream = new Subject<any>();
 
 		return rml`
 			<div>
 				Blah
-				<div ...${Animate(stream)}>Hohoho</div>
+				<div ...${Animate(stream)}>Animated bit</div>
 			</div>
 
 			<button onclick="${stream}">animate</button>
@@ -792,7 +836,7 @@ const component = () => {
 	return rml`
 		<style>
 			* {
-				font-size: 18px;
+				font-size: 16px;
 			}
 
 			body {
@@ -834,6 +878,7 @@ const component = () => {
 			.output {
 				position: fixed;
 				left: 0;
+				top: 0;
 				bottom: 0;
 				width: 100%;
 				margin: 0;
@@ -874,7 +919,7 @@ const component = () => {
 					<ul style="max-height: 50vh; overflow: auto; column-count: 2; list-style-type: none;">
 					${
 						Object.keys(sources).map((t, i, tests)=>rml`
-							<li><button title="${Tooltip(tests[t])}" onclick="${pipeIn(map(()=>[sources, t]))(chosen)}">${t}</button></li>
+							<li><button title="${Tooltip(tests[t])}" onclick="${pipeIn(chosen, map(()=>[sources, t] as [object, string]))}">${t}</button></li>
 						`).join('')
 					}
 					</ul>
@@ -885,7 +930,7 @@ const component = () => {
 					<ul style="max-height: 50vh; overflow: auto; column-count: 2; list-style-type: none;">
 					${
 						Object.keys(sinks).map((t, i, tests)=>rml`
-							<li><button title="${Tooltip(tests[t])}" onclick="${pipeIn(map(()=>[sinks, t]))(chosen)}">${t}</button></li>
+							<li><button title="${Tooltip(tests[t])}" onclick="${pipeIn(chosen, map(()=>[sinks, t] as [object, string]))}">${t}</button></li>
 						`).join('')
 					}
 					</ul>
@@ -910,4 +955,3 @@ const component = () => {
 }
 
 document.body.innerHTML = component();
-

@@ -65,6 +65,10 @@ export type SinkElementTypes = {
         elements: HTMLElement | SVGElement | MathMLElement;
         types: HTMLString;
     };
+    'textcontent': {
+        elements: HTMLElement;
+        types: HTMLString;
+    };
     'disabled': {
         elements: HTMLButtonElement | HTMLFieldSetElement | HTMLOptGroupElement | HTMLOptionElement | HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement;
         types: boolean | 'true' | 'disabled';
@@ -83,7 +87,7 @@ export type SinkElementTypes = {
     };
     'text': {
         elements: HTMLElement;
-        types: string;
+        types: string | number;
     };
     'value': {
         elements: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;

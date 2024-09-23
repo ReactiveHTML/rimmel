@@ -83,53 +83,29 @@ export type ElementAttribute =
 ;
 
 export type WritableElementAttribute =
-  | 'className'
-  | 'id'
-  | 'nodeValue'
-  | 'textContent'
-  | 'innerHTML'
-  | 'outerHTML'
-  | 'style'
-  | 'dataset'
-  | 'scrollTop'
-  | 'scrollLeft'
-  | 'offsetParent'
-  | 'offsetTop'
-  | 'offsetLeft'
-  | 'offsetWidth'
-  | 'offsetHeight'
-  | 'onclick'
-  | 'ondblclick'
-  | 'onmousedown'
-  | 'onmouseup'
-  | 'onmouseover'
-  | 'onmousemove'
-  | 'onmouseout'
-  | 'onmouseenter'
-  | 'onmouseleave'
-  | 'onkeydown'
-  | 'onkeypress'
-  | 'onkeyup'
-  | 'onabort'
-  | 'onbeforeinput'
-  | 'oninput'
-  | 'onchange'
-  | 'onreset'
-  | 'onsubmit'
-  | 'onfocus'
-  | 'onblur'
-  | 'onfocusin'
-  | 'onfocusout'
-  | 'onload'
-  | 'onloadeddata'
-  | 'onloadedmetadata'
-  | 'onloadstart'
-  | 'onprogress'
-  | 'onerror'
-  | 'onresize'
-  | 'onscroll'
-  | 'onselect'
-  | 'onwheel'
+    | 'className'
+    | 'id'
+    | 'innerHTML'
+    | 'outerHTML'
+    | 'scrollLeft'
+    | 'scrollTop'
+    | 'slot'
+    | 'nodeValue'
+    | 'textContent'
+;
+
+export type WritableHTMLElementAttribute =
+    | 'accessKey'
+    | 'contentEditable'
+    | 'dir'
+    | 'draggable'
+    | 'hidden'
+    | 'innerText'
+    | 'lang'
+    | 'spellcheck'
+    | 'tabIndex'
+    | 'title'
+    | 'translate'
 ;
 
 const isSource = (k: RMLEventAttributeName, v: MaybeFuture<unknown> | EventListenerObject | EventListenerDeclarationWithOptions) =>
@@ -157,24 +133,25 @@ export const ToggleAttributePreSink = (attributeName: string): Sink<Element> =>
  **/
 export const BooleanAttributeSink: Sink<Element> =
 	(node: Element, attributeName: WritableElementAttribute) =>
-		(value: boolean) => node[attributeName] = value
+		(value: boolean) => (node[attributeName] as unknown) = value
 ;
 
 /**
  * Set an attribute via direct DOM property, rather than setAttribute
  **/
 export const DOMAttributeSink: Sink<Element> =
-	(node: Element, attributeName: string) =>
-		(value: unknown) => node[attributeName] = value
-;
+	(node: Element, attributeName: WritableElementAttribute) =>
+        // node.setAttribute.bind(node, attributeName)
+		(value: unknown) => (node[attributeName] as unknown) = value
+    ;
 
 /**
  * A sink for all boolean DOM attributes (the ones that can be set via node[attr] = value
  * which also support "false" for disabled
  **/
-export const DOMAttributePreSink = (attributeName: string): Sink<Element> =>
+export const DOMAttributePreSink = (attributeName: WritableElementAttribute): Sink<Element> =>
     (node: Element) =>
-        (value: unknown) => node[attributeName] = value
+        (value: unknown) => (node[attributeName] as unknown) = value
 ;
 
 

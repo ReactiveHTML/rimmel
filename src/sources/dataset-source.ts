@@ -15,7 +15,7 @@ import { Source } from "../types/source";
  * @example <button data-foo="bar" onclick="${Dataset(resolveFn, 'foo')}"> ... </button>
  * @example <button data-foo="bar" onclick="${Dataset(rejectFn, 'foo')}"> ... </button>
 **/
-export const Dataset = <T extends HTMLElement, I extends Event, O extends RMLTemplateExpressions.SourceExpression<string | undefined>>
+export const Dataset = <T extends HTMLElement, I extends Event, O extends string | undefined>
 	(key: string, source?: RMLTemplateExpressions.SourceExpression<I | O>): Source<I, O> | Observer<I> | EventListenerFunction<I> => {
 		const handler = inputPipe<I, O>(
 			map((e: I) => <O>((<T>e.target).dataset[key]))
@@ -46,7 +46,7 @@ export const Dataset = <T extends HTMLElement, I extends Event, O extends RMLTem
  * @example <button data-foo="123" onclick="${Numberset(resolveFn, 'foo')}"> ... </button>
  * @example <button data-foo="123" onclick="${Numberset(rejectFn, 'foo')}"> ... </button>
 **/
-export const Numberset = <T extends HTMLElement, I extends Event, O extends RMLTemplateExpressions.SourceExpression<number>>(key: string): Source<I, O> =>
+export const Numberset = <T extends HTMLElement, I extends Event, O extends number>(key: string): Source<I, O> =>
 	inputPipe<I, O>(
 		map((e: Event) => <O>Number((<T>e.target).dataset[key]))
 	)

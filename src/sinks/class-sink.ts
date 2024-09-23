@@ -45,7 +45,7 @@ export const ExperimentalClassObjectSink: Sink<Element> = (node: Element) => {
   const remove = cl.remove.bind(cl);
   const toggle = cl.toggle.bind(cl);
 
-  const actions = new Map<number | boolean | undefined, (name: ClassName) => void>([
+  const actions = new Map<string | number | boolean | undefined, (name: ClassName) => void>([
     [true, add],
     [false, remove],
     [undefined, remove],
@@ -61,7 +61,7 @@ export const ExperimentalClassObjectSink: Sink<Element> = (node: Element) => {
       // FIXME: is it safe to assume it's an object, at this point?
         : Object.entries(name ?? {})
         // .forEach(([k, v]) => v ? add(k) : remove(k));
-        .forEach(([k, v]) => actions[v](k));
+        .forEach(([k, v]) => actions.get(v)?.(k));
   };
 
 };

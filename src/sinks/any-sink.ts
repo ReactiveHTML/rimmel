@@ -1,4 +1,4 @@
-import { sinkByAttributeName } from '.';
+import { sinkByAttributeName } from '../parser/sink-map';
 import { MaybeFuture, Observable } from '../types/futures';
 import { Sink, SinkFunction } from '../types/sink';
 import { DOMAttributeSink } from './attribute-sink';

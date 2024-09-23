@@ -112,6 +112,17 @@ export namespace RMLTemplateExpressions {
 	export type SinkExpression = Sink<Element | Text>;
 	// export type Empty = MaybeFuture<undefined | null | ''>;
 
+
+	export type _TargetEventHandler<T> =
+		| Observer<T>
+		| ((data: T) => void)
+	;
+
+	export type TargetEventHandler<T> =
+		| _TargetEventHandler<T>
+		| Observable<T> // FIXME: This is incorrect. Should only be Observer or a plain function. Only added to support Subject and BehaviorSubject in rx
+	;
+
 	/**
 	 * A valid RML template expression which can be:
 	 * - a static value, when no data binding is required (e.g.: a string)

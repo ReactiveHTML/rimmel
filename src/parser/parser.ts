@@ -1,4 +1,4 @@
-import type { AttributeObject, BindingConfiguration, RMLTemplateExpression, RMLTemplateExpressions, SourceBindingConfiguration } from "../types/internal";
+import type { AttributeObject, BindingConfiguration, RMLTemplateExpression, RMLTemplateExpressions, SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
 import type { Sink } from "../types/sink";
 import type { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
 
@@ -178,7 +178,7 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 					// <some-tag some-attribute="some-value" ...${mixin}></some-tag>
 					// <some-tag some-attributes ...${mixin} other-stuff>...</some-tag>
 					// will bind multiple attributes and values
-					let sink: Sink;
+					let sink: SinkBindingConfiguration<HTMLElement | SVGElement | MathMLElement>;
 					if(isSinkBindingConfiguration(expression)) {
 						acc = accPlusString;
 						sink = expression;

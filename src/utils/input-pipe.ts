@@ -1,6 +1,6 @@
 import type { OperatorFunction } from 'rxjs';
-import type { RMLTemplateExpressions } from '../types/internal';
 import type { Observable, Observer } from '../types/futures';
+import type { RMLTemplateExpressions } from '../types/internal';
 
 import { Subject } from 'rxjs';
 
@@ -12,11 +12,11 @@ type rxPipe<I, O> = (...pipeline: OperatorPipeline<I, O>) => (input: Observable<
  * This works the opposite of RxJS's pipe(), which works on the output of an Observable.
 **/
 export const pipeIn =
-	<I, O=I>(target: RMLTemplateExpressions.SourceExpression<O>, ...pipeline: OperatorPipeline<I, O>): Observer<I> => {
+	<I, O=I>(target: RMLTemplateExpressions.TargetEventHandler<O>, ...pipeline: OperatorPipeline<I, O>): Observer<I> => {
 		const source = new Subject<I>();
 		source
 			.pipe(...(<[OperatorFunction<I, O>]>pipeline))
-			.subscribe(target)
+			.subscribe(<RMLTemplateExpressions._TargetEventHandler<O>>target)
 		;
 		// FIXME: will we need to unsubscribe? Then store a reference for unsubscription
 		// TODO: can we/should we delay subscription until mounted? Could miss the first events otherwise
@@ -32,7 +32,7 @@ export const pipeIn =
  *   const p2 = inputPipe(targetObserver);
 **/
 export const inputPipe = <I, O=I>(...pipeline: OperatorPipeline<I, O>) =>
-	(target: RMLTemplateExpressions.SourceExpression<O>) =>
+	(target: RMLTemplateExpressions.TargetEventHandler<O>) =>
 		pipeIn(target, ...pipeline)
 ;
 

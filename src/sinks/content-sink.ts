@@ -58,8 +58,8 @@ export const InnerHTML: ExplicitSink<'content'> = (source: RMLTemplateExpression
  * @returns RMLTemplateExpression A text-node RML template expression
  * @example <div>${InnerText(stream)}</div>
  */
-export const InnerText: ExplicitSink<'content'> = (source: RMLTemplateExpressions.TextString) =>
-    <SinkBindingConfiguration<Element>>({
+export const InnerText: ExplicitSink<'text'> = (source: RMLTemplateExpressions.StringLike) =>
+    <SinkBindingConfiguration<HTMLElement>>({
         type: 'sink',
         source,
         sink: InnerTextSink,
@@ -85,7 +85,7 @@ export const TextContent: ExplicitSink<'text'> = (source: RMLTemplateExpressions
  * @returns RMLTemplateExpression A text-node RML template expression
  * @example <div>${NodeValue(stream)}</div>
  */
-export const NodeValue: ExplicitSink<'text'> = (source: RMLTemplateExpressions.TextString) =>
+export const NodeValue: ExplicitSink<'text'> = (source: RMLTemplateExpressions.StringLike) =>
     <SinkBindingConfiguration<Element>>({
         type: 'sink',
         source: source,

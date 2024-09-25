@@ -1,8 +1,5 @@
 <img src="docs/assets/github-hero.png" alt="Rimmel.js" style="text-align: start; max-width: 100%;">
-
-_A Functional-Reactive UI library for the Rx.Observable Universe_
-
-<br><br><br>
+<br><br>
 
 Rimmel lets you create a whole new world of powerful HTML templates and webapps using Observables and Promises as first-class citizens.<br>
 
@@ -42,7 +39,7 @@ The result is then "sinked" into the `<span>` element at the end.
 <img src="docs/assets/how-rimmel-works-6.png" alt="How RimmelJS Works">
 
 <div class="playground-link">
-<a href="https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111"><img src="docs/assets/try-it-button.png" valign="middle" height="40"> Rimmel Hello World</a> on Codepen.
+<a href="https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111">Rimmel Hello World</a> on Codepen.
 </div>
 
 <br><br><br><hr><br><br><br>
@@ -140,7 +137,7 @@ document.getElementById('rimmel-root').innerHTML = ColorPicker([255, 128, 64])
 <br><br>
 
 <div class="playground-link">
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="https://codepen.io/fourtyeighthours/pen/ExJOObG"><img src="docs/assets/try-it-button.png" valign="middle" height="40"> &nbsp; &nbsp; &nbsp;  Hello World Plus</a> on Codepen
+<a href="https://codepen.io/fourtyeighthours/pen/ExJOObG"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/ExJOObG">Hello World Plus</a> on Codepen
 </div>
 <br><br>
 
@@ -400,7 +397,7 @@ Promises and Observables get merged whenever they resolve/emit.
 
 <br><br>
 <div class="playground-link">
-  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010"><img src="docs/assets/try-it-button.png" valign="middle" height="40"> &nbsp; &nbsp; &nbsp; &nbsp; Draggable Mixin</a> on Codepen
+<a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010">Draggable Mixin</a> on Codepen
 </div>
 
 <br><br><br>

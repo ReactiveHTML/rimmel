@@ -1,7 +1,7 @@
 import type { HTMLString, SinkBindingConfiguration } from '../../src/index';
 
 import { BehaviorSubject, Observable, Subject, interval, filter, map, of, pipe, scan, startWith, switchMap, take, tap, throwError, withLatestFrom } from 'rxjs';
-import { rml, feed, inputPipe, AppendHTML, InnerText, InnerHTML, Removed, Sanitize, TextContent, Update } from '../../src/index';
+import { rml, feedIn, AppendHTML, InnerText, InnerHTML, Removed, Sanitize, TextContent, Update } from '../../src/index';
 import { Value, ValueAsDate, ValueAsNumber, Dataset, EventData, Target, Key, OffsetXY, Numberset, pipeIn } from '../../src/index';
 import { char } from '../../src/types/basic';
 import { RegisterElement } from '../../src/custom-element';
@@ -253,26 +253,26 @@ const sinks = {
 		`;
 	},
 
-  Calculator: () => {
-    const result = new BehaviorSubject<number>(0).pipe(
-      scan((acc, input) => acc +input)
-    );
+	Calculator: () => {
+		const result = new BehaviorSubject<number>(0).pipe(
+			scan((acc, input) => acc +input)
+		);
 
-    const buttonValue = pipe(
-      filter((e: Event) => (<HTMLElement>e.target).tagName == 'BUTTON'),
-        map((e: Event) => Number((<HTMLElement>e.target).dataset.key)),
-    );
+		const buttonValue = [
+			filter((e: Event) => (<HTMLElement>e.target).tagName == 'BUTTON'),
+				map((e: Event) => Number((<HTMLElement>e.target).dataset.key)),
+		];
 
-      return rml`
-      <div onclick="${feed(result, buttonValue)}">
-      <button data-key="1">1</button>
-      <button data-key="2">2</button>
-      <button data-key="3">3</button>
-      <button data-key="4">4</button>
-      </div>
-      <div>${result}</div>
-      `;
-  },
+		return rml`
+			<div onclick="${feedIn(result, buttonValue)}">
+				<button data-key="1">1</button>
+				<button data-key="2">2</button>
+				<button data-key="3">3</button>
+				<button data-key="4">4</button>
+			</div>
+			<div>${result}</div>
+		`;
+},
 
 	StyleValueSync: () => {
 		const bg = 'green';

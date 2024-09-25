@@ -38,20 +38,6 @@ export const inputPipe = <I, O=unknown>(...pipeline: OperatorPipeline<I, O>) =>
 ;
 
 
-/**
- * Create an "input pipe" by prepending an RxJS pipeline (what you get from a call to the `pipe()` function - not the method)
- * to the input of an Observer, Subject, BehaviorSubject, or plain subscriber function.
- * This works the opposite of RxJS's pipe() method, which works on the output of an Observable.
-**/
-export const feed =
-	<I, O=I>(target: RMLTemplateExpressions.TargetEventHandler<O>, pipe: Pipeline<I, O>): Observer<I> => {
-		const source = new Subject<I>();
-		(<Observable<O>>pipe(source))
-			.subscribe(<RMLTemplateExpressions._TargetEventHandler<O>>target);
-
-		// FIXME: will we need to unsubscribe? Then store a reference for unsubscription
-		// TODO: can we/should we delay subscription until mounted? Could miss the first events otherwise
-
-		return source;
-	};
+export const feed = pipeIn;
+export const feedIn = pipeIn;
 

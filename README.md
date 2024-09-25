@@ -88,7 +88,7 @@ When you're dealing with structured data, like lists or grids of repeated data, 
 To display and manage the UI for any dynamic list where you plan to support CRUD operations, perhaps drag'n'drop, you may consider using an `Observable Collection` from [Observable Types](https://github.com/ReactiveHTML/observable-types), which is a rendering-aware extension of `Array`, every method of which is mapped to an optimised UI rendering command.
 
 
-<br><br><br><hr><br><br><br>
+<br><br><br>
 
 
 ## 👋 Hello World👋 ++
@@ -148,7 +148,7 @@ When they emit, their values are merged together through `combineLatest`, which 
 
 Finally, we have two sinks where the data ends up; one as the innerHTML of the <span>, ther other as the fill colour of the SVG shape.
 
-<br><br><br><hr><br><br><br>
+<br><br><br>
 
 ## State doesn't exist (it's a Stream)
 "State", as the word itself suggests, is something static, so it doesn't belong to the dynamic, interactive, reactive webapps we make every day.
@@ -182,7 +182,7 @@ This might sound unusual, but Rimmel can actually coexist with other frameworks.
 If you are planning to perform a progressive framework migration, this is one way you can do it, one component at a time.
 
 
-<br><br><hr><br><br>
+<br><br><br>
 
 # Sources vs. Sinks
 There are two key concepts used by Rimmel: sources and sinks.
@@ -242,12 +242,9 @@ Rimmel comes with a handful of Event Mappers out of the box, but you can create 
 If you know how to use the <a href="https://rxjs.dev/api/index/function/pipe">`pipe()`</a> function from RxJS, then you know how to use `reversePipe()` from Rimmel (which should probably part of RxJS). It works like `pipe()`, except it applies the same operators to data coming in, rather than going out of an observable stream.
 
 ```js
-import { rml, reversePipe } from 'rimmel';
+import { rml, feed } from 'rimmel';
 
-// ButtonValue takes the numeric value of the data-action property of an element
-const ButtonValue = reversePipe(
-  map((e: PointerEvent) => Number(e.target.dataset.value))
-);
+const ButtonValue = map((e: PointerEvent) => Number(e.target.dataset.value));
 
 const Component = () => {
   const total = new Subject<number>().pipe(
@@ -255,7 +252,7 @@ const Component = () => {
   );
 
   return rml`
-    <div onclick="${ ButtonValue(total) }">
+    <div onclick="${ feedIn(total, ButtonValue) }">
 
       <button data-value="1">one</button>
       <button data-value="2">two</button>
@@ -334,7 +331,7 @@ target.innerHTML = rml`<div>${Sanitize(stream)}</div>`;
 
 ```
 
-<br><br><br><hr><br><br><br>
+<br><br><br>
 
 ## Extensible Components (AKA: Mixins)
 Mixins are an exciting by-product of dynamic sinks, which allow you to inject pretty much anything at any time (event listeners, classes, attributes, etc) into a target "host" element by means of simply emitting a "DOM Object" ­­­— a plain-old object whose properties and methods represent DOM attributes and event listeners.

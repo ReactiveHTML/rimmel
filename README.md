@@ -242,7 +242,7 @@ Rimmel comes with a handful of Event Mappers out of the box, but you can create 
 If you know how to use the <a href="https://rxjs.dev/api/index/function/pipe">`pipe()`</a> function from RxJS, then you know how to use `reversePipe()` from Rimmel (which should probably part of RxJS). It works like `pipe()`, except it applies the same operators to data coming in, rather than going out of an observable stream.
 
 ```js
-import { rml, feed } from 'rimmel';
+import { rml, feedIn } from 'rimmel';
 
 const ButtonValue = map((e: PointerEvent) => Number(e.target.dataset.value));
 

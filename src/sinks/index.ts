@@ -26,7 +26,9 @@ export const PreSink = <T extends HTMLElement>(sink: Sink<T>, source: RMLTemplat
 };
 
 export { AttributeObjectSink } from "./attribute-sink";
-export { AnyContentSink, AppendHTML, InnerHTML, InnerText, TextContent, InnerHTMLSink } from "./content-sink";
+export { AnyContentSink, AppendHTML, InnerHTML, InnerText, TextContent } from "./content-sink";
 export { ClassName, ToggleClass } from './class-sink';
 export { Removed } from "./removed-sink";
-export { Signal } from './signal-sink';
+export { Sanitize } from './sanitize-html';
+export { Signal } from './signal-sink'; // Experimental
+

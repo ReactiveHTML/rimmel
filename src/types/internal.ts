@@ -93,7 +93,7 @@ export namespace RMLTemplateExpressions {
 	export type ClassObject = MaybeFuture<Record<CSSClassName, boolean>>;
 
 	export type HTMLText = MaybeFuture<HTMLString>;
-	export type TextString = MaybeFuture<string>;
+	export type TextString = MaybeFuture<string | number>;
 	export type StringLike = MaybeFuture<string | number | Array<string | number>>;
 
 	export type POJO = ObjectSourceExpression<TargetObject>;
@@ -155,7 +155,9 @@ export type RMLTemplateExpression =
 	// | RMLTemplateExpressions.CSSStyleValue<T extends keyof CSSStyleDeclaration>
 	| RMLTemplateExpressions.EventHandler
 	| RMLTemplateExpressions.HTMLText
+	| RMLTemplateExpressions.HTMLText[]
 	| RMLTemplateExpressions.TextString
+	| RMLTemplateExpressions.TextString[]
 	| RMLTemplateExpressions.Mixin
 	| RMLTemplateExpressions.Node
 	| RMLTemplateExpressions.POJO

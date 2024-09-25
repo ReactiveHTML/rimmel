@@ -119,10 +119,13 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 
 			// // } else if(typeof ((<Observable<unknown>>expression).subscribe ?? (<Promise<unknown>>expression).then)  == 'function' && i<strings.length -1 || typeof expression == 'object') {
 			// } else if(
-			if(['string', 'number'].includes(typeof expression)) {
-
+			const expressionType = typeof expression;
+			if(['string', 'number'].includes(expressionType)) {
 				// Static expressions, no data binding. Just concatenate
 				acc = accPlusString +expression;
+			} else if(Array.isArray(expression)) {
+				// If sinking an array, we're likely just mapping t
+				acc = accPlusString +expression.join('');
 			} else {
 				// what if  !expression?
 

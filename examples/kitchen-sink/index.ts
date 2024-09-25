@@ -1,7 +1,7 @@
 import type { HTMLString, SinkBindingConfiguration } from '../../src/index';
 
-import { BehaviorSubject, Observable, Subject, interval, filter, map, of, scan, startWith, switchMap, take, tap, throwError, withLatestFrom } from 'rxjs';
-import { inputPipe, AppendHTML, InnerText, InnerHTML, InnerHTMLSink, Removed, TextContent, Update, rml } from '../../src/index';
+import { BehaviorSubject, Observable, Subject, interval, filter, map, of, pipe, scan, startWith, switchMap, take, tap, throwError, withLatestFrom } from 'rxjs';
+import { rml, feed, inputPipe, AppendHTML, InnerText, InnerHTML, Removed, Sanitize, TextContent, Update } from '../../src/index';
 import { Value, ValueAsDate, ValueAsNumber, Dataset, EventData, Target, Key, OffsetXY, Numberset, pipeIn } from '../../src/index';
 import { char } from '../../src/types/basic';
 import { RegisterElement } from '../../src/custom-element';
@@ -13,8 +13,6 @@ RegisterElement('custom-element', ({ title, content, onbuttonclick, onput }) => 
 		console.log('Internal event', e);
 		onput.next(e);
 	}
-
-	const Foo = ;
 
 	return rml`
 		<div class="cls1">
@@ -255,28 +253,26 @@ const sinks = {
 		`;
 	},
 
-	Calculator: () => {
-		const state = new BehaviorSubject<number>(0).pipe(
-			scan((acc, input) => {
-				input +acc
-				return acc
-			}, 0)
-		);
+  Calculator: () => {
+    const result = new BehaviorSubject<number>(0).pipe(
+      scan((acc, input) => acc +input)
+    );
 
-		const TargetButton = inputPipe<Event, number>(
-			map((e: Event) => Number((<HTMLElement>e.target).dataset.key)),
-			filter(x => x),
-		);
+    const buttonValue = pipe(
+      filter((e: Event) => (<HTMLElement>e.target).tagName == 'BUTTON'),
+        map((e: Event) => Number((<HTMLElement>e.target).dataset.key)),
+    );
 
-		return rml`
-			<div onclick="${TargetButton(state)}">
-				<button data-key="1">1</button>
-				<button data-key="2">2</button>
-				<button data-key="3">3</button>
-			</div>
-			<div>${state}</div>
-		`;
-	},
+      return rml`
+      <div onclick="${feed(result, buttonValue)}">
+      <button data-key="1">1</button>
+      <button data-key="2">2</button>
+      <button data-key="3">3</button>
+      <button data-key="4">4</button>
+      </div>
+      <div>${result}</div>
+      `;
+  },
 
 	StyleValueSync: () => {
 		const bg = 'green';
@@ -738,16 +734,41 @@ const sinks = {
 		`;
 	},
 
-	Sanitize: () => {
-		const Sanitize = (input: Observable<string>) => ({
-			type: 'sink',
-			source: input.pipe(
-				map(strHTML => strHTML.replace(/</g, '&lt;'))
-			),
-			sink: InnerHTMLSink
-		});
 
-		const stream = of('<script>alert("evil")</script>');
+	Array: () => {
+		const children = [
+		'foo', 'bar', 'baz', 'bat', 'bam'
+		];
+
+		return rml`
+			<ol>
+			${
+				children.map(str =>
+					rml`<li>${str}</li>`
+				)
+			}
+			</ol>
+		`;
+	},
+
+//	Sanitize: () => {
+//		const Sanitize = (input: Observable<string>) => ({
+//			type: 'sink',
+//			source: input.pipe(
+//				map(strHTML => strHTML.replace(/</g, '&lt;'))
+//			),
+//			sink: InnerHTMLSink
+//		});
+//
+//		const stream = of('<script>alert("evil")</script>');
+//
+//		return rml`
+//			<div>${Sanitize(stream)}</div>
+//		`;
+//	},
+
+	Sanitize: () => {
+		const stream = of(<HTMLString>'<div>Dirty code <script>alert("evil")</script><img onerror="alert(\"hack\")"></div>');
 
 		return rml`
 			<div>${Sanitize(stream)}</div>

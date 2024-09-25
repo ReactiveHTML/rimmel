@@ -25,7 +25,7 @@ export type { SinkBindingConfiguration } from './types/internal';
 export type { Stream } from './types/futures';
 export type { DocumentObject, HTMLContainerElement, HTMLString } from './types/dom';
 
-export { inputPipe, pipeIn } from './utils/input-pipe';
+export { feed, inputPipe, pipeIn } from './utils/input-pipe';
 
 // Event Sources
 export * from './sources/index';

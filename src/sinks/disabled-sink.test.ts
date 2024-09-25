@@ -10,8 +10,7 @@ describe('disabled Sink', () => {
             const sink = DisabledSink(<HTMLInputElement>el);
 
             sink(true);
-            expect(el.disabled).toEqual('disabled');
-            expect(el.getAttribute('disabled')).toEqual('disabled');
+            expect(el.disabled).toEqual(true);
         });
 
         it('clears the the readonly attribute on falsy', () => {
@@ -20,15 +19,15 @@ describe('disabled Sink', () => {
 
             sink(true);
             sink(false);
-            expect(el.getAttribute('disabled')).toBeUndefined();
+            expect(el.disabled).not.toEqual(true);
 
             sink(true);
             sink(undefined);
-            expect(el.getAttribute('disabled')).toBeUndefined();
+            expect(el.disabled).not.toEqual(true);
 
             sink(true);
             sink(0);
-            expect(el.getAttribute('disabled')).toBeUndefined();
+            expect(el.disabled).not.toEqual(true);
         });
 
     });

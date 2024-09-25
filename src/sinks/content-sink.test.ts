@@ -31,7 +31,7 @@ describe('appendHTML Sink', () => {
 
     describe('Given any HTML', () => {
 
-        xit('appends to the innerHTML on sink', () => {
+        it('appends to the innerHTML on sink', () => {
             const str1 = '<div>old text</div>';
             const str2 = '<div>hello</div>';
 

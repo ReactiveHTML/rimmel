@@ -1,14 +1,13 @@
 import type { OperatorFunction } from 'rxjs';
-import type { Observable, Observer } from '../types/futures';
+import type { Observer } from '../types/futures';
 import type { RMLTemplateExpressions } from '../types/internal';
 
 import { Subject } from 'rxjs';
 
 export type OperatorPipeline<I, O, N = O> = [OperatorFunction<I, N>, ...(OperatorFunction<N, O>[])];
-type rxPipe<I, O> = (...pipeline: OperatorPipeline<I, O>) => (input: Observable<I>) => Observable<O>;
 
 /**
- * Create an "input pipe" by prepending operators to the input of an Observer or a Subject
+ * Create an "input pipe" by prepending operators to the input of an Observer, Subject, BehaviorSubject, or plain subscriber function.
  * This works the opposite of RxJS's pipe(), which works on the output of an Observable.
 **/
 export const pipeIn =
@@ -36,11 +35,3 @@ export const inputPipe = <I, O=I>(...pipeline: OperatorPipeline<I, O>) =>
 		pipeIn(target, ...pipeline)
 ;
 
-
-/*
-const reverse = <I, O>(pipe: rxPipe<I, O>, target: Observer<O>) => {
-	const s = new Subject<I>();
-	pipe(s).subscribe(target);
-	return s;
-};
-*/

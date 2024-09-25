@@ -13,7 +13,7 @@ export interface MockElement extends HTMLElement {
     innerText: string;
     innerHTML: string;
     textContent: string;
-    readonly?: string;
+    readOnly?: string;
     remove: () => void;
     selectedIndex?: number;
     setAttribute(name: string, value: string): void;

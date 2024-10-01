@@ -2,6 +2,7 @@ import type { CSSClassName } from "../types/style";
 import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
 import type { Sink, ExplicitSink } from "../types/sink";
 
+import { SINK_TAG } from "../constants";
 import { asap } from "../lib/drain";
 
 export type ClassRecord = Record<string, string>;
@@ -77,7 +78,7 @@ export const ExperimentalClassObjectSink: Sink<Element> = (node: Element) => {
 **/
 export const ToggleClass: ExplicitSink<'class'> = (source: RMLTemplateExpressions.Any, className: CSSClassName) =>
     <SinkBindingConfiguration<HTMLElement | SVGElement>>({
-        type: 'sink',
+        type: SINK_TAG,
         source,
         sink: ToggleClassSink(className),
     })
@@ -93,7 +94,7 @@ export const ToggleClass: ExplicitSink<'class'> = (source: RMLTemplateExpression
 **/
 export const ClassName: ExplicitSink<'class'> = (source: RMLTemplateExpressions.ClassName) =>
     <SinkBindingConfiguration<HTMLElement | SVGElement>>({
-        type: 'sink',
+        type: SINK_TAG,
         source,
         sink: ClassNameSink,
     })

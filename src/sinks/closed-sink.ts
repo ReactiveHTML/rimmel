@@ -1,5 +1,7 @@
-import { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
+import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
 import type { ExplicitSink, Sink } from "../types/sink";
+
+import { SINK_TAG } from "../constants";
 
 /**
  * A sink that closes a <dialog> when called
@@ -17,7 +19,7 @@ export const ClosedSink: Sink<HTMLDialogElement> = (dialogBox: HTMLDialogElement
  */
 export const Closed: ExplicitSink<'closed'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'closed'>) =>
     <SinkBindingConfiguration<HTMLDialogElement>>({
-        type: 'sink',
+        type: SINK_TAG,
         source,
         sink: ClosedSink,
     })

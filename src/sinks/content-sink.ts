@@ -2,6 +2,7 @@ import type { ExplicitSink, Sink } from "../types/sink";
 import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
 import type { MaybeFuture, Observable } from "../types/futures";
 
+import { SINK_TAG } from "../constants";
 import { asap } from "../lib/drain";
 
 export const AnyContentSink: Sink<Element> = (node: Element) =>
@@ -46,7 +47,7 @@ export const InsertAdjacentHTMLSink: Sink<Element> = (node: Element, pos: Insert
  */
 export const InnerHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressions.HTMLText, sink: Sink<Element> = InnerHTMLSink) =>
     <SinkBindingConfiguration<Element>>({
-        type: 'sink',
+        type: SINK_TAG,
         source,
         sink,
     })
@@ -60,7 +61,7 @@ export const InnerHTML: ExplicitSink<'content'> = (source: RMLTemplateExpression
  */
 export const InnerText: ExplicitSink<'text'> = (source: RMLTemplateExpressions.StringLike) =>
     <SinkBindingConfiguration<HTMLElement>>({
-        type: 'sink',
+        type: SINK_TAG,
         source,
         sink: InnerTextSink,
     });
@@ -73,7 +74,7 @@ export const InnerText: ExplicitSink<'text'> = (source: RMLTemplateExpressions.S
  */
 export const TextContent: ExplicitSink<'text'> = (source: RMLTemplateExpressions.StringLike) =>
     <SinkBindingConfiguration<Element>>({
-        type: 'sink',
+        type: SINK_TAG,
         source: source,
         sink: TextContentSink,
     })
@@ -87,7 +88,7 @@ export const TextContent: ExplicitSink<'text'> = (source: RMLTemplateExpressions
  */
 export const NodeValue: ExplicitSink<'text'> = (source: RMLTemplateExpressions.StringLike) =>
     <SinkBindingConfiguration<Element>>({
-        type: 'sink',
+        type: SINK_TAG,
         source: source,
         sink: NodeValueSink,
     })
@@ -101,7 +102,7 @@ export const NodeValue: ExplicitSink<'text'> = (source: RMLTemplateExpressions.S
  */
 export const AppendHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressions.HTMLText, pos: InsertPosition = 'beforeend') =>
     <SinkBindingConfiguration<Element>>({
-        type: 'sink',
+        type: SINK_TAG,
         source,
         sink: InsertAdjacentHTMLSink,
         params: pos,
@@ -115,7 +116,7 @@ export const AppendHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressio
  */
 export const PrependHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressions.HTMLText, pos: InsertPosition = 'afterbegin') =>
     <SinkBindingConfiguration<Element>>({
-        type: 'sink',
+        type: SINK_TAG,
         source,
         sink: InsertAdjacentHTMLSink,
         params: pos,

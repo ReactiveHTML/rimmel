@@ -1,6 +1,8 @@
 import type { ExplicitSink, Sink, SinkElementTypes } from "../types/sink";
 import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
 
+import { SINK_TAG } from "../constants";
+
 /**
  * An Element supporting the "disabled" HTML attribute (i.e.: that can be disabled)
  */
@@ -22,7 +24,7 @@ export const DisabledSink: Sink<Disableable> = (node: Disableable) =>
  */
 export const Disabled: ExplicitSink<'disabled'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'disabled'>) =>
   <SinkBindingConfiguration<Disableable>>({
-    type: 'sink',
+    type: SINK_TAG,
     source,
     sink: DisabledSink,
   })

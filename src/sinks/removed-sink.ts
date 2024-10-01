@@ -1,6 +1,8 @@
 import type { ExplicitSink, Sink } from "../types/sink";
 import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
 
+import { SINK_TAG } from "../constants";
+
 /**
  * A sink that removes the given element from the DOM when the source emits
  * @param e A DOM element
@@ -19,7 +21,7 @@ export const RemovedSink: Sink<Element> = (e: Element) =>
  */
 export const Removed: ExplicitSink<'mixin' | 'removed'> = (source: RMLTemplateExpressions.Any) =>
 	<SinkBindingConfiguration<Element>>({
-		type: 'sink',
+		type: SINK_TAG,
 		source,
 		sink: RemovedSink,
 	})

@@ -2,6 +2,8 @@ import type { HTMLString } from '../types/dom';
 import type { ExplicitSink, Sink } from "../types/sink";
 import type { SinkBindingConfiguration, RMLTemplateExpressions } from "../types/internal";
 
+import { SINK_TAG } from "../constants";
+
 const sanitizeNode = (node) => {
   if (node.nodeType === Node.ELEMENT_NODE) {
     const forbiddenTags = ['script', 'style', 'iframe', 'object', 'embed'];
@@ -40,7 +42,7 @@ const SanitizeSink: Sink<HTMLElement> = node =>
 
 export const Sanitize: ExplicitSink<'textcontent'> = (source: RMLTemplateExpressions.HTMLText) =>
   <SinkBindingConfiguration<HTMLElement>>({
-    type: 'sink',
+    type: SINK_TAG,
     source,
     sink: SanitizeSink,
   })

@@ -1,5 +1,7 @@
-import { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
+import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
 import type { Sink, ExplicitSink } from "../types/sink";
+
+import { SINK_TAG } from "../constants";
 
 export const CheckedSink: Sink<HTMLInputElement> = (node: HTMLInputElement) =>
     (checked: boolean) => {
@@ -16,7 +18,7 @@ export const CheckedSink: Sink<HTMLInputElement> = (node: HTMLInputElement) =>
  */
 export const Checked: ExplicitSink<'checked'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'checked'>) =>
     <SinkBindingConfiguration<HTMLInputElement>>({
-        type: 'sink',
+        type: SINK_TAG,
         source,
         sink: CheckedSink,
     })

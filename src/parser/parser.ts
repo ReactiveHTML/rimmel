@@ -14,7 +14,7 @@ import { delegateEvent } from "../lifecycle/event-delegation";
 
 import { PreSink } from "../sinks/index";
 import { sinkByAttributeName } from '../parser/sink-map';
-import { DOMAttributePreSink, FixedAttributePreSink } from "../sinks/attribute-sink";
+import { DOMAttributePreSink, FixedAttributePreSink, WritableElementAttribute } from "../sinks/attribute-sink";
 import { Mixin } from "../sinks/mixin-sink";
 import { ObjectSource, isObjectSource } from "../sources/pojo-source";
 import { ObserverSource, isObserverSource } from "../sources/observer-source";
@@ -147,7 +147,7 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 
 						const attributeName = isAttribute.groups!.attribute;
 						const isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attributeName);
-						const sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(attributeName))) || FixedAttributePreSink(attributeName);
+						const sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName))) || FixedAttributePreSink(attributeName);
 						const handler = PreSink(sink, expression, attributeName);
 
 						// addRef(ref, <RMLTemplateExpressions.GenericHandler>{ handler: expression, type: attributeType, attribute: attributeName });

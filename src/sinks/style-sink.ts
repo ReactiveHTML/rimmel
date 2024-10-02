@@ -1,4 +1,4 @@
-import type { CSSDeclaration, CSSValue } from "../types/style";
+import type { CSSDeclaration, CSSValue, CSSWritableProperty } from "../types/style";
 import type { Sink } from "../types/sink";
 
 import { asap } from "../lib/drain";
@@ -24,6 +24,7 @@ export const StyleSink: Sink<HTMLElement> = <K extends keyof CSSDeclaration>(nod
 export const StyleObjectSink: Sink<HTMLElement> = (node: HTMLElement) => {
 	const style = node.style;
 	return (kvp: CSSDeclaration) =>
-		Object.entries(kvp ?? {}).forEach(([k, v]) => asap(v => style[k] = v, v))
+		Object.entries(kvp ?? {}).forEach(([k, v]) => asap(v => style[<keyof CSSWritableProperty>k] = v, v))
+
 	;
 };

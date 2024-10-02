@@ -36,7 +36,7 @@ describe('Style Object Sink', () => {
             const el = MockElement({style: {color: 'red'}})
             const sink = StyleObjectSink(el)
 
-            sink({ color: 'red', background: 'blue'})
+            sink({ color: 'red', background: 'blue'});
             expect(el.style.color).toEqual('red');
             expect(el.style.background).toEqual('blue');
 

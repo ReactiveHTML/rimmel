@@ -1,4 +1,4 @@
-import { EventListenerFunction } from "../types/dom";
+import type { EventListenerFunction } from "../types/dom";
 import type { RMLTemplateExpression } from "../types/internal";
 
 export type TargetObject = object | Array<string | number | object | Function>; // Record<string, unknown>;

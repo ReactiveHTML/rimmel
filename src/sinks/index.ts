@@ -14,16 +14,13 @@ import { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/inter
 // 	data,
 // });
 
-export const PreSink = <T extends HTMLElement>(sink: Sink<T>, source: RMLTemplateExpressions.Any, args: any) => {
-	const fn = (node: T) => {
-		return sink.bind(null, node, args);
-	};
-	return <SinkBindingConfiguration<HTMLElement>>{
+export const PreSink = <T extends HTMLElement>(sink: Sink<T>, source: RMLTemplateExpressions.Any, args: any) =>
+    <SinkBindingConfiguration<T>>({
         type: 'sink',
         source,
         sink,
-    };
-};
+    })
+;
 
 export { AttributeObjectSink } from "./attribute-sink";
 export { AnyContentSink, AppendHTML, InnerHTML, InnerText, TextContent } from "./content-sink";

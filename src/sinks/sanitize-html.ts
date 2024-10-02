@@ -4,8 +4,10 @@ import type { SinkBindingConfiguration, RMLTemplateExpressions } from "../types/
 
 import { SINK_TAG } from "../constants";
 
-const sanitizeNode = (node) => {
-  if (node.nodeType === Node.ELEMENT_NODE) {
+const isElement = (node: Element | DocumentFragment): node is Element => node.nodeType == Node.ELEMENT_NODE;
+
+const sanitizeNode = (node: Element | DocumentFragment) => {
+  if(isElement(node)) {
     const forbiddenTags = ['script', 'style', 'iframe', 'object', 'embed'];
     if (forbiddenTags.includes(node.tagName.toLowerCase())) {
       node.remove();
@@ -20,7 +22,7 @@ const sanitizeNode = (node) => {
     });
   }
 
-  Array.from(node.childNodes).forEach(child => sanitizeNode(child));
+  Array.from(node.children).forEach(child => sanitizeNode(child));
 };
 
 

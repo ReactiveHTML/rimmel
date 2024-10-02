@@ -1,4 +1,5 @@
 import type { BooleanAttribute } from "../definitions/boolean-attributes";
+import type { MonoTypeOperatorFunction } from 'rxjs';
 
 import { ObjectSourceExpression, TargetObject } from "../sources/pojo-source";
 import { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString  } from "./dom";
@@ -56,7 +57,7 @@ export type SourceAttributeName = RMLEventAttributeName;
 export type SinkAttributeName<T = string> = T extends RMLEventAttributeName ? never : string;
 export type AttributeName = SourceAttributeName | SinkAttributeName;
 
-export type SinkAttributeValue = boolean | string | number | Promise<any> | Observable<any>;
+export type SinkAttributeValue = boolean | string | number | Promise<any> | Observable<any> | null | undefined;
 export type SourceAttributeValue = Observer<any> | Function;
 export type AttributeValue = SinkAttributeValue | SourceAttributeValue;
 export type AttributeObject = {

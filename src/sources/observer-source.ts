@@ -1,6 +1,6 @@
+import type { Observer } from "../types/futures";
+import type { RMLTemplateExpression } from "../types/internal";
 import { isFunction } from "../utils/is-function";
-import { Observer } from "../types/futures";
-import { RMLTemplateExpression } from "../types/internal";
 
 export interface ObserverSourceHandler {
     next: (value: unknown) => void;

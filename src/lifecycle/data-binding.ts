@@ -4,7 +4,6 @@ import { NON_BUBBLING_DOM_EVENTS } from "../definitions/non-bubbling-events";
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_SELECTOR, RML_DEBUG } from "../constants";
 
 import { delegatedEventHandlers, subscriptions, waitingElementHanlders } from "../internal-state";
-import { errorHandler } from "../sinks/error-sink";
 import { isSinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
 import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
@@ -14,6 +13,8 @@ import { of } from "rxjs";
 const elementNodes = (n: Node): n is Element => n.nodeType == 1;
 
 // class LifecycleEvent extends CustomEvent{};
+
+const errorHandler = console.error;
 
 export const Rimmel_Bind_Subtree = (node: Element): void => {
 	const intermediateInteractiveNodes: Node[] = []; // Text nodes in a tag;

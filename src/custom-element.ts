@@ -18,6 +18,9 @@ export type CustomElementDefinition = {
 export type Inputs = Record<string, any>;
 export type Effects = Record<string, any>;
 export type RimmelComponent = (inputs: Inputs, effects?: Effects) => HTMLString;
+interface RMLNamedNodeMap extends NamedNodeMap {
+	resolve: Attr;
+}
 
 const SubjectProxy = (defaults: Record<string | symbol, any> = {}) => {
 	const subjects = <Record<string | symbol, BehaviorSubject<unknown> | Subject<unknown>>>{};
@@ -43,18 +46,22 @@ class RimmelElement extends HTMLElement {
 		// this.#events = {};
 		this.attachShadow({ mode: 'open' });
 
-		const [attrs, events] = [...this.attributes].reduce((a, b) => {
+		const [attrs, events] = [...(<RMLNamedNodeMap>this.attributes)].reduce((a, b) => {
 			const isEvent = <0 | 1>+b.nodeName.startsWith('on');
-			a[isEvent][b.nodeName] = b.nodeValue;
+			const t = a[isEvent];
+			// t[b.nodeName] = b.nodeValue!;
+			const attr = document.createAttribute(b.nodeName);
+			attr.value = b.nodeValue!;
+			t.setNamedItem(attr);
 			return a;
-		}, [{}, {}]);
+		}, [{}, {}] as NamedNodeMap[]);
 
-		const refs = waitingElementHanlders.get(this.attributes.resolve.nodeValue);
+		const refs = waitingElementHanlders.get((this.attributes as RMLNamedNodeMap).resolve.nodeValue ?? '');
 		this.attrs = SubjectProxy(attrs);
 
 		refs && Object.keys(events)
 			.forEach(eventName => {
-				const f = <SourceBindingConfiguration<any>>refs.find(x=>`on${x.eventName}` == eventName);
+				const f = (<SourceBindingConfiguration<any>[]>refs).find(x=>`on${x.eventName}` == eventName);
 				f && subscribe(this, this.attrs[eventName], f.listener);
 			})
 		;

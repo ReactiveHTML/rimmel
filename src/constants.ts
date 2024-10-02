@@ -13,3 +13,7 @@ export const RML_DEBUG='rml:debugger';
 // letting Rimmel know they'll need to be rendered as Text Nodes in the DOM, for updates
 export const INTERACTIVE_NODE_START = '\u200B';
 export const INTERACTIVE_NODE_END   = '\u200C'; // FIXME: can't use this
+
+export const SOURCE_TAG = 'source'
+export const SINK_TAG = 'sink'
+

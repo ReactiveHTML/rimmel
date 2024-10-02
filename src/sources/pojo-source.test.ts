@@ -1,4 +1,4 @@
-import { MockElement } from '../test-support';
+import { MockElement, MockEvent } from '../test-support';
 import { isObjectSource, ObjectSource, ObjectSourceExpression } from './pojo-source';
 
 describe('Object Source', () => {
@@ -14,11 +14,11 @@ describe('Object Source', () => {
             const el = MockElement({
                 value: newData,
             });
-            const eventData = {
+            const eventData = MockEvent('input', {
                 target: {
                     value: newData,
-                }
-            };
+                } as HTMLInputElement
+            });
 
             const source = ObjectSource(data).bind(el);
 
@@ -35,13 +35,14 @@ describe('Object Source', () => {
             const el = MockElement({
                 value: newData,
             });
-            const source = ObjectSource(data).bind(el);
 
-            const eventData = {
+            const eventData = MockEvent('input', {
                 target: {
                     value: newData,
-                }
-            };
+                } as HTMLInputElement
+            });
+
+            const source = ObjectSource(data).bind(el);
 
             source(eventData);
             expect(arr[testAttribute]).toEqual(newData);

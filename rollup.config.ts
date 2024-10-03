@@ -4,6 +4,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 const terserOptions = {
   compress: {
@@ -29,6 +30,24 @@ const es: OutputOptions = {
   format: 'es',
 };
 
+const cjs_ssr: OutputOptions = {
+  dir: './dist',
+  entryFileNames: 'ssr.cjs',
+  exports: 'named',
+  externalLiveBindings: false,
+  format: 'cjs',
+  freeze: false,
+  // generatedCode: 'es6',
+  // interop: 'default',
+  sourcemap: true,
+}
+
+const es_ssr: OutputOptions = {
+  ...cjs,
+  entryFileNames: 'ssr.js',
+  format: 'es',
+};
+
 const globalVar: OutputOptions = {
   ...cjs,
   dir: './dist',
@@ -51,6 +70,10 @@ export default [
   {
     external: ['rxjs'],
     input: './src/index.ts',
+    treeshake: {
+      moduleSideEffects: 'no-external',  // Only shake internal code
+      propertyReadSideEffects: false,    // Optimise property access side effects
+    },
     plugins: [
       nodeResolve({ preferBuiltins: true }),
       commonjs(),
@@ -61,8 +84,30 @@ export default [
         declarationDir: './dist/types',
       }),
       terser(terserOptions),
+      visualizer({ filename: 'bundle-stats.html' }),
     ],
     output: [ cjs, es, globalVar ],
+  },
+  {
+    external: ['rxjs'],
+    input: './src/ssr/index.ts',
+    treeshake: {
+      moduleSideEffects: 'no-external',  // Only shake internal code
+      propertyReadSideEffects: false,    // Optimise property access side effects
+    },
+    plugins: [
+      nodeResolve({ preferBuiltins: true }),
+      commonjs(),
+      json(),
+      typescript({
+        tsconfig: './tsconfig.build.json',
+        sourceMap: true,
+        declarationDir: './dist/types',
+      }),
+      terser(terserOptions),
+      visualizer({ filename: 'bundle-stats.html' }),
+    ],
+    output: [ cjs_ssr, es_ssr ],
   },
   {
     input: './src/index.ts',

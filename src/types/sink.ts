@@ -77,6 +77,10 @@ export type SinkElementTypes = {
         elements: HTMLElement | SVGElement | MathMLElement;
         types: AttributeObject;
     };
+    'object': {
+        elements: HTMLElement | SVGElement | MathMLElement;
+        types: Object;
+    };
     'readonly': {
         elements: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
         types: boolean | 'true' | 'readonly';

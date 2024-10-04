@@ -115,7 +115,8 @@ export namespace RMLTemplateExpressions {
 
 
 	export type _TargetEventHandler<T> =
-		| Observer<T>
+		| Partial<Observer<T>>
+		// | MonoTypeOperatorFunction<T>
 		| ((data: T) => void)
 	;
 

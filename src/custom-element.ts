@@ -49,12 +49,9 @@ class RimmelElement extends HTMLElement {
 		const [attrs, events] = [...(<RMLNamedNodeMap>this.attributes)].reduce((a, b) => {
 			const isEvent = <0 | 1>+b.nodeName.startsWith('on');
 			const t = a[isEvent];
-			// t[b.nodeName] = b.nodeValue!;
-			const attr = document.createAttribute(b.nodeName);
-			attr.value = b.nodeValue!;
-			t.setNamedItem(attr);
+			t[b.nodeName] = b.nodeValue!;
 			return a;
-		}, [{}, {}] as NamedNodeMap[]);
+		}, [{}, {}] as [Record<string, string>, Record<string, string>]);
 
 		const refs = waitingElementHanlders.get((this.attributes as RMLNamedNodeMap).resolve.nodeValue ?? '');
 		this.attrs = SubjectProxy(attrs);

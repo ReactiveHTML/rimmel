@@ -8,7 +8,6 @@ import { isSinkBindingConfiguration, SourceBindingConfiguration } from "../types
 import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
 import { tracing } from "../debug";
-import { of } from "rxjs";
 
 const elementNodes = (n: Node): n is Element => n.nodeType == 1;
 
@@ -61,7 +60,6 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 		node.append(...nodes);
 	}
 
-
 	([...node.attributes as unknown as Attr[]] || [])
 		.forEach(attr => {
 			const key = attr.nodeName;
@@ -83,7 +81,8 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 
 						const debugThisNode = node.hasAttribute(RML_DEBUG);
 						if(tracing && debugThisNode) {
-							debugger; /* Stopped binding data */
+							/* Stopped binding data */
+							debugger;
 						}
 
 						if (isSinkBindingConfiguration(bindingConfiguration)) {
@@ -164,20 +163,24 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 
 export const removeListeners = (node: Element) => {
 	// FIXME: what if someone (e.g.: JQuery's .css()) was just moving the element across the DOM?
-	// We lose the subscriptions/data binding...
+	// We would lose the subscriptions/data binding...
 	[...node.children as unknown as Element[]]
 		.forEach(node => removeListeners(node))
 	;
 
 	// TODO: add AbortController support for cancelable promises?
 	subscriptions.get(node)?.forEach(l => {
-		// FIXME: HACK — destination is not a supported API for Subscription...
-		l?.destination?.complete(); // do we need this?
+		// HACK: — destination is not a supported API for Subscription...
+		// l?.destination?.complete(); // do we need this, BTW?
 		l.unsubscribe?.()
 	});
 	subscriptions.delete(node);
 };
 
+/**
+ * Main callback triggered when an element is added to the DOM
+ * Here is where we start the data binding process
+ */
 export const Rimmel_Mount: MutationCallback = (mutationsList, observer) => {
 	const childList = mutationsList
 		.filter(m => m.type === 'childList')

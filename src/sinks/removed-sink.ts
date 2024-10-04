@@ -22,6 +22,7 @@ export const RemovedSink: Sink<Element> = (e: Element) =>
 export const Removed: ExplicitSink<'mixin' | 'removed'> = (source: RMLTemplateExpressions.Any) =>
 	<SinkBindingConfiguration<Element>>({
 		type: SINK_TAG,
+        t: 'Mixin',
 		source,
 		sink: RemovedSink,
 	})

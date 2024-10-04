@@ -17,6 +17,7 @@ import { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/inter
 export const PreSink = <T extends Element>(sink: Sink<T>, source: RMLTemplateExpressions.Any, args: any) =>
     <SinkBindingConfiguration<T>>({
         type: 'sink',
+        t: 'GenericSink',
         source,
         sink,
     })

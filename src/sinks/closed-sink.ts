@@ -20,6 +20,7 @@ export const ClosedSink: Sink<HTMLDialogElement> = (dialogBox: HTMLDialogElement
 export const Closed: ExplicitSink<'closed'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'closed'>) =>
     <SinkBindingConfiguration<HTMLDialogElement>>({
         type: SINK_TAG,
+		t: 'Closed',
         source,
         sink: ClosedSink,
     })

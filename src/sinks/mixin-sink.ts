@@ -14,6 +14,7 @@ import { SINK_TAG } from "../constants";
 export const Mixin: ExplicitSink<'mixin'> = (source: RMLTemplateExpressions.Mixin) => {
     return <SinkBindingConfiguration<Element>>{
         type: SINK_TAG,
+        t: 'Mixin',
         source,
         sink: AttributeObjectSink,
     };

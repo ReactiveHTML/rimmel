@@ -48,6 +48,7 @@ export const InsertAdjacentHTMLSink: Sink<Element> = (node: Element, pos: Insert
 export const InnerHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressions.HTMLText, sink: Sink<Element> = InnerHTMLSink) =>
     <SinkBindingConfiguration<Element>>({
         type: SINK_TAG,
+        t: 'InnerHTML',
         source,
         sink,
     })
@@ -62,6 +63,7 @@ export const InnerHTML: ExplicitSink<'content'> = (source: RMLTemplateExpression
 export const InnerText: ExplicitSink<'text'> = (source: RMLTemplateExpressions.StringLike) =>
     <SinkBindingConfiguration<HTMLElement>>({
         type: SINK_TAG,
+        t: 'InnerText',
         source,
         sink: InnerTextSink,
     });
@@ -75,6 +77,7 @@ export const InnerText: ExplicitSink<'text'> = (source: RMLTemplateExpressions.S
 export const TextContent: ExplicitSink<'text'> = (source: RMLTemplateExpressions.StringLike) =>
     <SinkBindingConfiguration<Element>>({
         type: SINK_TAG,
+        t: 'TextContent',
         source: source,
         sink: TextContentSink,
     })
@@ -89,6 +92,7 @@ export const TextContent: ExplicitSink<'text'> = (source: RMLTemplateExpressions
 export const NodeValue: ExplicitSink<'text'> = (source: RMLTemplateExpressions.StringLike) =>
     <SinkBindingConfiguration<Element>>({
         type: SINK_TAG,
+        t: 'NodeValue',
         source: source,
         sink: NodeValueSink,
     })
@@ -103,6 +107,7 @@ export const NodeValue: ExplicitSink<'text'> = (source: RMLTemplateExpressions.S
 export const AppendHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressions.HTMLText, pos: InsertPosition = 'beforeend') =>
     <SinkBindingConfiguration<Element>>({
         type: SINK_TAG,
+        t: 'AppendHTML',
         source,
         sink: InsertAdjacentHTMLSink,
         params: pos,
@@ -117,6 +122,7 @@ export const AppendHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressio
 export const PrependHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressions.HTMLText, pos: InsertPosition = 'afterbegin') =>
     <SinkBindingConfiguration<Element>>({
         type: SINK_TAG,
+        t: 'PrependHTML',
         source,
         sink: InsertAdjacentHTMLSink,
         params: pos,

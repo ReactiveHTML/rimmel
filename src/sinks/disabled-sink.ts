@@ -25,7 +25,9 @@ export const DisabledSink: Sink<Disableable> = (node: Disableable) =>
 export const Disabled: ExplicitSink<'disabled'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'disabled'>) =>
   <SinkBindingConfiguration<Disableable>>({
     type: SINK_TAG,
+    t: 'Disabled',
     source,
     sink: DisabledSink,
   })
 ;
+

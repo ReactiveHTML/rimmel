@@ -79,6 +79,7 @@ export const ExperimentalClassObjectSink: Sink<Element> = (node: Element) => {
 export const ToggleClass: ExplicitSink<'class'> = (source: RMLTemplateExpressions.Any, className: CSSClassName) =>
     <SinkBindingConfiguration<HTMLElement | SVGElement>>({
         type: SINK_TAG,
+        t: 'ToggleClass',
         source,
         sink: ToggleClassSink(className),
     })
@@ -95,6 +96,7 @@ export const ToggleClass: ExplicitSink<'class'> = (source: RMLTemplateExpression
 export const ClassName: ExplicitSink<'class'> = (source: RMLTemplateExpressions.ClassName) =>
     <SinkBindingConfiguration<HTMLElement | SVGElement>>({
         type: SINK_TAG,
+        t: 'ClassName',
         source,
         sink: ClassNameSink,
     })

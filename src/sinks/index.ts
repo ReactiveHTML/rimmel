@@ -14,7 +14,7 @@ import { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/inter
 // 	data,
 // });
 
-export const PreSink = <T extends HTMLElement>(sink: Sink<T>, source: RMLTemplateExpressions.Any, args: any) =>
+export const PreSink = <T extends Element>(sink: Sink<T>, source: RMLTemplateExpressions.Any, args: any) =>
     <SinkBindingConfiguration<T>>({
         type: 'sink',
         source,
@@ -25,7 +25,9 @@ export const PreSink = <T extends HTMLElement>(sink: Sink<T>, source: RMLTemplat
 export { AttributeObjectSink } from "./attribute-sink";
 export { AnyContentSink, AppendHTML, InnerHTML, InnerText, TextContent } from "./content-sink";
 export { ClassName, ToggleClass } from './class-sink';
+export { Disabled } from "./disabled-sink";
+export { JSONDump } from "./json-dump-sink";
 export { Removed } from "./removed-sink";
-export { Sanitize } from './sanitize-html';
+export { Sanitize } from './sanitize-html-sink';
 export { Signal } from './signal-sink'; // Experimental
-
+export { Suspend } from './suspense'; // Experimental

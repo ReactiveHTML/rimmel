@@ -15,13 +15,19 @@ import { asap } from "../lib/drain";
  * const setBackgroundColor = styleSink(divElement, 'backgroundColor');
  * setBackgroundColor('red'); // Sets the div's background color to red
 **/
-export const StyleSink: Sink<HTMLElement> = <K extends keyof CSSDeclaration>(node: HTMLElement, key: K) =>
-	(value: CSSValue<K>) => {
-		node.style[key] = value;
+export const StyleSink: Sink<HTMLElement | SVGElement> = <K extends keyof CSSDeclaration>(node: HTMLElement | SVGElement, key: K) => {
+	const style = node.style;
+	return (value: CSSValue<K>) => {
+		style[key] = value;
 	}
+};
+
+export const StylePreSink = (key: CSSWritableProperty) =>
+	(node: HTMLElement | SVGElement) =>
+		StyleSink(node, key)
 ;
 
-export const StyleObjectSink: Sink<HTMLElement> = (node: HTMLElement) => {
+export const StyleObjectSink: Sink<HTMLElement | SVGElement> = (node: HTMLElement | SVGElement) => {
 	const style = node.style;
 	return (kvp: CSSDeclaration) =>
 		Object.entries(kvp ?? {}).forEach(([k, v]) => asap(v => style[<keyof CSSWritableProperty>k] = v, v))

@@ -1,6 +1,6 @@
 import type { ExplicitSink, Sink } from "../types/sink";
 import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
-import type { MaybeFuture, Observable } from "../types/futures";
+import type { MaybeFuture } from "../types/futures";
 
 import { SINK_TAG } from "../constants";
 import { asap } from "../lib/drain";

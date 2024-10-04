@@ -41,10 +41,15 @@ export { RegisterElement } from './custom-element';
 export type { Component, Mixin } from './types/constructs';
 export type { RMLTemplateExpressions } from './types/internal';
 
+export { source, sink } from './utils/input-pipe';
+
+// Other Low-Level Utilities
+export { Rimmel_Bind_Subtree, Rimmel_Mount } from './lifecycle/data-binding';
+export { RESOLVE_SELECTOR }	from './constants';
+
 // Main entries
 export const html = rml;    // Shall we?
 export { default as rml } from './parser/parser';
 
 // Experimental stuff
 // export { rml } from 'rml/scandal';
-

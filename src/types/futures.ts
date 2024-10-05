@@ -1,18 +1,18 @@
-import type { BehaviorSubject, Observable, Observer, Subject, Subscription } from 'rxjs';
-export type { BehaviorSubject, Observable, Observer, OperatorFunction, Subject, Subscription } from 'rxjs';
+// import type { BehaviorSubject, Observable, Observer, Subject, Subscription } from 'rxjs';
+// export type { BehaviorSubject, Observable, Observer, OperatorFunction, Subject, Subscription } from 'rxjs';
 
-// export type Subject<T> = {
-//     subscribe: (observer: ObserverFunction<T>) => Subscription;
-//     pipe: (value: T) => void;
-//     next: (value: T) => void;
-//     error?: (error: unknown) => void;
-//     complete?: () => void;
-// };
+export type Subject<T> = {
+    subscribe: (observer: ObserverFunction<T>) => Subscription;
+    pipe: (value: T) => void;
+    next: (value: T) => void;
+    error?: (error: unknown) => void;
+    complete?: () => void;
+};
 
-// export type BehaviorSubject<T> = Subject<T> & {
-//     getValue: () => T;
-//     value: T;
-// };
+export type BehaviorSubject<T> = Subject<T> & {
+    getValue: () => T;
+    value: T;
+};
 
 // export type OperatorFunction<T, R> = (source: Observable<T>) => Observable<R>;
 
@@ -20,15 +20,21 @@ export type ObserverFunction<T> = (value: T) => void;
 export type ObserverErrorFunction = (e: Error) => void;
 export type ObserverCompleteFunction = () => void;
 
-// export interface Observer<I> {
-//     next: ObserverFunction<I>;
-//     error?: ObserverErrorFunction;
-//     complete?: ObserverCompleteFunction;
-// };
+export interface Observer<I> {
+    next: ObserverFunction<I>;
+    error?: ObserverErrorFunction;
+    complete?: ObserverCompleteFunction;
+};
 
-// export type Observable<T> = {
-//     subscribe: (observer: Observer<T> | ObserverFunction<T>, error?: ObserverErrorFunction, complete?: ObserverCompleteFunction) => Subscription;
-// };
+export type Subscription = {
+    unsubscribe: () => void;
+};
+
+export type Observable<T> = {
+    subscribe: (observer: Observer<T> | ObserverFunction<T>, error?: ObserverErrorFunction, complete?: ObserverCompleteFunction) =>
+        Subscription;
+};
+
 
 export const isObserver = (x: any): x is Observer<any> =>
     !!x?.next;

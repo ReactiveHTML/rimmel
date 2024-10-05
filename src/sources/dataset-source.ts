@@ -28,15 +28,6 @@ export const Dataset = <T extends HTMLElement, I extends Event, O extends string
 		);
 };
 
-// export const Dataset2 = <T extends HTMLElement, I extends Event, O extends RMLTemplateExpressions.SourceExpression<string | undefined>>
-// 	(key: string): Source<I, O> =>
-// 		inputPipe<I, O>(
-// 			map((e: I) => {
-// 				return <O>((<T>e.target).dataset[key])
-// 			})
-// 		)
-// ;
-
 /**
  * An Event Source emitting a numerical dataset value from the underlying element instead of a regular DOM Event object
  * @param handler A handler function or observer to send events to

@@ -1,5 +1,4 @@
 import type { BooleanAttribute } from "../definitions/boolean-attributes";
-import type { MonoTypeOperatorFunction } from 'rxjs';
 
 import { ObjectSourceExpression, TargetObject } from "../sources/pojo-source";
 import { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString  } from "./dom";

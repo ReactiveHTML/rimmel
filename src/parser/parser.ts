@@ -24,6 +24,7 @@ import { isPromise } from '../types/futures';
 import { skip } from 'rxjs';
 import { InnerHTML, TextContent } from "../sinks/content-sink";
 import { ClassRecord } from "../sinks/class-sink";
+import { StyleObjectSink, StylePreSink, StyleSink } from "../sinks/style-sink";
 
 // FIXME: add a unique prefix to prevent collisions with different dupes of the library running in the same context/app
 let refCount = 0;
@@ -134,6 +135,7 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 				const nextString = strings[i+1];
 
 				const isAttribute = /(?<attribute>[:a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(accPlusString);
+				// const isAttribute = /<[a-z][a-z0-9\-_]+\s+.*\s+(?<attribute>[:a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(accPlusString);
 				if(isAttribute) {
 
 					const quotationMarks = isAttribute.groups!.quote;
@@ -145,10 +147,19 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 						// <some-tag some-attributes class="some classes ${observable} and more" other-stuff></some-tag>
 						// <some-tag some-attributes data-xxx="123" data-yyy="${observable}" other-stuff></some-tag>
 
+						let sink: Sink<HTMLElement | SVGElement>;
+						let isBooleanAttribute = false;
+						let handler: SinkBindingConfiguration<HTMLElement | SVGElement>;
 						const attributeName = isAttribute.groups!.attribute;
-						const isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attributeName);
-						const sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName))) || FixedAttributePreSink(attributeName);
-						const handler = PreSink(sink, expression, attributeName);
+						if(attributeName == 'style') {
+							const CSSAttribute = /;?(?<key>[a-z][a-z0-9\-_]*)\s*:\s*$/.exec(string)?.groups?.key;
+							sink = CSSAttribute ? StylePreSink(CSSAttribute): StyleObjectSink;
+							handler = PreSink<HTMLElement | SVGElement>(sink, expression, CSSAttribute);
+						} else {
+							isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attributeName);
+							sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName))) || FixedAttributePreSink(attributeName);
+							handler = PreSink(sink, expression, attributeName);
+						}
 
 						// addRef(ref, <RMLTemplateExpressions.GenericHandler>{ handler: expression, type: attributeType, attribute: attributeName });
 						addRef(ref, handler);

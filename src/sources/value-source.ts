@@ -21,7 +21,7 @@ export const ValueAsNumber = inputPipe<Event, number>(
 
 /**
  * An Event Source for valueAsDate
- * @description Emits the numeric value of the underlying <input type="date"> instead of a regular DOM Event object
+ * @description Emits the numeric value of the underlying `<input type="date">` instead of a regular DOM Event object
  * @returns EventSource<string>
  */
 export const ValueAsDate = inputPipe<Event, Date | null>(

@@ -19,9 +19,9 @@ export const pipeIn =
 		const source = new Subject<I>();
 		source
 			.pipe(...(<[OperatorFunction<I, O>]>pipeline))
-			.subscribe(target)
+			.subscribe(<Observer<O>>target)
 		;
-		// FIXME: will we need to unsubscribe? Then store a reference for unsubscription
+		// FIXME: will we need to u1n1subscribe? Then store a reference for unsubscription
 		// TODO: can we/should we delay subscription until mounted? Could miss the first events otherwise
 
 		return source;

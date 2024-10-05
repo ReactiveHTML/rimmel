@@ -26,7 +26,7 @@ const cjs: OutputOptions = {
 
 const es: OutputOptions = {
   ...cjs,
-  entryFileNames: '[name].js',
+  entryFileNames: '[name].mjs',
   format: 'es',
 };
 
@@ -44,7 +44,7 @@ const cjs_ssr: OutputOptions = {
 
 const es_ssr: OutputOptions = {
   ...cjs,
-  entryFileNames: 'ssr.js',
+  entryFileNames: 'ssr.mjs',
   format: 'es',
 };
 
@@ -71,7 +71,6 @@ export default [
     external: ['rxjs'],
     input: './src/index.ts',
     treeshake: {
-      moduleSideEffects: 'no-external',  // Only shake internal code
       propertyReadSideEffects: false,    // Optimise property access side effects
     },
     plugins: [
@@ -90,26 +89,6 @@ export default [
   },
   {
     external: ['rxjs'],
-    input: './src/ssr/index.ts',
-    treeshake: {
-      moduleSideEffects: 'no-external',  // Only shake internal code
-      propertyReadSideEffects: false,    // Optimise property access side effects
-    },
-    plugins: [
-      nodeResolve({ preferBuiltins: true }),
-      commonjs(),
-      json(),
-      typescript({
-        tsconfig: './tsconfig.build.json',
-        sourceMap: true,
-        declarationDir: './dist/types',
-      }),
-      terser(terserOptions),
-      visualizer({ filename: 'bundle-stats.html' }),
-    ],
-    output: [ cjs_ssr, es_ssr ],
-  },
-  {
     input: './src/index.ts',
     plugins: [
       nodeResolve({ preferBuiltins: true }),
@@ -134,4 +113,25 @@ export default [
       }
     ],
   },
+  // {
+  //   external: ['rxjs'],
+  //   input: './src/ssr/index.ts',
+  //   treeshake: {
+  //     moduleSideEffects: 'no-external',  // Only shake internal code
+  //     propertyReadSideEffects: false,    // Optimise property access side effects
+  //   },
+  //   plugins: [
+  //     nodeResolve({ preferBuiltins: true }),
+  //     commonjs(),
+  //     json(),
+  //     typescript({
+  //       tsconfig: './tsconfig.build.json',
+  //       sourceMap: true,
+  //       declarationDir: './dist/types',
+  //     }),
+  //     terser(terserOptions),
+  //     visualizer({ filename: 'bundle-stats.html' }),
+  //   ],
+  //   output: [ cjs_ssr, es_ssr ],
+  // },
 ] as RollupOptions[];

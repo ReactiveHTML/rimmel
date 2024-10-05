@@ -1,10 +1,11 @@
-import type { HTMLString, SinkBindingConfiguration } from '../../src/index';
+import type { HTMLString, SinkBindingConfiguration, Stream } from '../../src/index';
 
 import { BehaviorSubject, Observable, Subject, interval, filter, map, merge, mergeWith, of, pipe, scan, startWith, switchMap, take, tap, throwError, withLatestFrom, catchError, ObservedValueOf } from 'rxjs';
 import { rml, feedIn, source, sink, AppendHTML, InnerText, InnerHTML, Removed, Sanitize, TextContent, Update, Suspend } from '../../src/index';
 import { Value, ValueAsDate, ValueAsNumber, Dataset, EventData, Form, JSONDump, Target, Key, OffsetXY, Numberset, inputPipe, pipeIn } from '../../src/index';
 import { char } from '../../src/types/basic';
 import { RegisterElement } from '../../src/custom-element';
+import { Observer } from '../../src/types/futures';
 
 const xxx = (e)=>console.log('something', e);
 

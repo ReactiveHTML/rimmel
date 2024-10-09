@@ -1,21 +1,48 @@
 {
   "name": "rimmel",
-  "version": "1.1.1",
-  "description": "Reactive template engine for webapps",
+  "version": "1.2.0",
+  "description": "A Functional-Reactive UI library for the Rx.Observable Universe",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/types/index.d.ts",
-  "sideEffect": false,
+  "paths": {
+    "rimmel/types/*": [
+      "dist/types/*"
+    ],
+    "rimmel/sinks": [
+      "dist/sinks/index"
+    ],
+    "rimmel/sinks/*": [
+      "dist/sinks/*"
+    ],
+    "rimmel/ssr": [
+      "dist/ssr"
+    ],
+    "rimmel/ssr/*": [
+      "dist/ssr"
+    ]
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/modules/index.mjs",
+      "require": "./dist/modules/index.cjs"
+    },
+    "./ssr": {
+      "import": "./dist/modules/ssr.mjs",
+      "require": "./dist/modules/ssr.cjs"
+    }
+  },
+  "sideEffects": false,
   "scripts": {
-    "build": "rimraf dist && rollup --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",
-    "dev": "rimraf dist && rollup -w --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",
+    "build": "rimraf dist && rollup --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript > rollup.log",
+    "dev": "rimraf dist && rollup -w --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript > rollup.log",
     "website:local": "bundle exec jekyll serve",
     "test": "bun test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hellomenu/rimmel.git"
+    "url": "git+https://github.com/reactivehtml/rimmel.git"
   },
   "keywords": [
     "rimmel",
@@ -37,10 +64,11 @@
   "author": "Dario Mannu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hellomenu/rimmel/issues"
+    "url": "https://github.com/reactivehtml/rimmel/issues"
   },
   "homepage": "https://rimmel.js.org",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
@@ -52,12 +80,13 @@
     "jest": "^27.2.0",
     "rimraf": "^3.0.2",
     "rollup": "^4.9.5",
+    "rollup-plugin-visualizer": "^5.12.0",
     "ts-node": "^10.9.2",
     "tslib": "^2.6.2",
-    "typescript": "^5.3.3",
+    "typescript": "^5.5.3",
     "vite": "^5.2.9"
   },
   "peerDependencies": {
-    "rxjs": "^7.8.1"
+    "rxjs": ">=5.5.0 || >=6.0.0 || >=7.0.0"
   }
 }

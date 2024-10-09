@@ -7,28 +7,27 @@ describe('Readonly Sink', () => {
 
         it('sets the the readonly attribute on sink', () => {
             const el = MockElement();
-            const sink = ReadonlySink(<HTMLElement>el);
+            const sink = ReadonlySink(<HTMLInputElement>el);
 
             sink(true);
-            expect(el.readonly).toEqual('readonly');
-            expect(el.getAttribute('readonly')).toEqual('readonly');
+            expect(el.readOnly).toEqual(true);
         });
 
         it('clears the the readonly attribute on falsy', () => {
             const el = MockElement();
-            const sink = ReadonlySink(<HTMLElement>el);
+            const sink = ReadonlySink(<HTMLInputElement>el);
 
             sink(true);
             sink(false);
-            expect(el.getAttribute('readonly')).toEqual(undefined);
+            expect(el.readOnly).not.toEqual(true);
 
             sink(true);
             sink(undefined);
-            expect(el.getAttribute('readonly')).toEqual(undefined);
+            expect(el.readOnly).not.toEqual(true);
 
             sink(true);
             sink(0);
-            expect(el.getAttribute('readonly')).toEqual(undefined);
+            expect(el.readOnly).not.toEqual(true);
         });
 
     });

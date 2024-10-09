@@ -1,5 +1,5 @@
-import { MockElement } from '../test-support';
-import { isPOJOSource, POJOSource, POJOSourceHandler } from './pojo-source';
+import { MockElement, MockEvent } from '../test-support';
+import { isObjectSource, ObjectSource, ObjectSourceExpression } from './pojo-source';
 
 describe('Object Source', () => {
 
@@ -8,30 +8,43 @@ describe('Object Source', () => {
         it('Creates an Object Source', () => {
             const object: any = {};
             const testAttribute = 'someAttribute';
-            const data = <POJOSourceHandler>[object, testAttribute];
+            const data = <ObjectSourceExpression<typeof object>>[object, testAttribute];
             const newData = 'new value';
 
             const el = MockElement({
                 value: newData,
             });
-            const source = POJOSource(data).bind(el);
+            const eventData = MockEvent('input', {
+                target: {
+                    value: newData,
+                } as HTMLInputElement
+            });
 
-            source(/* Event */);
+            const source = ObjectSource(data).bind(el);
+
+            source(eventData);
             expect(object[testAttribute]).toEqual(newData);
         });
 
         it('Creates an Array Source', () => {
             const arr = [0, 1, 2, 3, 4];
             const testAttribute = 2;
-            const data = <POJOSourceHandler>[arr, testAttribute];
+            const data = <ObjectSourceExpression<typeof arr>>[arr, testAttribute];
             const newData = 'new value';
 
             const el = MockElement({
                 value: newData,
             });
-            const source = POJOSource(data).bind(el);
 
-            source(/* Event */);
+            const eventData = MockEvent('input', {
+                target: {
+                    value: newData,
+                } as HTMLInputElement
+            });
+
+            const source = ObjectSource(data).bind(el);
+
+            source(eventData);
             expect(arr[testAttribute]).toEqual(newData);
         });
 
@@ -41,6 +54,6 @@ describe('Object Source', () => {
 
 describe('isObjectSource', () => {
     it('tells if it is an object source', () => {
-        expect(isPOJOSource([{}, 'a'])).toEqual(true);
+        expect(isObjectSource([{}, 'a'])).toEqual(true);
     });
 });

@@ -1,5 +1,5 @@
 import { MockElement } from '../test-support';
-import { ClassSink, toggleClass } from './class-sink';
+import { ClassObjectSink, ToggleClassSink } from './class-sink';
 
 describe('Class Sink', () => {
 
@@ -7,7 +7,7 @@ describe('Class Sink', () => {
 
         it('sets classes for truthy attributes on sink', () => {
             const el = MockElement();
-            const sink = ClassSink(<HTMLElement>el);
+            const sink = ClassObjectSink(<HTMLElement>el);
 
             sink({
                 class1: true,
@@ -21,7 +21,7 @@ describe('Class Sink', () => {
 
         it('clears classes for falsy attributes on sink', () => {
             const el = MockElement({ className: 'class1 class2 class3' });
-            const sink = ClassSink(<HTMLElement>el);
+            const sink = ClassObjectSink(<HTMLElement>el);
             expect(el.className).toContain('class1');
             expect(el.className).toContain('class2');
             expect(el.className).toContain('class3');
@@ -46,7 +46,7 @@ describe('Class Toggle Sink', () => {
 
         it('sets classes for truthy value on sink', () => {
             const el = MockElement();
-            const sink = toggleClass(<HTMLElement>el, 'class1');
+            const sink = ToggleClassSink('class1')(<HTMLElement>el);
 
             sink(true);
             expect(el.className).toContain('class1');
@@ -54,8 +54,7 @@ describe('Class Toggle Sink', () => {
 
         it('clears classes for falsy values on sink', () => {
             const el = MockElement({ className: 'class1' });
-            const sink = toggleClass(<HTMLElement>el, 'class1');
-            expect(el.className).toContain('class1');
+            const sink = ToggleClassSink('class1')(<HTMLElement>el);
 
             sink(false);
             expect(el.className).not.toContain('class1');
@@ -64,3 +63,62 @@ describe('Class Toggle Sink', () => {
     });
 
 });
+
+
+//////////////////////////////////////
+
+// it('sets classes for properties set to true on sink', () => {
+//     const el = MockElement();
+//     const sink = ClassObjectSink(<HTMLElement>el);
+
+//     sink({
+//         class1: true,
+//     });
+//     expect(el.className).toContain('class1');
+// });
+
+// it('clears classes for properties set to false on sink', () => {
+//     const el = MockElement({ className: 'class1 class2 class3' });
+//     const sink = ClassObjectSink(<HTMLElement>el);
+//     sink({
+//         class1: false,
+//     });
+//     expect(el.className).not.toContain('class1');
+//     expect(el.className).toContain('class2');
+//     expect(el.className).toContain('class3');
+// });
+
+// it('sets classes for properties set to 1 on sink', () => {
+//     const el = MockElement();
+//     const sink = ClassObjectSink(<HTMLElement>el);
+
+//     sink({
+//         class1: 1,
+//     });
+//     expect(el.className).toContain('class1');
+// });
+
+// it('clears classes for properties set to -1 on sink', () => {
+//     const el = MockElement({ className: 'class1 class2 class3' });
+//     const sink = ClassObjectSink(<HTMLElement>el);
+
+//     sink({
+//         class1: -1,
+//     });
+//     expect(el.className).not.toContain('class1');
+//     expect(el.className).toContain('class2');
+//     expect(el.className).toContain('class3');
+// });
+
+// it('toggles classes for properties set to 0 on sink', () => {
+//     const el = MockElement({ className: 'class1 class2 class3' });
+//     const sink = ClassObjectSink(<HTMLElement>el);
+//     sink({
+//         class1: 0,
+//     });
+//     expect(el.className).not.toContain('class1');
+//     sink({
+//         class1: 0,
+//     });
+//     expect(el.className).toContain('class1');
+// });

@@ -1,3 +1,4 @@
+import { HTMLFieldElement } from "./dom";
 import { MaybeFuture } from "./futures";
 
 type ValueOf<T> = T extends HTMLInputElement ? string | number :
@@ -9,8 +10,8 @@ type ValueOf<T> = T extends HTMLInputElement ? string | number :
 ;
 
 /**
- * An attribute object that represents the "value" of different HTML elements.
+ * An attribute object that represents the "value" of HTML elements that can have one.
  */
-export type ValueAttribute<T extends HTMLElement> = {
+export type ValueAttribute<T extends HTMLFieldElement> = {
     value: MaybeFuture<ValueOf<T>>;
 };

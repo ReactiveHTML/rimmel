@@ -13,7 +13,7 @@ export interface MockElement extends HTMLElement {
     innerText: string;
     innerHTML: string;
     textContent: string;
-    readonly?: string;
+    readOnly?: boolean;
     remove: () => void;
     selectedIndex?: number;
     setAttribute(name: string, value: string): void;
@@ -76,3 +76,19 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
 
     return el;
 };
+
+export const MockEvent = (name: string, data: Partial<Event>) =>
+    new Event(name, <Event>{
+        bubbles: true,
+        cancelable: true,
+        currentTarget: null,
+        defaultPrevented: false,
+        eventPhase: 0,
+        isTrusted: false,
+        target: null,
+        preventDefault: () => {},
+        stopPropagation: () => {},
+        timeStamp: 0,
+        type: name,
+        ...data,
+     });

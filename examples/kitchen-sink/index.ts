@@ -5,9 +5,6 @@ import { rml, feedIn, source, sink, AppendHTML, InnerText, InnerHTML, Removed, S
 import { Value, ValueAsDate, ValueAsNumber, Dataset, EventData, Form, JSONDump, Target, Key, OffsetXY, Numberset, inputPipe, pipeIn } from '../../src/index';
 import { char } from '../../src/types/basic';
 import { RegisterElement } from '../../src/custom-element';
-import { Observer } from '../../src/types/futures';
-
-const xxx = (e)=>console.log('something', e);
 
 RegisterElement('custom-element', ({ title, content, onbuttonclick, onput }) => {
 	const handle = e => {

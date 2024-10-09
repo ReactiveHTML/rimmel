@@ -1,5 +1,5 @@
 <img src="docs/assets/github-hero.png" alt="Rimmel.js" style="text-align: start; max-width: 100%;">
-<br><br>
+<br>
 
 Rimmel lets you create a whole new world of powerful HTML templates and webapps using Observables and Promises as first-class citizens.<br>
 
@@ -42,7 +42,9 @@ The result is then "sinked" into the `<span>` element at the end.
 <a href="https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111">Rimmel Hello World</a> on Codepen.
 </div>
 
-<br><br><br><hr><br><br><br>
+<br><br><br>
+<hr>
+<br><br><br>
 
 ## Imperative-Reactive? No
 Most other reactive or non-reactive JavaScript UI libraries and frameworks out there are designed for the imperative programming paradigm. Occasionally they may support a few aspects of functional programming. Third-party adapters can also help with it, but the truth is that FRP was just an afterhthought and its use is severely limited in practice.
@@ -229,7 +231,7 @@ target.innerHTML = rml`<div style="color: ${color}; background: black;">
 ### Event Mapping
 In normal circumstances your event handlers receive a native DOM `Event` object, such as `MouseEvent`, `PointerEvent`, etc.
 
-To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Mappers to feed your event handlers or observable streams the exact data they need, in the format they expect it, rather than the raw DOM Event objects.
+To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Mappers to feed your event handlers or Observable streams the exact data they need, in the format they expect it, rather than the generic, raw DOM Event objects they would get otherwise.
 
 Do you only need the relative `[x, y]` mouse coordinates when hovering an element?<br>
 Use `<div onmousemove="${ OffsetXY(handler) }">`
@@ -239,10 +241,13 @@ Use `<input oninput="${ Key(handler) }">`
 
 Rimmel comes with a handful of Event Mappers out of the box, but you can create your own with ease.
 
-If you know how to use the <a href="https://rxjs.dev/api/index/function/pipe">`pipe()`</a> function from RxJS, then you know how to use `reversePipe()` from Rimmel (which should probably part of RxJS). It works like `pipe()`, except it applies the same operators to data coming in, rather than going out of an observable stream.
+If you know how to use the <a href="https://rxjs.dev/api/index/function/pipe">`pipe()`</a> function from RxJS, then you almost know how to use `source()` from Rimmel.
+It works like `pipe()`, except it applies the same operators to data coming in, rather than going out of an Observable stream.
+
+`pipe(...operators, targetObserver)`
 
 ```js
-import { rml, feedIn } from 'rimmel';
+import { rml, source } from 'rimmel';
 
 const ButtonValue = map((e: PointerEvent) => Number(e.target.dataset.value));
 
@@ -252,11 +257,11 @@ const Component = () => {
   );
 
   return rml`
-    <div onclick="${ feedIn(total, ButtonValue) }">
+    <div onclick="${ source(ButtonValue, total) }">
 
-      <button data-value="1">one</button>
-      <button data-value="2">two</button>
-      <button data-value="3">three</button>
+      <button data-value="1">add one</button>
+      <button data-value="2">add two</button>
+      <button data-value="3">add three</button>
 
     </div>
 

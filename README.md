@@ -474,6 +474,12 @@ bun run build
 bun test
 ```
 
+To run the "kitchen sink" example:
+```bash
+cd examples/kitchen-sink
+vite
+```
+
 <br>
 
 ## Roadmap

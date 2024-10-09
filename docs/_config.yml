@@ -21,7 +21,6 @@
 title: Rimmel.js
 email: your-email@example.com
 description: A Functional-Reactive templating library for the Rx.Observable Universe
-baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://rimmel.js.org" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: jekyllrb
 #github_username:  jekyll

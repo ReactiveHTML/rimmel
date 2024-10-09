@@ -34,29 +34,38 @@ const defer = <T>(x: T, timeout: number = 500): Promise<T> =>
 
 const sources = {
 	ObjectSourceImplicit: () => {
-		const stream = new Subject();
-
 		const data = {
 			prop1: undefined
 		}
+
+		const stream = new Subject().pipe(
+			map(() => data.prop1) // Just emit the latest value of data.prop1 every time
+		);
+
 		return  rml`
-			<input type="text" value="" onchange="${[data, 'prop1']}"><br>
-			<button onclick="${()=>stream.next(data.prop1)}">check</button>
-			<div>${stream}</div>
+			Updating a non-reactive property of an object<br>
+			<input onchange="${[data, 'prop1']}"><br>
+
+			<button onclick="${stream}">check</button>
+			data.prop1 = <span>${stream}</span>
 		`;
 	},
 
 	ObjectSourceExplicit: () => {
-		const stream = new Subject();
 		const data = {
 			prop1: undefined
-		}
+		};
+
+		const stream = new Subject().pipe(
+			map(() => data.prop1) // Just emit the latest value of data.prop1 every time
+		);
+
 
 		return  rml`
 			Updating a non-reactive property of an object<br>
-			<input type="text" onchange="${Update(data, 'prop1')}"><br>
+			<input onchange="${Update(data, 'prop1')}"><br>
 
-			<button onclick="${()=>stream.next(data.prop1)}">check</button>
+			<button onclick="${stream}">check</button>
 			data.prop1 = <span>${stream}</span>
 		`;
 	},
@@ -583,23 +592,7 @@ const sinks = {
 		const stream = defer('bar');
 
 		return rml`
-			Attribute sink
-			<style>
-				.pqpqpq::after {
-					content: attr(foo);
-					margin: 0 1rem;
-					color: darkgreen;
-				}
-			</style>
-			<div class="pqpqpq" foo="${stream}">foo...</div>
-		`;
-	},
-
-	'Attribute (Mixin)': () => {
-		const stream = defer({foo: 'bar'});
-
-		return rml`
-			Attribute sink
+			Attribute sink <br>
 			<style>
 				.pqpqpq::after {
 					content: attr(foo);
@@ -607,7 +600,23 @@ const sinks = {
 					color: green;
 				}
 			</style>
-			<div class="pqpqpq" ...${stream}>...</div>
+			<span class="pqpqpq" foo="${stream}">foo...</span>
+		`;
+	},
+
+	'Attribute (Mixin)': () => {
+		const stream = defer({foo: 'bar'});
+
+		return rml`
+			Attribute sink <br>
+			<style>
+				.pqpqpq::after {
+					content: attr(foo);
+					margin: 0 1rem;
+					color: green;
+				}
+			</style>
+			<span class="pqpqpq" ...${stream}>foo...</span>
 		`;
 	},
 
@@ -844,7 +853,12 @@ const sinks = {
 //	},
 
 	Sanitize: () => {
-		const stream = of(<HTMLString>'<div>Dirty code <script>alert("evil")</script><img onerror="alert(\"hack\")"></div>');
+		const stream = of(<HTMLString>`<div>
+			Dirty code
+			<script>alert("evil")</script>
+			<img onload="alert('hack')" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHBhdGggZmlsbD0icmVkIiBkPSJNNTAgMTAwYTUwIDUwIDAgMSAwIDAtMTAwIDUwIDUwIDAgMCAwIDAgMTAwWiIvPjwvc3ZnPg==" width="100" height="100" />
+			</div>
+		`);
 
 		return rml`
 			<div>${Sanitize(stream)}</div>

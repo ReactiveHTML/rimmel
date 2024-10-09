@@ -28,6 +28,7 @@ const es: OutputOptions = {
   ...cjs,
   entryFileNames: '[name].mjs',
   format: 'es',
+  sourcemap: true,
 };
 
 const cjs_ssr: OutputOptions = {
@@ -46,6 +47,7 @@ const es_ssr: OutputOptions = {
   ...cjs,
   entryFileNames: 'ssr.mjs',
   format: 'es',
+  sourcemap: true,
 };
 
 const globalVar: OutputOptions = {
@@ -54,11 +56,11 @@ const globalVar: OutputOptions = {
   entryFileNames: 'rimmel.js',
   freeze: true,
   generatedCode: 'es2015',
-  sourcemap: true,
   format: 'esm',
   globals: {
     'rml': 'rimmel',
-  }
+  },
+  sourcemap: true,
 };
 
 const preserveModules = {

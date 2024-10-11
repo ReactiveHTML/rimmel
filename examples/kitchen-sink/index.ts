@@ -1040,13 +1040,32 @@ const component = () => {
 				color: #999;
 			}
 
+			a.btn {
+				display: inline-block;
+				padding: .2rem .4rem;
+				background-color: #eee;
+				color: #222;
+				border-radius: 2px;
+				border: 1px solid #777;
+				font-family: system-ui;
+				font-size: 80%;
+				text-decoration: none;
+			}
+
+			a.btn:target,
 			button:active,
 			button:focus {
+				display: inline-block;
 				background-color: #333;
 				color: #ccc;
 			}
 
 			@media(prefers-color-scheme: dark) {
+				a.btn {
+					background-color: #222;
+					color: #eee;
+				}
+
 				button:active,
 				button:focus {
 					background-color: #888;
@@ -1063,7 +1082,7 @@ const component = () => {
 					<ul style="list-style-type: none;">
 					${
 						Object.keys(sources).map((t, i, tests)=>rml`
-							<li><button title="${Tooltip(tests[t])}" onclick="${pipeIn(chosen, map(()=>[sources, t] as [object, string]))}">${t}</button></li>
+							<li><a class="btn" id="${t}" href="#${t}" title="${Tooltip(tests[t])}" onclick="${pipeIn(chosen, map(()=>[sources, t] as [object, string]))}">${t}</a></li>
 						`).join('')
 					}
 					</ul>
@@ -1074,7 +1093,7 @@ const component = () => {
 					<ul style="max-height: 50vh; overflow: visible; column-count: 3; list-style-type: none;">
 					${
 						Object.keys(sinks).map((t, i, tests)=>rml`
-							<li><button title="${Tooltip(tests[t])}" onclick="${pipeIn(chosen, map(()=>[sinks, t] as [object, string]))}">${t}</button></li>
+							<li><a class="btn" id="${t}" href="#${t}" title="${Tooltip(tests[t])}" onclick="${pipeIn(chosen, map(()=>[sinks, t] as [object, string]))}">${t}</a></li>
 						`).join('')
 					}
 					</ul>

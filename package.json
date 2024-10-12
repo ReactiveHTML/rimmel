@@ -25,12 +25,12 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/modules/index.mjs",
-      "require": "./dist/modules/index.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
     },
     "./ssr": {
-      "import": "./dist/modules/ssr.mjs",
-      "require": "./dist/modules/ssr.cjs"
+      "import": "./dist/ssr.mjs",
+      "require": "./dist/ssr.cjs"
     }
   },
   "sideEffects": false,

@@ -23,12 +23,18 @@ export const PreSink = <T extends Element>(sink: Sink<T>, source: RMLTemplateExp
     })
 ;
 
+export { AnyContentSink } from "./content-sink";
+export { AppendHTML } from "./append-html-sink";
 export { AttributeObjectSink } from "./attribute-sink";
-export { AnyContentSink, AppendHTML, InnerHTML, InnerText, TextContent } from "./content-sink";
 export { ClassName, ToggleClass } from './class-sink';
 export { Disabled } from "./disabled-sink";
+export { InnerHTML } from "./inner-html-sink";
+export { InnerText } from "./inner-text-sink";
 export { JSONDump } from "./json-dump-sink";
+export { PrependHTML } from "./prepend-html-sink";
 export { Removed } from "./removed-sink";
 export { Sanitize } from './sanitize-html-sink';
 export { Signal } from './signal-sink'; // Experimental
 export { Suspend } from './suspense'; // Experimental
+export { TextContent } from "./text-content-sink";
+

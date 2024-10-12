@@ -29,6 +29,7 @@ type SinkableNode =
  * @param T The type of HTML element the sink can be applied to
  */
 export interface Sink<T extends SinkableNode> extends Function {
+    // FIXME: move node as last parameter to facilitate currying
     (node: T, ...args: any[]): SinkFunction;
     // [Symbol.sink]?: string;
 }

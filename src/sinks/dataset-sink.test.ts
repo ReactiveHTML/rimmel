@@ -1,7 +1,7 @@
 import { MockElement } from '../test-support';
 import { DatasetSink, DatasetObjectSink } from './dataset-sink';
 
-describe('dataset Sink', () => {
+describe('Dataset Sink', () => {
 
     describe('Given a key', () => {
 

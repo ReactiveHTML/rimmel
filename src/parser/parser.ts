@@ -22,9 +22,10 @@ import { ObserverSource, isObserverSource } from "../sources/observer-source";
 import { isPromise } from '../types/futures';
 
 import { skip } from 'rxjs';
-import { InnerHTML, TextContent } from "../sinks/content-sink";
+import { InnerHTML } from "../sinks/inner-html-sink";
+import { TextContent } from "../sinks/text-content-sink";
 import { ClassRecord } from "../sinks/class-sink";
-import { StyleObjectSink, StylePreSink, StyleSink } from "../sinks/style-sink";
+import { StyleObjectSink, StylePreSink } from "../sinks/style-sink";
 
 // FIXME: add a unique prefix to prevent collisions with different dupes of the library running in the same context/app
 let refCount = 0;
@@ -69,7 +70,8 @@ export default function rml(strings: TemplateStringsArray, ...expressions: RMLTe
 			);
 			const currentTemplate = strings.reduce(reducer, <string[]>[]);
 			console.log(...currentTemplate);
-			debugger; /* Stopped parsing a RML template */
+			/* Stopped parsing a RML template */
+			debugger;
 		}
 
 		if(expression == undefined || expression === '') {

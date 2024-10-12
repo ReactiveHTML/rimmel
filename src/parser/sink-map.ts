@@ -1,19 +1,23 @@
-import { Sink } from "../types/sink";
+import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
+import type { Sink } from "../types/sink";
+
+import { AppendHTMLSink } from "../sinks/append-html-sink";
 import { CheckedSink } from "../sinks/checked-sink";
-import { DisabledSink } from "../sinks/disabled-sink";
-import { ToggleAttributePreSink } from "../sinks/attribute-sink";
-import { ClosedSink } from "../sinks/closed-sink";
 import { ClassName, ClassObjectSink, ToggleClass } from "../sinks/class-sink";
+import { ClosedSink } from "../sinks/closed-sink";
 import { DatasetSink, DatasetObjectSink } from "../sinks/dataset-sink";
-import { InsertAdjacentHTMLSink, InnerHTMLSink, InnerTextSink, TextContentSink } from "../sinks/content-sink";
-import { RemovedSink } from "../sinks/removed-sink";
+import { DisabledSink } from "../sinks/disabled-sink";
+import { InnerHTMLSink } from "../sinks/inner-html-sink";
+import { InnerTextSink } from "../sinks/inner-text-sink";
 import { ReadonlySink } from "../sinks/readonly-sink";
+import { RemovedSink } from "../sinks/removed-sink";
 import { StyleObjectSink } from "../sinks/style-sink";
+import { TextContentSink } from "../sinks/text-content-sink";
+import { ToggleAttributePreSink } from "../sinks/attribute-sink";
 import { ValueSink } from "../sinks/value-sink";
-import { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/internal";
 
 export const sinkByAttributeName = new Map(<Iterable<readonly [string, Sink<any>]>>[
-	['appendHTML',      InsertAdjacentHTMLSink],
+	['appendHTML',      AppendHTMLSink],
 	//['contenteditable', ToggleAttributePreSink('contenteditable')],
 	['rml:removed',     RemovedSink],
 	['rml:closed',      ClosedSink],

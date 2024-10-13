@@ -1,6 +1,7 @@
 import type { CSSClassName } from "./style";
 import type { MaybeFuture } from "./futures";
-import type {HTMLString} from './dom';
+import type { HTMLString } from './dom';
+import type { FocusableElement } from './rml';
 import { AttributeObject, SinkBindingConfiguration } from "./internal";
 
 /**
@@ -69,6 +70,10 @@ export type SinkElementTypes = {
     'textcontent': {
         elements: HTMLElement;
         types: HTMLString;
+    };
+    'rml:focus': {
+        elements: FocusableElement;
+        types: boolean ;
     };
     'disabled': {
         elements: HTMLButtonElement | HTMLFieldSetElement | HTMLOptGroupElement | HTMLOptionElement | HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement;

@@ -7,6 +7,7 @@ import { ClassName, ClassObjectSink, ToggleClass } from "../sinks/class-sink";
 import { ClosedSink } from "../sinks/closed-sink";
 import { DatasetSink, DatasetObjectSink } from "../sinks/dataset-sink";
 import { DisabledSink } from "../sinks/disabled-sink";
+import { FocusSink } from "../sinks/focus-sink";
 import { InnerHTMLSink } from "../sinks/inner-html-sink";
 import { InnerTextSink } from "../sinks/inner-text-sink";
 import { ReadonlySink } from "../sinks/readonly-sink";
@@ -21,6 +22,7 @@ export const sinkByAttributeName = new Map(<Iterable<readonly [string, Sink<any>
 	//['contenteditable', ToggleAttributePreSink('contenteditable')],
 	['rml:removed',     RemovedSink],
 	['rml:closed',      ClosedSink],
+	['rml:focus',       FocusSink],
 	['checked',         CheckedSink],
 //  ['rml:checked',     DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
 	['disabled',        DisabledSink],

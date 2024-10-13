@@ -28,6 +28,7 @@ export { AppendHTML } from "./append-html-sink";
 export { AttributeObjectSink } from "./attribute-sink";
 export { ClassName, ToggleClass } from './class-sink';
 export { Disabled } from "./disabled-sink";
+export { Focus } from "./focus-sink";
 export { InnerHTML } from "./inner-html-sink";
 export { InnerText } from "./inner-text-sink";
 export { JSONDump } from "./json-dump-sink";

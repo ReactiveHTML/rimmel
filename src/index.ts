@@ -45,10 +45,10 @@ export { source, sink } from './utils/input-pipe';
 
 // Other Low-Level Utilities
 export { Rimmel_Bind_Subtree, Rimmel_Mount } from './lifecycle/data-binding';
-export { RESOLVE_SELECTOR }	from './constants';
+export { RESOLVE_SELECTOR, RML_DEBUG, SINK_TAG } from './constants';
 
 // Main entries
-export const html = rml;    // Shall we?
+export const html = rml; // Shall we?
 export { default as rml } from './parser/parser';
 
 // Experimental stuff

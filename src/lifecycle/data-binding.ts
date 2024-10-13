@@ -9,6 +9,7 @@ import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
 import { tracing } from "../debug";
 
+const AUTOREMOVE_LISTENERS_DELAY = 100; // Cleanup event listeners after this much time
 const elementNodes = (n: Node): n is Element => n.nodeType == 1;
 
 // class LifecycleEvent extends CustomEvent{};
@@ -162,9 +163,13 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 };
 
 export const removeListeners = (node: Element) => {
-	// FIXME: what if someone (e.g.: JQuery's .css()) was just moving the element across the DOM?
-	// We would lose the subscriptions/data binding...
+	if(document.contains(node)) {
+		// Don't remove listeners if the node has just been moved across (so it's back in the DOM)
+		return
+	}
+
 	[...node.children as unknown as Element[]]
+		//.filter(n => document.contains(n))
 		.forEach(node => removeListeners(node))
 	;
 
@@ -172,6 +177,8 @@ export const removeListeners = (node: Element) => {
 	subscriptions.get(node)?.forEach(l => {
 		// HACK: — destination is not a supported API for Subscription...
 		// l?.destination?.complete(); // do we need this, BTW?
+
+		// console.debug('Rimmel: Unsubscribing', node, l);
 		l.unsubscribe?.()
 	});
 	subscriptions.delete(node);
@@ -203,7 +210,6 @@ export const Rimmel_Mount: MutationCallback = (mutationsList, observer) => {
 		.filter(elementNodes)
 	;
 
-	removedNodes
-		.forEach(removeListeners)
+	setTimeout(() => removedNodes.forEach(removeListeners), AUTOREMOVE_LISTENERS_DELAY)
 	;
 };

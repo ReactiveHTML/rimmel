@@ -11,7 +11,7 @@ describe('Blur Sink', () => {
         const sink = BlurSink(<HTMLElement>el);
         sink();
 
-        expect(call1).toBeTrue();
+        expect(call1).toBe(true);
     });
 
 });

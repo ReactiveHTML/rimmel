@@ -75,6 +75,10 @@ export type SinkElementTypes = {
         elements: FocusableElement;
         types: boolean ;
     };
+    'rml:blur': {
+        elements: FocusableElement;
+        types: any ;
+    };
     'disabled': {
         elements: HTMLButtonElement | HTMLFieldSetElement | HTMLOptGroupElement | HTMLOptionElement | HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement;
         types: boolean | 'true' | 'disabled';

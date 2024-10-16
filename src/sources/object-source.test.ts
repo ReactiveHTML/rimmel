@@ -65,7 +65,7 @@ describe('Object Source', () => {
               });
               const eventData = MockEvent('change', {
                   target: {
-                      value: newData,
+                      checked: newData,
                   } as HTMLInputElement
               });
 
@@ -88,12 +88,11 @@ describe('Object Source', () => {
               const el = MockElement({
                   tagName: 'DIV',
                   innerText: newData,
-                  value: newData,
               });
               const eventData = MockEvent('randomevent', {
                   target: {
-                      value: newData,
-                  } as HTMLInputElement
+                      innerText: newData,
+                  } as HTMLDivElement
               });
 
               const source = ObjectSource(data).bind(el);
@@ -113,3 +112,4 @@ describe('isObjectSource', () => {
         expect(isObjectSource([{}, 'a'])).toEqual(true);
     });
 });
+

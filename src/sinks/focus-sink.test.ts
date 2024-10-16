@@ -13,8 +13,8 @@ describe('Focus Sink', () => {
         const sink = FocusSink(<HTMLElement>el);
         sink(true);
 
-        expect(call1).toBeTrue();
-        expect(call2).toBeFalse();
+        expect(call1).toBe(true);
+        expect(call2).toBe(false);
     });
 
     it('blurs the element when a falsy value is sinked', () => {
@@ -27,8 +27,8 @@ describe('Focus Sink', () => {
         const sink = FocusSink(<HTMLElement>el);
         sink(false);
 
-        expect(call1).toBeFalse();
-        expect(call2).toBeTrue();
+        expect(call1).toBe(false);
+        expect(call2).toBe(true);
     });
 
 });

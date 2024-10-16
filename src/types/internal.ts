@@ -1,6 +1,6 @@
 import type { BooleanAttribute } from "../definitions/boolean-attributes";
 
-import { ObjectSourceExpression, TargetObject } from "../sources/pojo-source";
+import { ObjectSourceExpression, TargetObject } from "../sources/object-source";
 import { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString  } from "./dom";
 import { RMLEventName, RMLEventAttributeName } from "./dom";
 import { Future, MaybeFuture, Observable, Observer, Subject } from "./futures";

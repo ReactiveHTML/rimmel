@@ -19,7 +19,8 @@ export const isObjectSource = <T extends TargetObject>(expression: RMLTemplateEx
 export const ObjectSource = <E extends Event, T extends TargetObject>(expression: ObjectSourceExpression<T>) =>
     <EventListenerFunction<E>>function () {
         // Only <input> elements are supported for this source
-        const valueSource = this.type == 'checkbox' ? this.checked : this.value;
+        //const valueSource = this.type == 'checkbox' ? this.checked : this.value;
+        const valueSource = this.type == 'checkbox' ? this.checked : this.tagName == 'INPUT' ? this.value : this.innerText;
         const [target, key] = expression;
         target[key] = valueSource;
     }

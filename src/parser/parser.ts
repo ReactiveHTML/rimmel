@@ -16,7 +16,7 @@ import { PreSink } from "../sinks/index";
 import { sinkByAttributeName } from '../parser/sink-map';
 import { DOMAttributePreSink, FixedAttributePreSink, WritableElementAttribute } from "../sinks/attribute-sink";
 import { Mixin } from "../sinks/mixin-sink";
-import { ObjectSource, isObjectSource } from "../sources/pojo-source";
+import { ObjectSource, isObjectSource } from "../sources/object-source";
 import { ObserverSource, isObserverSource } from "../sources/observer-source";
 
 import { isPromise } from '../types/futures';

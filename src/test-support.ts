@@ -28,8 +28,11 @@ export interface MockElement extends HTMLElement {
 
 export const MockElement = (props?: Record<string, any>): MockElement => {
     const el = <MockElement>{
+        'focus': () => {},
+        'blur': () => {},
         'dataset': {},
         'style': {},
+        'tagName': 'MOCKELEMENT',
         'textContent': '',
         'innerText': '',
         'innerHTML': '',

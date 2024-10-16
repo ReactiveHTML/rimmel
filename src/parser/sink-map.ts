@@ -2,6 +2,7 @@ import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/
 import type { Sink } from "../types/sink";
 
 import { AppendHTMLSink } from "../sinks/append-html-sink";
+import { BlurSink } from "../sinks/blur-sink";
 import { CheckedSink } from "../sinks/checked-sink";
 import { ClassName, ClassObjectSink, ToggleClass } from "../sinks/class-sink";
 import { ClosedSink } from "../sinks/closed-sink";
@@ -19,26 +20,27 @@ import { ValueSink } from "../sinks/value-sink";
 
 export const sinkByAttributeName = new Map(<Iterable<readonly [string, Sink<any>]>>[
 	['appendHTML',      AppendHTMLSink],
-	//['contenteditable', ToggleAttributePreSink('contenteditable')],
-	['rml:removed',     RemovedSink],
-	['rml:closed',      ClosedSink],
-	['rml:focus',       FocusSink],
 	['checked',         CheckedSink],
-//  ['rml:checked',     DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
-	['disabled',        DisabledSink],
-//  ['rml:disabled',    DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
 	['class',           ClassObjectSink],
+	//['contenteditable', ToggleAttributePreSink('contenteditable')],
+	['data-',           DatasetSink],
+	['dataset',         DatasetObjectSink], // Shall we include this, too?
+	['disabled',        DisabledSink],
 	['innerHTML',       InnerHTMLSink],
 	['innerText',       InnerTextSink],
 	['readonly',        ReadonlySink],
-//  ['rml:readonly',    ReadonlySink], // Can make this one act as a boolean attribute that understands "false" and other values...
 	['style',           StyleObjectSink],
+	// ['termination',  terminationSink], // a sink that runs when an observable completes... will we ever need this?
 	['textContent',     TextContentSink],
 	['value',           ValueSink],
+	['rml:blur',        BlurSink],
+//  ['rml:checked',     DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
+	['rml:closed',      ClosedSink],
 	['rml:dataset',     DatasetObjectSink],
-	['dataset',         DatasetObjectSink], // Shall we include this, too?
-	['data-',           DatasetSink],
-	// ['termination',  terminationSink], // a sink that runs when an observable completes... will we ever need this?
+//  ['rml:disabled',    DisabledSink], // Can make this one act as a boolean attribute that understands "false" and other values...
+	['rml:focus',       FocusSink],
+//  ['rml:readonly',    ReadonlySink], // Can make this one act as a boolean attribute that understands "false" and other values...
+	['rml:removed',     RemovedSink],
 ]);
 
 

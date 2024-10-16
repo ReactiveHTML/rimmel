@@ -26,6 +26,7 @@ export const PreSink = <T extends Element>(sink: Sink<T>, source: RMLTemplateExp
 export { AnyContentSink } from "./content-sink";
 export { AppendHTML } from "./append-html-sink";
 export { AttributeObjectSink } from "./attribute-sink";
+export { Blur } from "./blur-sink";
 export { ClassName, ToggleClass } from './class-sink';
 export { Disabled } from "./disabled-sink";
 export { Focus } from "./focus-sink";

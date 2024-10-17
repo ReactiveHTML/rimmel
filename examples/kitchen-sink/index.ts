@@ -6,6 +6,8 @@ import { Value, ValueAsDate, ValueAsNumber, Dataset, EventData, Form, JSONDump, 
 import { char } from '../../src/types/basic';
 import { RegisterElement } from '../../src/custom-element';
 
+const log = (p) => tap(x=>console.log(p, x))
+
 RegisterElement('custom-element', ({ title, content, onbuttonclick, onput }) => {
 	const handle = e => {
 		console.log('Internal event', e);
@@ -186,7 +188,7 @@ const sources = {
 		`;
 	},
 
-	PointerCoordsSource: () => {
+	OffsetXYSource: () => {
 		type coords = [number, number];
 		const stream = new Subject<coords>().pipe(
 			map(([x, y]) => `x: ${x}; y: ${y}`)
@@ -200,7 +202,7 @@ const sources = {
 		`;
 	},
 
-	'KeyboardSource (EventData)': () => {
+	'KeyboardSource_EventData': () => {
 		const stream = new Subject<char>();
 
 		return rml`
@@ -376,7 +378,32 @@ const sinks = {
 		const empty = undefined;
 
 		return  rml`
-			<button style="min-width: 5rem; min-height: 2rem;"r>${empty}</button>
+			<button style="min-width: 5rem; min-height: 2rem;">${empty}</button>
+		`;
+	},
+
+	FocusSink: () => {
+		const altern = interval(500).pipe(
+			scan(x => !x, false),
+		)
+
+		return  rml`
+			Focus/Blur
+			<input rml:focus="${altern}">
+		`;
+	},
+
+
+	BlurSink: () => {
+		const keyStream = new Subject();
+		const blur = keyStream.pipe(
+			log('KEY'),
+			filter(k => k == 'Enter')
+		);
+
+		return  rml`
+			Type some text and hit Enter to blur<br>
+			<input rml:blur="${blur}" onkeydown="${Key(keyStream)}">
 		`;
 	},
 

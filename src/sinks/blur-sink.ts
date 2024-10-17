@@ -5,7 +5,7 @@ import type { FocusableElement } from '../types/rml';
 import { SINK_TAG } from "../constants";
 
 export const BlurSink: Sink<FocusableElement> = (node: FocusableElement) =>
-	node.blur
+	node.blur.bind(node)
 ;
 
 /**

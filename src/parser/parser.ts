@@ -40,7 +40,7 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): RMLEventName
 }
 // GOTCHA: attributes starting with "on" will be treated as event handlers ------------------------------------> HERE <------------------, so avoid any <tag with ongoing="trouble">
 
-export default function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateExpression[]): HTMLString {
+export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateExpression[]): HTMLString {
 	let acc = '';
 	const strlen = strings.length -1;
 	for(let i=0; i<strlen; i++) {

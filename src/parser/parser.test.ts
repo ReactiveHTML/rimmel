@@ -1,6 +1,6 @@
 import { waitingElementHanlders } from '../internal-state';
 import { RMLEventName } from '../types/dom';
-import rml from './parser';
+import { rml } from './parser';
 
 
 describe('Parser', () => {

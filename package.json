@@ -29,8 +29,8 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "rimraf dist && rollup --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript > rollup.log",
-    "dev": "rimraf dist && rollup -w --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript > rollup.log",
+    "build": "rimraf dist && rollup --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",
+    "dev": "rimraf dist && rollup -w --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",
     "website:local": "bundle exec jekyll serve",
     "test": "bun test"
   },

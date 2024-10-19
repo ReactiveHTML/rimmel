@@ -61,7 +61,7 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 		node.append(...nodes);
 	}
 
-	([...node.attributes as unknown as Attr[]] || [])
+	[...node.attributes as unknown as Attr[]]
 		.forEach(attr => {
 			const key = attr.nodeName;
 			const value = attr.nodeValue;

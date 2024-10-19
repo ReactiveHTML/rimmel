@@ -7,133 +7,120 @@ import terser from '@rollup/plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 const terserOptions = {
-  compress: {
-    drop_debugger: false,
-  },
+	compress: {
+		drop_debugger: false,
+	},
 };
 
-const cjs: OutputOptions = {
-  dir: './dist',
-  entryFileNames: '[name].cjs',
-  exports: 'named',
-  externalLiveBindings: false,
-  format: 'cjs',
-  freeze: false,
-  // generatedCode: 'es6',
-  // interop: 'default',
-  sourcemap: true,
-}
+export default <RollupOptions[]>[
+	{	// Global JS
+		// external: ['rxjs'],
+		input: './src/index.ts',
+		treeshake: {
+			propertyReadSideEffects: false,    // Optimise property access side effects
+		},
+		plugins: [
+			nodeResolve({ preferBuiltins: true }),
+			// json(),
+			typescript({
+				tsconfig: './tsconfig.build.json',
+				sourceMap: true,
+				// declarationDir: './dist/types',
+				outDir: 'dist/globaljs',
+				declaration: false,
+			}),
+			terser(terserOptions),
+			visualizer({ filename: 'bundle-stats-globaljs.html' }),
+		],
+		output: [{
+			exports: 'named',
+			externalLiveBindings: false,
+			dir: './dist/globaljs',
+			entryFileNames: 'rimmel.js',
+			freeze: true,
+			generatedCode: 'es2015',
+			format: 'esm',
+			globals: {
+				'rml': 'rml',
+			},
+			sourcemap: true,
+		}],
+	},
 
-const es: OutputOptions = {
-  ...cjs,
-  entryFileNames: '[name].mjs',
-  format: 'es',
-  sourcemap: true,
-};
+	{
+		external: ['rxjs'],
+		input: './src/index.ts',
+		treeshake: {
+			propertyReadSideEffects: false,    // Optimise property access side effects
+		},
+		plugins: [
+			nodeResolve({ preferBuiltins: true }),
+			commonjs(),
+			json(),
+			typescript({
+				tsconfig: './tsconfig.build.json',
+				sourceMap: true,
+				outDir: './dist/esm/modules',
+			}),
+			terser(terserOptions),
+			visualizer({ filename: 'bundle-stats-esm.html' }),
+		],
+		output: [
+			{
+				exports: 'named',
+				externalLiveBindings: false,
+				freeze: false,
+				sourcemap: true,
+				entryFileNames: 'rimmel.mjs',
+				format: 'es',
+				dir: './dist/esm',
+				preserveModules: true,
+			}
+		],
+	},
 
-const cjs_ssr: OutputOptions = {
-  dir: './dist',
-  entryFileNames: 'ssr.cjs',
-  exports: 'named',
-  externalLiveBindings: false,
-  format: 'cjs',
-  freeze: false,
-  // generatedCode: 'es6',
-  // interop: 'default',
-  sourcemap: true,
-}
+	{
+		external: ['rxjs'],
+		input: './src/ssr/index.ts',
+		treeshake: {
+			moduleSideEffects: 'no-external',  // Only shake internal code
+			propertyReadSideEffects: false,    // Optimise property access side effects
+		},
+		plugins: [
+			nodeResolve({ preferBuiltins: true }),
+			commonjs(),
+			json(),
+			typescript({
+				tsconfig: './tsconfig.build.json',
+				sourceMap: true,
+				outDir: './dist/ssr',
+				declarationDir: './dist/ssr/types',
+			}),
+			terser(terserOptions),
+			visualizer({ filename: 'bundle-stats-ssr.html' }),
+		],
+		output: [
+			{	// CJS SSR
+				dir: './dist/ssr',
+				entryFileNames: 'ssr.cjs',
+				exports: 'named',
+				externalLiveBindings: false,
+				format: 'cjs',
+				freeze: false,
+				// generatedCode: 'es6',
+				// interop: 'default',
+				sourcemap: true,
+			},
+			{	// ESM SSR
+				exports: 'named',
+				externalLiveBindings: false,
+				freeze: false,
+				dir: './dist/ssr',
+				entryFileNames: 'ssr.mjs',
+				format: 'es',
+				sourcemap: true,
+			}
+		],
+	},
+];
 
-const es_ssr: OutputOptions = {
-  ...cjs,
-  entryFileNames: 'ssr.mjs',
-  format: 'es',
-  sourcemap: true,
-};
-
-const globalVar: OutputOptions = {
-  ...cjs,
-  dir: './dist',
-  entryFileNames: 'rimmel.js',
-  freeze: true,
-  generatedCode: 'es2015',
-  format: 'esm',
-  globals: {
-    'rml': 'rimmel',
-  },
-  sourcemap: true,
-};
-
-const preserveModules = {
-  dir: './dist/modules',
-  preserveModules: true,
-};
-
-export default [
-  {
-    external: ['rxjs'],
-    input: './src/index.ts',
-    treeshake: {
-      propertyReadSideEffects: false,    // Optimise property access side effects
-    },
-    plugins: [
-      nodeResolve({ preferBuiltins: true }),
-      commonjs(),
-      json(),
-      typescript({
-        tsconfig: './tsconfig.build.json',
-        sourceMap: true,
-        declarationDir: './dist/types',
-      }),
-      terser(terserOptions),
-      visualizer({ filename: 'bundle-stats.html' }),
-    ],
-    output: [ cjs, es, globalVar ],
-  },
-  {
-    external: ['rxjs'],
-    input: './src/index.ts',
-    plugins: [
-      nodeResolve({ preferBuiltins: true }),
-      commonjs(),
-      json(),
-      typescript({
-        tsconfig: './tsconfig.build.json',
-        sourceMap: true,
-        outDir: preserveModules.dir,
-        declaration: false,
-      }),
-      terser(terserOptions),
-    ],
-    output: [
-      {
-        ...cjs,
-        ...preserveModules,
-      },
-      {
-        ...es,
-        ...preserveModules,
-      }
-    ],
-  },
-  // {
-  //   external: ['rxjs'],
-  //   input: './src/ssr/index.ts',
-  //   treeshake: {
-  //     moduleSideEffects: 'no-external',  // Only shake internal code
-  //     propertyReadSideEffects: false,    // Optimise property access side effects
-  //   },
-  //   plugins: [
-  //     nodeResolve({ preferBuiltins: true }),
-  //     commonjs(),
-  //     json(),
-  //     typescript({
-  //       tsconfig: './tsconfig.build.json',
-  //       sourceMap: true,
-  //       declarationDir: './dist/types',
-  //     }),
-  //     terser(terserOptions),
-  //     visualizer({ filename: 'bundle-stats.html' }),
-  //   ],
-  //   output: [ cjs_ssr, es_ssr ],
-  // },
-] as RollupOptions[];

@@ -14,7 +14,7 @@ const terserOptions = {
 
 export default <RollupOptions[]>[
 	{	// Global JS
-		// external: ['rxjs'],
+		external: ['rxjs'],
 		input: './src/index.ts',
 		treeshake: {
 			propertyReadSideEffects: false,    // Optimise property access side effects
@@ -39,9 +39,10 @@ export default <RollupOptions[]>[
 			entryFileNames: 'rimmel.js',
 			freeze: true,
 			generatedCode: 'es2015',
-			format: 'esm',
+			format: 'iife',
+			name: 'rml',    // The name of your global variable
 			globals: {
-				'rml': 'rml',
+				'rxjs': 'rxjs',  // Assuming rxjs is an external dependency
 			},
 			sourcemap: true,
 		}],

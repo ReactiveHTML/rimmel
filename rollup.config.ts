@@ -25,6 +25,7 @@ export default <RollupOptions[]>[
 			typescript({
 				tsconfig: './tsconfig.build.json',
 				sourceMap: true,
+				inlineSources: true,
 				// declarationDir: './dist/types',
 				outDir: 'dist/globaljs',
 				declaration: false,
@@ -61,7 +62,10 @@ export default <RollupOptions[]>[
 			typescript({
 				tsconfig: './tsconfig.build.json',
 				sourceMap: true,
+				inlineSources: true,
 				outDir: './dist/esm/modules',
+				declarationDir: './dist/esm/types',
+				declarationMap: true,
 			}),
 			terser(terserOptions),
 			visualizer({ filename: 'bundle-stats-esm.html' }),
@@ -94,8 +98,10 @@ export default <RollupOptions[]>[
 			typescript({
 				tsconfig: './tsconfig.build.json',
 				sourceMap: true,
+				inlineSources: true,
 				outDir: './dist/ssr',
 				declarationDir: './dist/ssr/types',
+				declarationMap: true,
 			}),
 			terser(terserOptions),
 			visualizer({ filename: 'bundle-stats-ssr.html' }),

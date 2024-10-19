@@ -248,6 +248,23 @@ const sinks = {
 		return  rml`<button onclick="${()=>alert('clicked')}">click me</button>`
 	},
 
+	ZeroInitial: () => {
+		const bs = new BehaviorSubject(0).pipe(
+			mergeWith(interval(1000).pipe(map(x=>x+2))),
+		);
+
+		return  rml`Outpuut: <span>${bs}</span>`;
+	},
+
+	EmptyInitial: () => {
+		const bs = new BehaviorSubject('').pipe(
+			mergeWith(interval(1000)),
+		);
+
+		return  rml`Outpuut: <span>${bs}</span>`;
+	},
+
+
 	ClassSink: () => {
 		const cls1 = 'cls1';
 		const cls2 = defer('cls2', 1000);

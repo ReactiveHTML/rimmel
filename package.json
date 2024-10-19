@@ -1,21 +1,12 @@
 {
   "name": "rimmel",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A Functional-Reactive UI library for the Rx.Observable Universe",
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/types/index.d.ts",
+  "_main": "dist/cjs/index.cjs",
+  "module": "dist/esm/rimmel.mjs",
+  "types": "dist/esm/modules/index.d.ts",
   "paths": {
-    "rimmel/types/*": [
-      "dist/types/*"
-    ],
-    "rimmel/sinks": [
-      "dist/sinks/index"
-    ],
-    "rimmel/sinks/*": [
-      "dist/sinks/*"
-    ],
     "rimmel/ssr": [
       "dist/ssr"
     ],
@@ -25,14 +16,17 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "import": "./dist/esm/index.mjs"
     },
     "./ssr": {
-      "import": "./dist/ssr.mjs",
-      "require": "./dist/ssr.cjs"
+      "import": "./dist/ssr/ssr.mjs",
+      "require": "./dist/ssr/ssr.cjs"
     }
   },
+  "files": [
+    "dist/",
+    "favicon.svg"
+  ],
   "sideEffects": false,
   "scripts": {
     "build": "rimraf dist && rollup --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript > rollup.log",
@@ -82,9 +76,9 @@
     "rollup": "^4.9.5",
     "rollup-plugin-visualizer": "^5.12.0",
     "ts-node": "^10.9.2",
-    "tslib": "^2.6.2",
-    "typescript": "^5.5.3",
-    "vite": "^5.2.9"
+    "tslib": "^2.8.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.9"
   },
   "peerDependencies": {
     "rxjs": ">=5.5.0 || >=6.0.0 || >=7.0.0"

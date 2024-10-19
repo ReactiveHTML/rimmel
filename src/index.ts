@@ -37,6 +37,7 @@ export { Form } from './sources/form-data-source';
 export { Key } from './sources/keyboard-source';
 export { Update } from './sources/object-source';
 export { ClientXY } from './sources/client-xy-source';
+export { OffsetXY } from './sources/offset-xy-source';
 export { LastTouchXY } from './sources/last-touch-xy-source';
 export { Value, ValueAsDate, ValueAsNumber } from './sources/value-source';
 

@@ -1,11 +1,11 @@
 {
   "name": "rimmel",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "A Functional-Reactive UI library for the Rx.Observable Universe",
   "type": "module",
   "_main": "dist/cjs/index.cjs",
   "module": "dist/esm/rimmel.mjs",
-  "types": "dist/esm/modules/index.d.ts",
+  "types": "dist/esm/types/index.d.ts",
   "paths": {
     "rimmel/ssr": [
       "dist/ssr"
@@ -45,10 +45,14 @@
     "rxjs",
     "rx",
     "html",
+    "observables",
+    "observable",
     "reactive",
     "reactive html",
     "reactive dom",
     "rml",
+    "reactive-markup",
+    "stream",
     "fp",
     "frp",
     "functional programming",

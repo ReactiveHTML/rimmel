@@ -10,8 +10,6 @@ No need to "set up" or "tear down" observables in your components so you can kee
 Rimmel works with standard JavaScript/TypeScript template literals tagged with `rml` and it works out of the box.
 
 <br>
-<br>
-<br>
 
 ## Hello World
 The modern "Hello World" for reactive interfaces is the click counter: one button, one text box.<br>

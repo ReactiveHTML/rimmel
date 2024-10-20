@@ -156,11 +156,11 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						if(attributeName == 'style') {
 							const CSSAttribute = /;?(?<key>[a-z][a-z0-9\-_]*)\s*:\s*$/.exec(string)?.groups?.key;
 							sink = CSSAttribute ? StylePreSink(CSSAttribute): StyleObjectSink;
-							handler = PreSink<HTMLElement | SVGElement>(sink, expression, CSSAttribute);
+							handler = PreSink<HTMLElement | SVGElement>('StyleObject', sink, expression, CSSAttribute);
 						} else {
 							isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attributeName);
 							sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName))) || FixedAttributePreSink(attributeName);
-							handler = PreSink(sink, expression, attributeName);
+							handler = PreSink(attributeName, sink, expression, attributeName);
 						}
 
 						// addRef(ref, <RMLTemplateExpressions.GenericHandler>{ handler: expression, type: attributeType, attribute: attributeName });

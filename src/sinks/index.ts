@@ -14,13 +14,13 @@ import { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/inter
 // 	data,
 // });
 
-export const PreSink = <T extends Element>(sink: Sink<T>, source: RMLTemplateExpressions.Any, args: any) =>
-    <SinkBindingConfiguration<T>>({
-        type: 'sink',
-        t: 'GenericSink',
-        source,
-        sink,
-    })
+export const PreSink = <T extends Element>
+	(tag: string, sink: Sink<T>, source: RMLTemplateExpressions.Any, args: any) => ({
+		type: 'sink',
+		t: tag,
+		source,
+		sink,
+	}) as SinkBindingConfiguration<T>
 ;
 
 //export { AnyContentSink } from "./content-sink";

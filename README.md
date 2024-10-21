@@ -197,10 +197,6 @@ Sinks are most often the place where you want to display any information in the 
 
 With RML/Rimmel you can treat most DOM elements as sources, sinks, or both.
 
-## Stream Processing
-Sources normally emit raw data, not meant to display in a UI (e.g.: a `ScrollEvent` or a `MouseEvent`), so what we do is to process and format them.
-RxJS comes with a comprehensive set of utility functions to transform data streams, so Rimmel doesn't offer any. This enables you to choose any 
-
 ## Event Sources
 Rimmel supports event listeners from all DOM elements.
 Static values are treated as non-observable values and no data-binding will be created.
@@ -218,17 +214,23 @@ target.innerHTML = rml`<button onclick="${stream}></button>`;
 const fn = (e: MouseEvent) => alert('hover');
 target.innerHTML = rml`<a onmouseover="${fn}></button>`;
 
+// Event Delegation
+const buttonClicks = new Subject<MouseEvent>().pipe(
+  filter(e => e.target.tagName == 'BUTTON')
+);
 
-// Simple static values
-const color = 'red';
-target.innerHTML = rml`<div style="color: ${color}; background: black;">
-  red on black
-</div>`;
+target.innerHTML = rml`
+   <div onclick="${buttonClicks}>
+     <button>button1</button>
+     <button>button2</button>
+     <button>button3</button>
+   </div>
+`;
 ```
 
 <br>
 
-### Event Mapping
+### Event Adapters
 In normal circumstances your event handlers receive a native DOM `Event` object, such as `MouseEvent`, `PointerEvent`, etc.
 
 To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Mappers to feed your event handlers or Observable streams the exact data they need, in the format they expect it, rather than the generic, raw DOM Event objects they would get otherwise.
@@ -241,7 +243,7 @@ Use `<input oninput="${ Key(handler) }">`
 
 Rimmel comes with a handful of Event Mappers out of the box, but you can create your own with ease.
 
-If you know how to use the <a href="https://rxjs.dev/api/index/function/pipe">`pipe()`</a> function from RxJS, then you almost know how to use `source()` from Rimmel.
+If you know how to use the <a href="https://rxjs.dev/api/index/function/pipe">`pipe()`</a> function from RxJS, then you almost know how to use `source(...operators, target)` from Rimmel.
 It works like `pipe()`, except it applies the same operators to data coming in, rather than going out of an Observable stream.
 
 `pipe(...operators, targetObserver)`
@@ -249,7 +251,8 @@ It works like `pipe()`, except it applies the same operators to data coming in, 
 ```js
 import { rml, source } from 'rimmel';
 
-const ButtonValue = map((e: PointerEvent) => Number(e.target.dataset.value));
+const Value = map((e: Event) => Number(e.target.dataset.value));
+const ButtonClick = filter((e: Event) => e.target.tagName == 'BUTTON');
 
 const Component = () => {
   const total = new Subject<number>().pipe(
@@ -257,7 +260,7 @@ const Component = () => {
   );
 
   return rml`
-    <div onclick="${ source(ButtonValue, total) }">
+    <div onclick="${source(ButtonClick, Value, total)}">
 
       <button data-value="1">add one</button>
       <button data-value="2">add two</button>
@@ -286,18 +289,9 @@ These include:
 - Value
 - Style
 - Attribute (any generic HTML attribute not listed above)
-- InnerHTML, InnerText, TextContent
+- InnerText, TextContent, InnerHTML, PrependHTML, AppendHTML
+- Custom Sinks (create your own for specific, optimised rendering of complex data)
 - Higher-Order Sinks (dynamic sinks that emit other sinks)
-- Custom Sinks
-
-Dynamic sinks can emit any of the above and will be evaluated at runtime.
-Best suited for cases when flexibility is preferred over raw performance.
-
-You can create and use your custom sinks to have fine-grained control over the rendering of particular pieces of data (E.G.: Data Collections, generic vector graphics to map or render on SVG or canvas, 3D models to translate to WebGL)
-
-### Custom Sinks
-Do you have any more specific way to display your data? You can create and use your own custom sinks. They are the opposite of Event Mappers, in that they take a stream of data and render in on the page the way you like.
-
 
 ### Examples:
 
@@ -322,21 +316,20 @@ target.innerHTML = rml`<div data-attribute="${stream}"></div>`;
 const stream = new Subject<string>();
 target.innerHTML = rml`<div some-attribute="${stream}"></div>`;
 
-// A "Bridge" Sink (add a final step, before calling the actual sink)
-const Sanitize = input => {
-    type: 'sink',
-    source: input.pipe(
-        map(strHTML => strHTML.replace(/</g, '&lt;'))
-    ),
-    sink: InnerHTMLSink
-};
+// A "Custom" Sink (add a final step, before calling the actual sink)
+const Sanitize = inputPipe(map(strHTML => strHTML.replace(/</g, '&lt;')));
 
 const stream = new Subject<HTMLString>();
 target.innerHTML = rml`<div>${Sanitize(stream)}</div>`;
 
 ```
 
-<br><br><br>
+<br><br>
+
+### Custom Sinks
+Do you have any more specific way to display your data? You can create and use your own custom sinks.
+They are the opposite of Event Adapters, in that they take a stream of data and render in on the page the way you like.
+
 
 ## Extensible Components (AKA: Mixins)
 Mixins are an exciting by-product of dynamic sinks, which allow you to inject pretty much anything at any time (event listeners, classes, attributes, etc) into a target "host" element by means of simply emitting a "DOM Object" ­­­— a plain-old object whose properties and methods represent DOM attributes and event listeners.
@@ -344,7 +337,7 @@ Mixins are an exciting by-product of dynamic sinks, which allow you to inject pr
 <br>
 
 ```javascript
-const mixin = () => {
+const Mixin = () => {
   const onmouseover = () => console.log('mouseover')
 
   const onclick = new Subject()
@@ -368,13 +361,12 @@ const mixin = () => {
   }
 }
 
-
 // ----------------------------
 // And this is how you call it:
 // ----------------------------
 const component = () => {
   return rml`
-    <div ...${mixin()}></div>
+    <div ...${Mixin()}></div>
   `;
 }
 ```

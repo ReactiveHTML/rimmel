@@ -1,15 +1,12 @@
-Rimmel treats Observables and Promises as fist-class citizens.<br />
-
-\- When a DOM event fires an Observer reacts.<br />
-\- When an Observable emits the DOM renders.<br />
-\- When you connect `DOM => [ an observable stream ] => DOM`, you have a reactive UI
-
-No need for JSX, HyperScript, Virtual DOM, Babel, Webpack, React.<br>
-No need to "set up" or "tear down" observables in your components so you can keep them pure, no need to unsubscribe or dispose of observers, no need to perform any manual memory cleanup.
-
-Rimmel works with standard JavaScript/TypeScript template literals tagged with `rml` and it works out of the box.
+With Rimmel you can create a whole new world of powerful HTML templates and webapps using Observables and Promises as first-class citizens.<br>
 
 <br>
+
+```
+<button onclick="${anObserver}"></div>
+<div>${anObservable}</div>
+```
+
 
 ## Hello World
 The modern "Hello World" for reactive interfaces is the click counter: one button, one text box.<br>

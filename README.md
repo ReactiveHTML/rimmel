@@ -1,12 +1,13 @@
 <img src="docs/assets/github-hero.png" alt="Rimmel.js" style="text-align: start; max-width: 100%;">
 <br>
 
-Rimmel lets you create a whole new world of powerful HTML templates and webapps using Observables and Promises as first-class citizens.<br>
+With Rimmel you can create a whole new world of powerful HTML templates and webapps using Observables and Promises as first-class citizens.<br>
 
 <br>
 
 ```
-<div>  ${ anObservable }  </div>
+<button onclick="${anObserver}"></div>
+<div>${anObservable}</div>
 ```
 
 <br>

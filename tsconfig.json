@@ -10,5 +10,5 @@
     "importHelpers": false,
     "strict": true
   },
-  "include": ["rollup.config.ts"]
+  "include": ["rollup.config.ts", "src/types/**/*.d.ts"]
 }

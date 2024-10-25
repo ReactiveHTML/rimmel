@@ -17,9 +17,10 @@ export const INTERACTIVE_NODE_END   = '\u200C'; // FIXME: can't use this
 export const SOURCE_TAG = 'source';
 export const SINK_TAG = 'sink';
 
-// Use a single, delegated event listener at the root level vs attaching individual event listeners or event observers to each node
-export const DELEGATE_EVENTS = !true;
+// Use a single, delegated event listener at the root level
+// or attach individual event listeners or event observers to each node?
+export const DELEGATE_EVENTS: boolean = false;
 
-// Use the new native Web Platform Observable instead of addEventListener
-export const USE_DOM_OBSERVABLES = !true;
+// Use the new native Web Platform Observables instead of addEventListener when available
+export const USE_DOM_OBSERVABLES: boolean = !true;
 

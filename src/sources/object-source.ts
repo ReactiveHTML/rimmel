@@ -17,13 +17,13 @@ export const isObjectSource = <T extends TargetObject>(expression: RMLTemplateEx
  * @example <input oninput="${ObjectSource([arr, 4])}">
  */
 export const ObjectSource = <E extends Event, T extends TargetObject>(expression: ObjectSourceExpression<T>) =>
-    <EventListenerFunction<E>>function () {
+    <EventListenerFunction<E>>((e: E) => {
         // Only <input> elements are supported for this source
-        //const valueSource = this.type == 'checkbox' ? this.checked : this.value;
-        const valueSource = this.type == 'checkbox' ? this.checked : this.tagName == 'INPUT' ? this.value : this.innerText;
-        const [target, key] = expression;
-        target[key] = valueSource;
-    }
+        const t = (<HTMLInputElement>e.target)
+        const valueSource = t.type == 'checkbox' ? t.checked : t.tagName == 'INPUT' ? t.value : t.innerText;
+        const [target, key] = <[Record<string, any>, string] | [Array<any>, number]>expression;
+        (<any>target[<any>key]) = valueSource;
+    })
 ;
 
 /**

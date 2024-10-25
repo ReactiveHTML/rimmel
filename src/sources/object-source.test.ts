@@ -13,12 +13,11 @@ describe('Object Source', () => {
 
             const el = MockElement({
                 tagName: 'INPUT',
+                type: 'text',
                 value: newData,
             });
             const eventData = MockEvent('input', {
-                target: {
-                    value: newData,
-                } as HTMLInputElement
+                target: el as HTMLInputElement
             });
 
             const source = ObjectSource(data).bind(el);
@@ -35,13 +34,12 @@ describe('Object Source', () => {
 
             const el = MockElement({
                 tagName: 'INPUT',
+                type: 'text',
                 value: newData,
             });
 
             const eventData = MockEvent('input', {
-                target: {
-                    value: newData,
-                } as HTMLInputElement
+                target: el as HTMLInputElement
             });
 
             const source = ObjectSource(data).bind(el);
@@ -64,9 +62,7 @@ describe('Object Source', () => {
                   checked: newData,
               });
               const eventData = MockEvent('change', {
-                  target: {
-                      checked: newData,
-                  } as HTMLInputElement
+                  target: el as HTMLInputElement
               });
 
               const source = ObjectSource(data).bind(el);
@@ -90,9 +86,7 @@ describe('Object Source', () => {
                   innerText: newData,
               });
               const eventData = MockEvent('randomevent', {
-                  target: {
-                      innerText: newData,
-                  } as HTMLDivElement
+                  target: el as HTMLDivElement
               });
 
               const source = ObjectSource(data).bind(el);

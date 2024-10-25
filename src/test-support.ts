@@ -81,17 +81,17 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
 };
 
 export const MockEvent = (name: string, data: Partial<Event>) =>
-    new Event(name, <Event>{
-        bubbles: true,
-        cancelable: true,
-        currentTarget: null,
-        defaultPrevented: false,
-        eventPhase: 0,
-        isTrusted: false,
-        target: null,
-        preventDefault: () => {},
-        stopPropagation: () => {},
-        timeStamp: 0,
-        type: name,
-        ...data,
-     });
+ (<Event>{
+   bubbles: true,
+   cancelable: true,
+   currentTarget: null,
+   defaultPrevented: false,
+   eventPhase: 0,
+   isTrusted: false,
+   target: null,
+   preventDefault: () => {},
+   stopPropagation: () => {},
+   timeStamp: 0,
+   type: name,
+   ...data,
+ });

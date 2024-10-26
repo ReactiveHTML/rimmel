@@ -78,20 +78,58 @@ Rimmel uses Sinks, which are memory and/or performance-optimised direct DOM mani
 Several UI libraries and frameworks around have a concept of component re-rendering, which implies running the whole component's function again in order to check its output and diff it against the DOM.
 Since Rimmel makes use of reactive streams for state management, everything turned out to be dramatically simpler.
 
-There is only one time a component is "rendered", which is when it first goes to the page. After that, only "updates" happen, which are performed with native DOM calls.
+There is only one time a component is "rendered" and that is when it first lands on the page. After that, only "updates" happen, which are performed with native DOM calls.
+
+
+## Static Conditional Rendering? We've got plain old JS
+If you need to statically render something based on various conditions, plain-old standard JavaScript can help you and there's no need for further abstractions:
+```javascript
+document.body.innerHTML = rml`
+  <main>
+    ${ some == thing
+		? rml`<div>yes, it's true</div>`
+		: rml`<div>no, it's false</div>`
+	}
+  </main>
+```
+
+You only want to use this method if your condition is not reactive and content doesn't need to reflect changes over time.
+
+
+## Dynamic Conditional Rendering? We've got streams
+The simplest way to render something based on a dynamic, ever-changing condition (so that if the condition changes, something else is rendered) is just using a normal Observable stream:
+
+```javascript
+const conditionalStream = new Subject().pipe(
+  map(data => {
+    if(data.hasSomething) {
+      return rml`<child1>`
+    } else {
+      return rml`<child2>`
+    }
+}
+
+document.body.innerHTML = rml`
+  <main>
+    ${conditionalStream}
+  </main>
+```
 
 ## Forward Refs? No need
 Forward refs are a construct used in Imperative-Reactive UI libraries to enable referencing and later modifying DOM elements that don't exist yet.
 The simple, yet effective functional paradigm used by Rimmel enables you to define any change to a DOM element as a Promise or Observable stream. This means whenever your streams emit any data, the elements will already be there to receive them, effectively making the use of Forward Refs redundant.
 
 
-## Structured Data? Delegated
-When you're dealing with structured data, like lists or grids of repeated data, the best way to handle it depends on multiple factors, so it's left as an extension opportunity. You can create your advanced Sinks to render complex data structures and manage specific aspects of its interactions in the most optimal way for your needs.
+## Structured Data? We stop here and this is why
+When you're dealing with structured data, like lists or grids of repeated data, the best way to handle it depends on multiple factors, so it's left as an extension opportunity.
 
-To display and manage the UI for any dynamic list where you plan to support CRUD operations, perhaps drag'n'drop, you may consider using an `Observable Collection` from [Observable Types](https://github.com/ReactiveHTML/observable-types), which is a rendering-aware extension of `Array`, every method of which is mapped to an optimised UI rendering command.
+You can create your custom, advanced Sinks to render data structures of any complexity and manage any specific aspects of its interactions in the most optimal way for your needs.
+This is a perfect case for reactive grids, spreadsheets, SVG or Canvas drawings, interactive 3D scenes, etc.
+
+To display and manage the UI for any dynamic list where you plan to support CRUD operations, perhaps drag'n'drop, you may consider using a `Collection` from [ObservableTypes](https://github.com/reactivehtml/observable-types), which is a rendering-aware extension of `Array`, every method of which is mapped to an optimised UI rendering command, and it also exposes the `Observable` and `Observer` interfaces for seamless reactivity and integration with Rimmel and RxJS.
 
 
-<br><br><br>
+<br><br>
 
 
 ## 👋 Hello World👋 ++
@@ -134,7 +172,7 @@ const ColorPicker = (initial = [0, 0, 0]) => {
   `;
 }
 
-document.getElementById('rimmel-root').innerHTML = ColorPicker([255, 128, 64])
+document.getElementById('root-node').innerHTML = ColorPicker([255, 128, 64])
 ```
 
 <br><br>
@@ -146,8 +184,8 @@ document.getElementById('rimmel-root').innerHTML = ColorPicker([255, 128, 64])
 
 <br>
 
-As you can see, there are three main streams, one for each colour gauge in the HTML.
-When they emit, their values are merged together through `combineLatest`, which passes them through as an array to `toRGBString` which will retutn the string as we need it.
+As you can see, there are three main streams, one for each colour slider in the HTML.
+When they emit, their values are merged together through `combineLatest`, which passes them through as an array to `toRGBString` which will return the string as we need it.
 
 Finally, we have two sinks where the data ends up; one as the innerHTML of the <span>, ther other as the fill colour of the SVG shape.
 
@@ -174,7 +212,7 @@ All Rimmel does is binding your observable streams to the UI with a seamless int
 
 
 ## "Lifecycle Events" are gone (you have streams)
-Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless and redudant here. Streams get connected and disconnected automatically for you and that happens to be what you normally do in your init/onmount function.
+Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless, redudant and discouraged here. Streams get connected and disconnected automatically for you and that happens to be what you normally do in your init/onmount function.
 Using streams instead makes your code immensely cleaner and more testable.
 
 Rimmel still has a `rml:onmount` event, but its use is only left as a last resort to integrate imperative, non-Rimmel components (some old jQuery plugins, etc?)
@@ -185,7 +223,7 @@ This might sound unusual, but Rimmel can actually coexist with other frameworks.
 If you are planning to perform a progressive framework migration, this is one way you can do it, one component at a time.
 
 
-<br><br><br>
+<br><br>
 
 # Sources vs. Sinks
 There are two key concepts used by Rimmel: sources and sinks.
@@ -234,7 +272,7 @@ target.innerHTML = rml`
 ### Event Adapters
 In normal circumstances your event handlers receive a native DOM `Event` object, such as `MouseEvent`, `PointerEvent`, etc.
 
-To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Mappers to feed your event handlers or Observable streams the exact data they need, in the format they expect it, rather than the generic, raw DOM Event objects they would get otherwise.
+To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Mappers, or Event Adapters to feed your event handlers or Observable streams the exact data they need, in the format they expect it, rather than the generic, raw DOM Event objects.
 
 Do you only need the relative `[x, y]` mouse coordinates when hovering an element?<br>
 Use `<div onmousemove="${ OffsetXY(handler) }">`
@@ -242,12 +280,12 @@ Use `<div onmousemove="${ OffsetXY(handler) }">`
 Do you want the last typed character when handling keyboard events?
 Use `<input oninput="${ Key(handler) }">`
 
-Rimmel comes with a handful of Event Mappers out of the box, but you can create your own with ease.
+Rimmel comes with a handful of Event Adapters out of the box, but you can create your own with ease.
 
 If you know how to use the <a href="https://rxjs.dev/api/index/function/pipe">`pipe()`</a> function from RxJS, then you almost know how to use `source(...operators, target)` from Rimmel.
 It works like `pipe()`, except it applies the same operators to data coming in, rather than going out of an Observable stream.
 
-`pipe(...operators, targetObserver)`
+`source(...operators, targetObserver)`
 
 ```js
 import { rml, source } from 'rimmel';
@@ -281,25 +319,32 @@ Finally, we're leveraging the DOM's standard Event Delegation by only adding one
 <br>
 
 ## Data Sinks
-Rimmel supports two types of sinks: specialised and dynamic sinks.
-Specialised sinks are the simplest and most intuitive ones: those you define in a template from which the data binding can be easily inferred.<br />
+Rimmel supports two categories of sinks: (standard) specialised sinks and dynamic sinks.
+Specialised sinks are the simplest and most intuitive ones: those you define in an everyday template from which the type of data binding required can be easily inferred. They are optimised for performance, updating a specific part of the DOM.<br />
 
 These include:
 - Class
 - Dataset
 - Value
 - Style
+- Closed
+- Removed
+- Disabled
+- Readonly
 - Attribute (any generic HTML attribute not listed above)
 - InnerText, TextContent, InnerHTML, PrependHTML, AppendHTML
 - Custom Sinks (create your own for specific, optimised rendering of complex data)
-- Higher-Order Sinks (dynamic sinks that emit other sinks)
 
 ### Examples:
 
 ```ts
-// InnerHTML
+// InnerHTML (this is implicit, from the context)
 const stream = new Subject<HTMLString>();
 target.innerHTML = rml`<div>${stream}</div>`;
+
+// InnerText (the easy way to prevent XSS)
+const stream = new Subject<HTMLString>();
+target.innerHTML = rml`<div>${InnerText(stream)}</div>`;
 
 // Class
 const stream = new Subject<CSSClassObject>();
@@ -313,6 +358,18 @@ target.innerHTML = rml`<div style="${stream}"></div>`;
 const stream = new Subject<string>();
 target.innerHTML = rml`<div data-attribute="${stream}"></div>`;
 
+// Disabled Attribute
+const stream = new Subject<boolean>();
+target.innerHTML = rml`<button disabled="${stream}">clickable</button>`;
+
+// Removed (this is a RML attribute, not a standard HTML one)
+const stream = new Subject<boolean>();
+target.innerHTML = rml`<div rml:removed="${stream}"></div>`;
+
+// Closed
+const stream = new Subject<boolean>();
+target.innerHTML = rml`<dialog closed="${stream}">...</dialog>`;
+
 // Generic Attribute
 const stream = new Subject<string>();
 target.innerHTML = rml`<div some-attribute="${stream}"></div>`;
@@ -322,18 +379,13 @@ const Sanitize = inputPipe(map(strHTML => strHTML.replace(/</g, '&lt;')));
 
 const stream = new Subject<HTMLString>();
 target.innerHTML = rml`<div>${Sanitize(stream)}</div>`;
-
 ```
 
-<br><br>
-
-### Custom Sinks
-Do you have any more specific way to display your data? You can create and use your own custom sinks.
-They are the opposite of Event Adapters, in that they take a stream of data and render in on the page the way you like.
+Dynamic sinks, on the other hand, are optimised for size and designed for convenience. They can take anyhing as input and figure out how to update the DOM at runtime.
 
 
 ## Extensible Components (AKA: Mixins)
-Mixins are an exciting by-product of dynamic sinks, which allow you to inject pretty much anything at any time (event listeners, classes, attributes, etc) into a target "host" element by means of simply emitting a "DOM Object" ­­­— a plain-old object whose properties and methods represent DOM attributes and event listeners.
+Mixins are an exciting by-product of dynamic sinks, which allow you to inject pretty much anything at any time (event listeners, classes, attributes, etc) into a target "host" element by means of emitting a `DOM Object` ­­­— a plain-old object whose properties and methods represent DOM attributes and event listeners.
 
 <br>
 
@@ -374,9 +426,31 @@ const component = () => {
 
 <br>
 
-When the above component is rendered on the page, the mixin will inject everything else into it, including the `onclick` and the `onmouseover` event handlers, a statically defined `data-new-attribute` and a "merge-in" observable stream, `classes` to set classes dynamically!
+When the above component is rendered on the page, the mixin will inject everything else into it, including the `onclick` and the `onmouseover` event handlers, a statically defined `data-new-attribute` and a "merge-in" observable stream, `classes` to set classes dynamically.
 
 Whenever the `classes` stream emits, you will be able to set/unset class names in the component.
+
+#### No reference to the host element
+You may have noticed that mixins doesn't get any reference to the elements you merge them into.
+
+In the imperative paradigm you would indeed have one, so you can imperatively set `hostElement.classList.add('big')`.
+
+In order to stick with good functional principles, mixins only return this `DOM Object`, which is a declarative way to tell Rimmel what you want it to set on the host element.
+
+```js
+  const returnValue = <DOMObject>{
+    onclick,
+    onmouseover,
+    'class': classes,
+    'data-new-attribute': 'some value',
+    'rml:closed': closedStream,
+    'disabled': disabledStream,
+    'readonly': readonlyStream,
+    'innerHTML': contentStream1,
+    'appendHTML': contentStream2,
+    // etc...
+  }
+```
 
 <br>
 
@@ -402,58 +476,66 @@ Promises and Observables get merged whenever they resolve/emit.
 
 Performance is always key, isn't it?
 
-Actually, it depends. Some studies, in fact, show that a little bit of waiting in _certain conditions_ can actually improve the overall user experience!<br>
-_(Bryant&amp;Veroff, Kahneman&amp;Tversky, Brickman&amp;Campbell, Schultz)_
+Actually, it depends. Some studies, in fact, show that a little bit of waiting in _certain conditions_ can actually improve the overall user experience! _(Bryant&amp;Veroff, Kahneman&amp;Tversky, Brickman&amp;Campbell, Schultz)_
 
 
 Anyway, Rimmel is fast. You can slow it down with the `Rx.delay()` operator if you want, but if you don't, it's fast and here's why:<br>
 
-- It doesn't use a Virtual DOM. If you ever believed the story that the DOM is slow and re-running your components' code every time you blink an eye is the fast and good thing to do, you may have been victim of a scam.<br>
+- It doesn't use a Virtual DOM. If you ever believed the story that the DOM is slow and re-running your components' code every time you blink an eye is the fast and good thing to do, you may have been the victim of a scam.<br>
 
-- Rimmel updates the DOM using "precharged" Sinks,which are just some little element-bound functions that won't need to perform any lookup, but are just ready to update the DOM as fast as possible.<br>
+- Rimmel updates the DOM using "precharged" Sinks, which are just some little element-bound functions that won't need to perform any lookup, but are just ready to update the DOM as fast as possible.<br>
 As a result, your updates in certain cases may happen even faster than the normal `document.getElementById(target).style.color = newColor`.<br>
 
-We call it the **Vanilla+ Speed**.
+We call this the **Vanilla+ Speed**.
 
 - Lightweight bundle size. V1 was just 2.5KB of code. Now it's a little more as we're sorting out a few things with specialised sinks and we are in a bit of a feature rush, but the aim is to fall back below 1KB with the launch of the new template compiler.
 
-- The rest is on you. Rimmel is a minimalistic UI library, but the reason it's so powerful is RxJS being behind its reactivity.
+- The rest is on you. Rimmel is a minimalistic UI library, but the true reason for its immense power is RxJS being behind its reactivity.
 
 <br>
 
-### Special cases
+### Special cases of "fast"
 Do you have a Combobox with 1M rows?<br>
 A large spreadsheet with 1k x 10k reactive cells?<br>
 An HFT stock ticker with 10000 subscriptions?<br>
 
-These are obviously edge cases where "fast updates" are obviously irrelevant.<br>
-However, Rimmel can still help implementing your custom logic and optimisation patterns in an ergonomic, functional-reactive style that's easy to test and keep well organised.
+These are obviously cases where "fast updates" or raw speed are irrelevant and what truly matters is adequate frontend architecture.<br>
+
+These are perfect cases to create Custom Sinks implementing relevant design patterns to make extreme scenarios still work optimally in an ergonomic, functional-reactive style that's easy to test and keep well organised.
 
 <br>
 
 ## Memory management
-If you come from some other libraries or frameworks, including RxJS, you know you're somewhat responsible of cleaning up memory. The indiscriminate use of Observable subscriptions can cause memory leaks in various scenarios.
+If you come from some other libraries or frameworks, including "vanilla RxJS", you know you're somewhat responsible of cleaning up memory. The indiscriminate use of Observable subscriptions without proper cleanup can cause memory leaks in certain scenarios.
 
 Using Observables with Rimmel is trivial. All DOM subscriptions and event listeners are handled by the library behind the scenes, registered when a component is mounted and unregistered when it's removed.
 
 <br>
 
 ## "Suspense" for free, out of the box
-Do you have async data like an API call and a placeholder to display whilst waiting? We have good news: a BehaviorSubject is all you need.
-The BehaviorSubject, since it has an initial, "current" value, is the perfect candidate for this, and as such, it receives a special treatment from Rimmel in that its initial value will be rendered immediately, synchronously, whilst subsequent emissions will replace it as normal.
+Do you have async data like an API call and a placeholder to display whilst waiting? We have good news: a `BehaviorSubject` is all you need.
+
+A `BehaviorSubject` receives a special treatment from Rimmel in that its initial value will be rendered immediately, synchronously, whilst subsequent emissions will replace it as normal. This helps avoid unnecessary reflows and jank on the page.
 
 ```javascript
+import { ajax } from 'rxjs/ajax';
+
 const WaitingComponent = () => {
-  const stream = new BehaviorSubject('loading...').pipe(
-    switchMap(fetch('https://api.example.com/data))
-  );
+  const stream = new BehaviorSubject('loading...');
+
+  ajax.getJSON('https://api.example.com/data')
+    .pipe(map(data => `<pre>${JSON.stringify(data, null, 2)}</pre>`))
+    .subscribe(stream)
+  ;
 
   return rml`
     <div>${stream}</div>
-  `
+  `;
 }
 ```
 <br>
+
+<a href="https://stackblitz.com/edit/rimmel-suspense"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://stackblitz.com/edit/rimmel-suspense">Suspense</a> on Stackblitz.
 
 
 ## Use with AI assistants/LLMs

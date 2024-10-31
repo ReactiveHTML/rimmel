@@ -5,15 +5,19 @@ With Rimmel you can create a whole new world of powerful HTML templates and weba
 
 <br>
 
-```
-<button onclick="${anObserver}"></div>
-<div>${anObservable}</div>
-```
+- When a DOM event is triggered an Observer reacts
+- When an Observable emits the DOM gets updated
 
 <br>
 
-- When a DOM event is triggered an Observer reacts
-- When an Observable emits the DOM gets updated
+
+```html
+<button onclick="${anObserver}">click me</button>
+
+<span class="${anObservable}"></span>
+<div style="color: ${anObservable};"></div>
+<div>${anObservable}</div>
+```
 
 <br>
 
@@ -24,7 +28,6 @@ No need to unsubscribe or dispose of observers or perform any manual memory clea
 <br>
 
 Rimmel works with standard JavaScript/TypeScript template literals tagged with `rml` out of the box.
-<br>
 <br>
 
 ## 👋 Hello World 👋
@@ -43,9 +46,9 @@ The result is then "sinked" into the `<span>` element at the end.
 <a href="https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/bGKRKqq?editors=0111">Rimmel Hello World</a> on Codepen.
 </div>
 
-<br><br><br>
+<br>
 <hr>
-<br><br><br>
+<br>
 
 ## Imperative-Reactive? No
 Most other reactive or non-reactive JavaScript UI libraries and frameworks out there are designed for the imperative programming paradigm. Occasionally they may support a few aspects of functional programming. Third-party adapters can also help with it, but the truth is that FRP was just an afterhthought and its use is severely limited in practice.
@@ -86,10 +89,11 @@ If you need to statically render something based on various conditions, plain-ol
 ```javascript
 document.body.innerHTML = rml`
   <main>
-    ${ some == thing
-		? rml`<div>yes, it's true</div>`
-		: rml`<div>no, it's false</div>`
-	}
+    ${
+	  some == thing
+        ? rml`<div>yes, it's true</div>`
+        : rml`<div>no, it's false</div>`
+    }
   </main>
 ```
 
@@ -115,6 +119,19 @@ document.body.innerHTML = rml`
   </main>
 ```
 
+## The little gotcha!
+Never forget to tag your templates with `rml`, otherwise they won't be reactive.
+This is a standard piece of HTML string: 
+```ts
+const str = `<div>hello</div>`
+```
+
+And this is a reactive template managed by Rimmel:
+```ts
+const str = rml`<div>hello</div>`
+```
+
+
 ## Forward Refs? No need
 Forward refs are a construct used in Imperative-Reactive UI libraries to enable referencing and later modifying DOM elements that don't exist yet.
 The simple, yet effective functional paradigm used by Rimmel enables you to define any change to a DOM element as a Promise or Observable stream. This means whenever your streams emit any data, the elements will already be there to receive them, effectively making the use of Forward Refs redundant.
@@ -129,7 +146,7 @@ This is a perfect case for reactive grids, spreadsheets, SVG or Canvas drawings,
 To display and manage the UI for any dynamic list where you plan to support CRUD operations, perhaps drag'n'drop, you may consider using a `Collection` from [ObservableTypes](https://github.com/reactivehtml/observable-types), which is a rendering-aware extension of `Array`, every method of which is mapped to an optimised UI rendering command, and it also exposes the `Observable` and `Observer` interfaces for seamless reactivity and integration with Rimmel and RxJS.
 
 
-<br><br>
+<br>
 
 
 ## 👋 Hello World👋 ++
@@ -180,8 +197,6 @@ document.getElementById('root-node').innerHTML = ColorPicker([255, 128, 64])
 <div class="playground-link">
 <a href="https://codepen.io/fourtyeighthours/pen/ExJOObG"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/ExJOObG">Hello World Plus</a> on Codepen
 </div>
-<br><br>
-
 <br>
 
 As you can see, there are three main streams, one for each colour slider in the HTML.
@@ -189,7 +204,7 @@ When they emit, their values are merged together through `combineLatest`, which 
 
 Finally, we have two sinks where the data ends up; one as the innerHTML of the <span>, ther other as the fill colour of the SVG shape.
 
-<br><br><br>
+<br>
 
 ## State doesn't exist (it's a Stream)
 "State", as the word itself suggests, is something static, so it doesn't belong to the dynamic, interactive, reactive webapps we make every day.
@@ -223,7 +238,7 @@ This might sound unusual, but Rimmel can actually coexist with other frameworks.
 If you are planning to perform a progressive framework migration, this is one way you can do it, one component at a time.
 
 
-<br><br>
+<br>
 
 # Sources vs. Sinks
 There are two key concepts used by Rimmel: sources and sinks.
@@ -469,7 +484,7 @@ Promises and Observables get merged whenever they resolve/emit.
 <a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010">Draggable Mixin</a> on Codepen
 </div>
 
-<br><br><br>
+<br>
 
 
 # Performance

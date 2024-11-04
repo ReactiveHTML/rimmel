@@ -1,7 +1,7 @@
 import type { HTMLString, SinkBindingConfiguration, Stream } from '../../src/index';
 
 import { BehaviorSubject, Observable, Subject, interval, filter, map, merge, mergeWith, of, pipe, scan, startWith, switchMap, take, tap, throwError, withLatestFrom, catchError, ObservedValueOf } from 'rxjs';
-import { rml, feedIn, source, sink, AppendHTML, InnerText, InnerHTML, Removed, Sanitize, TextContent, Update, Suspend } from '../../src/index';
+import { rml, All, feedIn, source, sink, inputPipe, AppendHTML, InnerText, InnerHTML, Removed, Sanitize, TextContent, Update, Suspend } from '../../src/index';
 import { Value, ValueAsDate, ValueAsNumber, Dataset, EventData, Form, JSONDump, Target, Key, OffsetXY, Numberset, inputPipe, pipeIn } from '../../src/index';
 import { char } from '../../src/types/basic';
 import { RegisterElement } from '../../src/custom-element';
@@ -1003,6 +1003,10 @@ const component = () => {
 	const Tooltip = (str) => String(str)
 		.replace(/"/g, "''")
 
+	const autorun = (e: Event) => {
+		e.target.querySelector(':target')?.click();
+	}
+
 	return rml`
 		<style>
 			* {
@@ -1019,11 +1023,26 @@ const component = () => {
 				padding: 1rem;
 				white-space: pre;
 				tab-size: 2;
+				overflow-x: auto;
+			}
+
+			code::before {
+				display: block;
+				margin-bottom: 1rem;
+				content: "Code";
+				border-bottom: 1px solid;
 			}
 
 			.rendered {
-				background-color: #e0e0f0;
 				padding: 1rem;
+				background-color: #e0e0f0;
+			}
+
+			.rendered::before {
+				display: block;
+				margin-bottom: 1rem;
+				content: "Rendered";
+				border-bottom: 1px solid;
 			}
 
 			@media(prefers-color-scheme: dark) {
@@ -1040,6 +1059,7 @@ const component = () => {
 
 			.twocol {
 				display: grid;
+				align-items: start;
 				grid-template-columns: 1fr 1fr;
 				gap: 1rem;
 			}
@@ -1115,7 +1135,7 @@ const component = () => {
 
 		</style>
 
-		<div class="output">
+		<div class="output" rml:onmount="${autorun}">
 			<div class="selector">
 				<fieldset>
 					<legend>Sources</legend>
@@ -1141,16 +1161,10 @@ const component = () => {
 			</div>
 			<hr>
 			<div class="twocol">
-				<div>
-					Rendered:
-					<div class="rendered" style="margin-block: 2rem;">
-						${chosenComponent}
-					</div>
+				<div class="rendered">
+					${chosenComponent}
 				</div>
-				<div>
-					Code:
-					<code>${InnerText(chosenSource)}</code>
-				</div>
+				<code>${InnerText(chosenSource)}</code>
 			</div>
 		</div>
 

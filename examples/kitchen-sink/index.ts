@@ -41,7 +41,7 @@ const sources = {
 			map(() => data.prop1) // Just emit the latest value of data.prop1 every time
 		);
 
-		return  rml`
+		return rml`
 			Updating a non-reactive property of an object<br>
 			<input onchange="${[data, 'prop1']}"><br>
 
@@ -60,7 +60,7 @@ const sources = {
 		);
 
 
-		return  rml`
+		return rml`
 			Updating a non-reactive property of an object<br>
 			<input onchange="${Update(data, 'prop1')}"><br>
 
@@ -72,7 +72,7 @@ const sources = {
 	ValueSource: () => {
 		const stream = new Subject<string>();
 
-		return  rml`
+		return rml`
 			<input type="text" oninput="${Value(stream)}" placeholder="type someting" autofocus>
 			[ <span>${stream}</span> ]
 		`;
@@ -83,7 +83,7 @@ const sources = {
 			map(x=> isNaN(x) ? '' : 2*x)
 		);
 
-		return  rml`
+		return rml`
 			x : <input type="number" oninput="${ValueAsNumber(stream)}" size="3" autofocus><br>
 			2x: <span>${stream}</span>
 		`;
@@ -97,7 +97,7 @@ const sources = {
 			})
 		);
 
-		return  rml`
+		return rml`
 			Today is: <input type="date" oninput="${ValueAsDate(stream)}" autofocus><br>
 			Tomorrow: <span>${stream}</span>
 		`;
@@ -106,7 +106,7 @@ const sources = {
 	FormDataSource: () => {
 		const stream = new Subject<string>();
 
-		return  rml`
+		return rml`
 			<form onsubmit="${Form(stream)}" action="">
 				<input name="field1" value="a">
 				<input name="field2" value="b">
@@ -154,7 +154,7 @@ const sources = {
 		const stream = new Subject<string>();
 		const JustFoo = Dataset('foo');
 
-		return  rml`
+		return rml`
 			<button data-foo="bar" onclick="${JustFoo(stream)}">click me</button>
 			<br>
 			data-foo = <span>${stream}</span>
@@ -167,7 +167,7 @@ const sources = {
 
 		const stream = new Subject<string>();
 
-		return  rml`
+		return rml`
 			<button data-foo="bar" onclick="${source(dataset, stream)}">click me</button>
 			<br>
 			data-foo = <span>${sink(stream, JSONPrint)}</span>
@@ -223,7 +223,7 @@ const sources = {
 	UndefinedSource: () => {
 		const empty = undefined;
 
-		return  rml`
+		return rml`
 			Handler is undefined — nothing should happen.<br>
 			<button onclick="${empty}">click me</button>
 		`;
@@ -233,19 +233,19 @@ const sources = {
 
 const sinks = {
 	EmptyString: () => {
-		return  rml``;
+		return rml``;
 	},
 
 	StaticNumber: () => {
-		return  rml`<div>${123}</div>`;
+		return rml`<div>${123}</div>`;
 	},
 
 	StaticString: () => {
-		return  rml`<div>${'hello'}</div>`;
+		return rml`<div>${'hello'}</div>`;
 	},
 
 	AlertButton: () => {
-		return  rml`<button onclick="${()=>alert('clicked')}">click me</button>`
+		return rml`<button onclick="${()=>alert('clicked')}">click me</button>`
 	},
 
 	ZeroInitial: () => {
@@ -253,7 +253,7 @@ const sinks = {
 			mergeWith(interval(1000).pipe(map(x=>x+2))),
 		);
 
-		return  rml`Outpuut: <span>${bs}</span>`;
+		return rml`Outpuut: <span>${bs}</span>`;
 	},
 
 	EmptyInitial: () => {
@@ -261,9 +261,8 @@ const sinks = {
 			mergeWith(interval(1000)),
 		);
 
-		return  rml`Outpuut: <span>${bs}</span>`;
+		return rml`Outpuut: <span>${bs}</span>`;
 	},
-
 
 	ClassSink: () => {
 		const cls1 = 'cls1';
@@ -271,7 +270,7 @@ const sinks = {
 		const cls3 = defer('cls3', 2000);
 		const cls4 = defer('cls4', 3000);
 
-		return  rml`
+		return rml`
 			<style>
 				.cls1 .cls1 {
 					text-shadow: 0px 0px 2px goldenrod;
@@ -368,7 +367,7 @@ const sinks = {
 	StyleValueSync: () => {
 		const bg = 'green';
 
-		return  rml`
+		return rml`
 			<div style="background: clay; color: ${bg}; padding: 1rem;">
 				Should be green
 			</div>
@@ -384,7 +383,7 @@ const sinks = {
 			opacity: .5,
 		}, 2000)
 
-		return  rml`
+		return rml`
 			<div style="background: #f0c0b0; color: ${bg}; text-decoration: ${textDeco}; padding: 1rem; font-size: ${size}; ${rest}; font-family: monospace;">
 				Should turn maroon, underlined, large, rotated, translucent
 			</div>
@@ -394,7 +393,7 @@ const sinks = {
 	UndefinedSink: () => {
 		const empty = undefined;
 
-		return  rml`
+		return rml`
 			<button style="min-width: 5rem; min-height: 2rem;">${empty}</button>
 		`;
 	},
@@ -404,12 +403,11 @@ const sinks = {
 			scan(x => !x, false),
 		)
 
-		return  rml`
+		return rml`
 			Focus/Blur
 			<input rml:focus="${altern}">
 		`;
 	},
-
 
 	BlurSink: () => {
 		const keyStream = new Subject();
@@ -418,7 +416,7 @@ const sinks = {
 			filter(k => k == 'Enter')
 		);
 
-		return  rml`
+		return rml`
 			Type some text and hit Enter to blur<br>
 			<input rml:blur="${blur}" onkeydown="${Key(keyStream)}">
 		`;
@@ -525,7 +523,7 @@ const sinks = {
 	},
 
 	Mixin3: () => {
-		const mixin2 = (args?: any) => {
+		const Mixin2 = (args?: any) => {
 			const dataset = new Subject();
 			const classObject = new Subject();
 			const style = new Subject();
@@ -536,6 +534,7 @@ const sinks = {
 				dataset.next({
 					hello: 'world',
 					foo: 'bar',
+					deferred: 'deferred data',
 				});
 
 				classObject.next({
@@ -554,7 +553,7 @@ const sinks = {
 				});
 
 				innerHTML.next('Replaced!');
-			}, 2000)
+			}, 1000)
 
 			return {
 				dataset,
@@ -566,8 +565,8 @@ const sinks = {
 		};
 
 		return rml`
-			<div ...${mixin2()}>
-				with mixin2()
+			<div ...${Mixin2()}>
+				with Mixin2()
 			</div>
 		`;
 	},
@@ -575,7 +574,7 @@ const sinks = {
 	'Removed (Implicit)': () => {
 		const removed = new Subject<Event>();
 
-		return  rml`
+		return rml`
 			<div rml:removed="${removed}">
 				Removed (Implicit) sink
 				<button onclick="${removed}">Remove</button>
@@ -599,7 +598,6 @@ const sinks = {
 		`;
 	},
 
-
 	'Removed (Implicit Mixin, async)': () => {
 		const removed = new Subject().pipe(
 			map(() => ({
@@ -622,12 +620,10 @@ const sinks = {
 		return rml`
 			<div ...${Removed(removed)}>
 				Removed (Implicit Mixin) sink<br>
-				(this should NOT be supported, in theory)<br>
 				<button onclick="${removed}">Remove</button>
 			</div>
 		`;
 	},
-
 
 	'Attribute (Implicit)': () => {
 		const stream = defer('bar');

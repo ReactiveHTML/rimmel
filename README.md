@@ -343,21 +343,50 @@ Finally, we're leveraging the DOM's standard Event Delegation by only adding one
 <br>
 
 ## Data Sinks
-Rimmel supports two categories of sinks: (standard) specialised sinks and dynamic sinks.
+Rimmel supports two categories of sinks: standard (specialised) sinks and dynamic sinks.
 Standard sinks are the simplest and most intuitive ones: those you define in an everyday template from which the type of data binding required can be easily inferred. They are optimised for performance, updating a specific part of the DOM.<br />
 
 These include:
-- Class
-- Dataset
-- Value
-- Style
-- Closed
-- Removed
-- Disabled
-- Readonly
-- InnerText, TextContent, InnerHTML, PrependHTML, AppendHTML
-- Attribute (any generic HTML attribute not listed above)
+- Class (add/remove/change classes to an element)
+- Dataset (add/remove/change dataset values)
+- Value (set the value of an input field)
+- Style (apply styles from a CSS Object/key-value pair)
+- Closed (set the closed attribute of a dialog box)
+- Removed (destroy an element when a source emits)
+- Disabled (disable a UI control)
+- Readonly (make a UI control read-only)
+- InnerText, TextContent, InnerHTML, PrependHTML, AppendHTML, Sanitize
+- Attribute (set any generic HTML attribute not listed above)
 - Custom Sinks (create your own for specific, optimised rendering of complex data)
+
+### Implicit vs Explicit sinks
+Some sinks are implicit as the surrounding HTML and/or CSS context makes it clear what they should do.
+E.g.:
+```html
+<!-- set class names -->
+<div class="${stream}">
+<!-- set inline style -->
+<div style="${stream}">
+<!-- set background colour -->
+<div style="background-color: ${stream};">
+```
+
+Other sinks can be specified explicitly when it's not obvious from the context or when several options are available to display the same content:
+```html
+<!-- Remove dangerous scripts from the stream before rendering -->
+<div>${Sanitize(stream)}</div>
+```
+
+```html
+<!-- Sink the stream's content into `.innerText`, rahter than `.innerHTML` (which is the default) on an element -->
+<div>${InnerText(stream)}</div>
+```
+
+```html
+<!-- You take control and decide exactly how that stream should be rendered -->
+<!-- Useful for complex data structures -->
+<div>${YourCustomSink(stream)}</div>
+```
 
 ### Examples:
 
@@ -398,11 +427,19 @@ target.innerHTML = rml`<dialog closed="${stream}">...</dialog>`;
 const stream = new Subject<string>();
 target.innerHTML = rml`<div some-attribute="${stream}"></div>`;
 
-// A "Custom" Sink (add a final step, before calling the actual sink)
-const Sanitize = inputPipe(map(strHTML => strHTML.replace(/</g, '&lt;')));
+// "Sanitize" - display render-safe HTML
+import { rml, Sanitize } from 'rimmel';
 
 const stream = new Subject<HTMLString>();
 target.innerHTML = rml`<div>${Sanitize(stream)}</div>`;
+
+// A "Custom" Sink to just make output uppercase
+const UpperCase = sink(
+  map(strHTML => strHTML.toUpperCase())
+);
+
+const stream = new Subject<HTMLString>();
+target.innerHTML = rml`<div>${UpperCase(stream)}</div>`;
 ```
 
 Dynamic sinks, on the other hand, are optimised for size and designed for convenience. They can take anyhing as input and figure out how to update the DOM at runtime.
@@ -574,10 +611,14 @@ Want to delve deeper into more advanced scenarios? Have a look at the following 
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-todomvc)
 
+## Tic-Tac-Toe - with Streams
+Here's a version of Tic Tac Toe made with Observable Streams
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/tic-tac-toe-rimmeljs)
 
 
 # Building and testing
-Either with bun or other runtimes:
+To work with Rimmel locally, check it out then either with bun or other runtimes:
 
 ```bash
 bun install
@@ -585,7 +626,7 @@ bun run build
 bun test
 ```
 
-To run the "kitchen sink" example:
+There is a "kitchen sink" app you can use to play around locally, which should showcase most of what you can do with Rimmel:
 ```bash
 cd examples/kitchen-sink
 vite

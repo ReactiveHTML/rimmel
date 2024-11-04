@@ -570,9 +570,10 @@ We are creating a few experimental AI assistants like [RimmelGPT.js](https://cha
 <br>
 
 ## TodoMVC - the Rimmel way
-Want to delve deeper into more advanced scenarios? Have a look at the following todo app all based on RxJS streams, ObservableTypes and Rimmel.
+Want to delve deeper into more advanced scenarios? Have a look at the following todo app all based on RxJS streams, [ObservableTypes](https://github.com/reactivehtml/observable-types) and Rimmel.
 
-<a href="https://stackblitz.com/edit/rimmel-todomv"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://stackblitz.com/edit/rimmel-todomv">Rimmel TodoMVC</a> on Stackblitz.
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-todomvc)
+
 
 
 # Building and testing

@@ -84,26 +84,29 @@ Since Rimmel makes use of reactive streams for state management, everything turn
 There is only one time a component is "rendered" and that is when it first lands on the page. After that, only "updates" happen, which are performed with native DOM calls.
 
 
-## Static Conditional Rendering? We've got plain old JS
-If you need to statically render something based on various conditions, plain-old standard JavaScript can help you and there's no need for further abstractions:
+## Conditional (static) Rendering? Just use Plain-Old JS
+If you need to render something based on a condition, plain-old standard JS can help you. No need for further abstractions:
+
 ```javascript
 document.body.innerHTML = rml`
   <main>
     ${
-	  some == thing
+      condition == true
         ? rml`<div>yes, it's true</div>`
         : rml`<div>no, it's false</div>`
     }
   </main>
 ```
 
-You only want to use this method if your condition is not reactive and content doesn't need to reflect changes over time.
+You only want to use this method if your condition is static, as in non-reactive and the content won't need to reflect your changes over time.
+Otherwise read on.
 
 
-## Dynamic Conditional Rendering? We've got streams
-The simplest way to render something based on a dynamic, ever-changing condition (so that if the condition changes, something else is rendered) is just using a normal Observable stream:
+## Conditional (dynamic) Rendering? Just use Observable Streams
+If you need to render based on a live, reactive condition (so when the condition changes, the other thing is rendered) you can just use a normal Observable stream:
 
 ```javascript
+// Use RxJS's `map` operator to emit any HTML based on whatever conditions you like
 const conditionalStream = new Subject().pipe(
   map(data => {
     if(data.hasSomething) {
@@ -132,9 +135,10 @@ const str = rml`<div>hello</div>`
 ```
 
 
-## Forward Refs? No need
-Forward refs are a construct used in Imperative-Reactive UI libraries to enable referencing and later modifying DOM elements that don't exist yet.
-The simple, yet effective functional paradigm used by Rimmel enables you to define any change to a DOM element as a Promise or Observable stream. This means whenever your streams emit any data, the elements will already be there to receive them, effectively making the use of Forward Refs redundant.
+## Forward Refs? An unnecessary evil
+Forward refs are a construct used in Imperative-Reactive UI libraries to enable referencing and later modifying DOM elements that don't exist yet (you're writing components that to act on DOM elements that will only exist after they are mounted).
+
+The simple, yet effective functional paradigm used by Rimmel enables you to define any change to a DOM element as a Promise or Observable stream. The mounting and data binding is completely managed by Rimmel. This means when they resolve or emit, the elements will already be there to receive them, effectively making the use of Forward Refs redundant.
 
 
 ## Structured Data? We stop here and this is why
@@ -226,13 +230,18 @@ Modelling your state as one or more observable streams will give you fine-graine
 All Rimmel does is binding your observable streams to the UI with a seamless integration that will result in improved code quality, scale, testability and performance.
 
 
-## "Lifecycle Events" are gone (you have streams)
-Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless, redudant and discouraged here. Streams get connected and disconnected automatically for you and that happens to be what you normally do in your init/onmount function.
-Using streams instead makes your code immensely cleaner and more testable.
+## "Lifecycle Events" are dead (you have streams)
+Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless, redudant and discouraged here.
+Streams and other listeners get connected and disconnected automatically for you when a component is mounted/unmounted. If you think about it, this is exactly what you would normally do in your init/onmount functions, so you no longer have to deal with these tiny details.
+
+Since you only declare streams now and let Rimmel connect them to the DOM and each-other, your code will be immensely more concise, cleaner and more testable.
 
 Rimmel still has a `rml:onmount` event, but its use is only left as a last resort to integrate imperative, non-Rimmel components (some old jQuery plugins, etc?)
 
-## Migration from/to other frameworks and libraries
+## Side Effects are gone (that's what a framework is for)
+You may have already realised that writing UI components with Rimmel means you no longer have to deal with side effects, which makes it trivial to make your code purely functional.
+
+## Migrating from/to other frameworks and libraries
 This might sound unusual, but Rimmel can actually coexist with other frameworks. Your Rimmel component can be embedded in a React component and have children made in Vue, or even jQuery plugins or sit inside a larger jQuery application, or the other way around.
 
 If you are planning to perform a progressive framework migration, this is one way you can do it, one component at a time.
@@ -305,7 +314,7 @@ It works like `pipe()`, except it applies the same operators to data coming in, 
 ```js
 import { rml, source } from 'rimmel';
 
-const Value = map((e: Event) => Number(e.target.dataset.value));
+const DatasetValue = map((e: Event) => Number(e.target.dataset.value));
 const ButtonClick = filter((e: Event) => e.target.tagName == 'BUTTON');
 
 const Component = () => {
@@ -314,7 +323,7 @@ const Component = () => {
   );
 
   return rml`
-    <div onclick="${source(ButtonClick, Value, total)}">
+    <div onclick="${source(ButtonClick, DatasetValue, total)}">
 
       <button data-value="1">add one</button>
       <button data-value="2">add two</button>
@@ -328,14 +337,14 @@ const Component = () => {
 ```
 
 As you can see, the main data model, which is the observable stream called `total`, receives `number` and emits `number`.
-The `ButtonValue` Event Mapper translates raw DOM events into the plain numbers required by the model.
-Finally, we're leveraging the DOM's standard Event Delegation by only adding one listener to the container, rather than to each button.
+The `DatasetValue` Event Adapter translates raw DOM events into the plain numbers required by the model.
+Finally, we're leveraging the DOM's standard Event Delegation by only adding one listener to the container, rather than to each button. We're making sure only button clicks are captured by using the `ButtonClick` filter
 
 <br>
 
 ## Data Sinks
 Rimmel supports two categories of sinks: (standard) specialised sinks and dynamic sinks.
-Specialised sinks are the simplest and most intuitive ones: those you define in an everyday template from which the type of data binding required can be easily inferred. They are optimised for performance, updating a specific part of the DOM.<br />
+Standard sinks are the simplest and most intuitive ones: those you define in an everyday template from which the type of data binding required can be easily inferred. They are optimised for performance, updating a specific part of the DOM.<br />
 
 These include:
 - Class
@@ -346,8 +355,8 @@ These include:
 - Removed
 - Disabled
 - Readonly
-- Attribute (any generic HTML attribute not listed above)
 - InnerText, TextContent, InnerHTML, PrependHTML, AppendHTML
+- Attribute (any generic HTML attribute not listed above)
 - Custom Sinks (create your own for specific, optimised rendering of complex data)
 
 ### Examples:
@@ -400,7 +409,7 @@ Dynamic sinks, on the other hand, are optimised for size and designed for conven
 
 
 ## Extensible Components (AKA: Mixins)
-Mixins are an exciting by-product of dynamic sinks, which allow you to inject pretty much anything at any time (event listeners, classes, attributes, etc) into a target "host" element by means of emitting a `DOM Object` ­­­— a plain-old object whose properties and methods represent DOM attributes and event listeners.
+Mixins are an exciting by-product of dynamic sinks, which allow you to inject pretty much anything at any time (event listeners, classes, attributes, etc) into the target "host" element by means of emitting a `DOM Object`­— a plain-old object whose properties and methods represent DOM attributes and event listeners.
 
 <br>
 
@@ -560,7 +569,13 @@ We are creating a few experimental AI assistants like [RimmelGPT.js](https://cha
 
 <br>
 
-## Building and testing
+## TodoMVC - the Rimmel way
+Want to delve deeper into more advanced scenarios? Have a look at the following todo app all based on RxJS streams, ObservableTypes and Rimmel.
+
+<a href="https://stackblitz.com/edit/rimmel-todomv"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://stackblitz.com/edit/rimmel-todomv">Rimmel TodoMVC</a> on Stackblitz.
+
+
+# Building and testing
 Either with bun or other runtimes:
 
 ```bash
@@ -577,7 +592,7 @@ vite
 
 <br>
 
-## Roadmap
+# Roadmap
 - Completion handlers (what should happen when observables complete?)
 - Error sinks (what if streams throw? Anything better than just "error boundaries"?)
 - Performance benchmarks (we know it's fast, but, let's see the numbers!)
@@ -608,3 +623,4 @@ Rimmel is closely following these initiatives and aims to align with them as the
 
 
 If you like Rimmel and would like to help the functional-reactive world grow in the JavaScript land, come say hi and let's talk.
+

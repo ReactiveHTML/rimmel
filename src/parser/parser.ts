@@ -4,7 +4,7 @@ import type { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/d
 
 import { isSinkBindingConfiguration } from "../types/internal";
 
-import { waitingElementHanlders } from "../internal-state";
+import { state, waitingElementHanlders } from "../internal-state";
 import { isFunction } from "../utils/is-function";
 import { BehaviorSubject, isObservable, MaybeFuture, Observable } from "../types/futures";
 import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
@@ -27,10 +27,7 @@ import { TextContent } from "../sinks/text-content-sink";
 import { ClassRecord } from "../sinks/class-sink";
 import { StyleObjectSink, StylePreSink } from "../sinks/style-sink";
 
-// FIXME: add a unique prefix to prevent collisions with different dupes of the library running in the same context/app
-let refCount = 0;
-
-const addRef = (ref: string, data: BindingConfiguration) => {
+export const addRef = (ref: string, data: BindingConfiguration) => {
 	waitingElementHanlders.get(ref)?.push(data) ?? waitingElementHanlders.set(ref, [data]);
 };
 
@@ -52,7 +49,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 		const eventName = getEventName(string as RMLEventAttributeName);
 		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*(?:>\s*[^<]*|[^>]*)$/);
 		const existingRef = r?.groups?.existingRef;
-		const ref = existingRef ?? `${REF_TAG}${refCount++}`;
+		const ref = existingRef ?? `${REF_TAG}${state.refCount++}`;
 
 		// Determine in which template context is any given expression appearing
 		//const context =

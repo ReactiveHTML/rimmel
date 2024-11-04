@@ -18,6 +18,9 @@
     ".": {
       "import": "./dist/esm/rimmel.mjs"
     },
+    "./internals": {
+      "import": "./dist/esm/internals.mjs"
+    },
     "./ssr": {
       "import": "./dist/ssr/ssr.mjs",
       "require": "./dist/ssr/ssr.cjs"

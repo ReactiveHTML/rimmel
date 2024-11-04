@@ -1,6 +1,6 @@
 export { InnerHTMLSink } from './sinks/inner-html-sink';
 
 export { addRef } from "./parser/parser";
-export { newRef, lastRef } from "./internal-state";
+export { newRef } from "./internal-state";
 
 

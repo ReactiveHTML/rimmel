@@ -21,8 +21,8 @@ export const ObjectSource = <E extends Event, T extends TargetObject>(expression
         // Only <input> elements are supported for this source
         const t = (<HTMLInputElement>e.target)
         const valueSource = t.type == 'checkbox' ? t.checked : t.tagName == 'INPUT' ? t.value : t.innerText;
-        const [target, key] = <[Record<string, any>, string] | [Array<any>, number]>expression;
-        (<any>target[<any>key]) = valueSource;
+        const [target, key] = <[Record<string, unknown>, string] | [Array<T>, number]>expression;
+        (target as any)[key] = valueSource;
     })
 ;
 

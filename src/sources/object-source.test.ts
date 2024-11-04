@@ -86,7 +86,7 @@ describe('Object Source', () => {
                   innerText: newData,
               });
               const eventData = MockEvent('randomevent', {
-                  target: el as HTMLDivElement
+                  target: el
               });
 
               const source = ObjectSource(data).bind(el);

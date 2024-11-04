@@ -16,5 +16,4 @@ export const state = {
 }
 
 export const newRef = () => REF_TAG +state.refCount++;
-export const lastRef = () => REF_TAG +state.refCount;
 

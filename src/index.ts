@@ -20,15 +20,16 @@ export const setRoot = (e: Element): RML => {
 init();
 
 // Types
-export type * from './types/sink';
-export type * from './types/internal';
-export type * from './types/futures';
-export type * from './types/dom';
+export * from './types/sink';
+export * from './types/internal';
+export * from './types/futures';
+export * from './types/dom';
 
 // Event Mapping Functions
 export { feed, feedIn, inputPipe, pipeIn } from './utils/input-pipe';
 
 // Event Sources
+export { All, qs } from './sources/all-source';
 export { Dataset } from './sources/dataset-source';
 export { Numberset } from './sources/numberset-source';
 export { EventData } from './sources/event-data';
@@ -65,8 +66,8 @@ export { TextContent } from './sinks/text-content-sink';
 export { RegisterElement } from './custom-element';
 
 // Utilities (Will take them out to the framework)
-export type { Component, Mixin } from './types/constructs';
-export type { RMLTemplateExpressions } from './types/internal';
+export { Component, Mixin } from './types/constructs';
+export { RMLTemplateExpressions } from './types/internal';
 
 export { source, sink } from './utils/input-pipe';
 

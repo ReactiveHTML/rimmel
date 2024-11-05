@@ -2,7 +2,7 @@ import type { RMLEventName } from "../types/dom";
 import type { SourceBindingConfiguration } from "../types/internal";
 
 import { NON_BUBBLING_DOM_EVENTS } from "../definitions/non-bubbling-events";
-import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_SELECTOR, RML_DEBUG } from "../constants";
+import { DELEGATE_EVENTS, INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_SELECTOR, RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
 
 import { delegatedEventHandlers, subscriptions, waitingElementHanlders } from "../internal-state";
 import { isSinkBindingConfiguration } from "../types/internal";
@@ -131,6 +131,14 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 							// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
 							console.log('[data binding] adding event listener', node, 'eventName=', eventName, listener);
 							node.addEventListener(eventName, listener, { capture: true });
+							if (!DELEGATE_EVENTS || NON_BUBBLING_DOM_EVENTS.has(eventName) || node.getRootNode() instanceof ShadowRoot) {
+								// We add an event listener for all those events who don't bubble by default (as we're delegating them to the top)
+								// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
+								(USE_DOM_OBSERVABLES && node.when)
+									? node.when?.(eventName)
+										.subscribe(listener)
+									: node.addEventListener(eventName, listener, { capture: true });
+							}
 							// if it's an event source (like onclick, etc)
 							// Object.keys(conf).length && handlers.set(node, ([] as RMLTemplateExpression<typeof node>[]).concat(handlers.get(node) || [], <RMLTemplateExpression<typeof node>>{ ...(conf as BindingConfiguration<typeof node>), handler: boundHandler }));
 

@@ -4,7 +4,6 @@
     "declaration": true,
     "rootDir": "./src"
   },
-  "files": ["global.d.ts"],
-  "include": ["src/types/**/*.d.ts"]
+  "files": ["global.d.ts", "src/types/dom-observable.d.ts"]
 } 
 

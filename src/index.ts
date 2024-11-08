@@ -66,8 +66,8 @@ export { TextContent } from './sinks/text-content-sink';
 export { RegisterElement } from './custom-element';
 
 // Utilities (Will take them out to the framework)
-export { Component, Mixin } from './types/constructs';
-export { RMLTemplateExpressions } from './types/internal';
+export type { Component, Mixin } from './types/constructs';
+export type { RMLTemplateExpressions } from './types/internal';
 
 export { source, sink } from './utils/input-pipe';
 

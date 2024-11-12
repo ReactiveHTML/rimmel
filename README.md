@@ -1,6 +1,8 @@
 <img src="docs/assets/github-hero.png" alt="Rimmel.js" style="text-align: start; max-width: 100%;">
 <br>
 
+[![npm](https://img.shields.io/npm/v/rimmel.svg)](https://www.npmjs.com/package/rimmel)
+
 With Rimmel you can create a whole new world of powerful HTML templates and webapps using Observables and Promises as first-class citizens.<br>
 
 <br>
@@ -648,7 +650,8 @@ vite
 - JSX/ESX support?
 - Plugin support
 - Sink pipelines (just like you have rendering pipelines in computer graphics)
-- RML Security (leverage pipelines to weed out XSS and other dirt)
+- RML Security (leverage sink pipelines to weed out XSS and other dirt)
+- i18n (leverage sink pipelines to make localisation trivial)
 
 <br>
 

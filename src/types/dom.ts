@@ -47,6 +47,8 @@ export interface LifecycleEvent extends Event {
 export type RMLEventMap = HTMLElementEventMap & {
     mount: LifecycleEvent; // Assuming 'mount' events use the base Event class
     unmount: LifecycleEvent; // Assuming 'mount' events use the base Event class
+    'rml:mount': LifecycleEvent; // Assuming 'mount' events use the base Event class
+    'rml:unmount': LifecycleEvent; // Assuming 'mount' events use the base Event class
 };
 
 /**

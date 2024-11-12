@@ -44,6 +44,7 @@ export { Value, ValueAsDate, ValueAsNumber } from './sources/value-source';
 
 // Data Sinks
 export { AnyContentSink } from "./sinks/content-sink";
+export { AttributeObjectSink } from "./sinks/attribute-sink";
 export { AppendHTML } from './sinks/append-html-sink';
 export { Blur } from './sinks/blur-sink';
 export { Checked } from './sinks/checked-sink';

@@ -4,7 +4,7 @@
   "description": "A Functional-Reactive UI library for the Rx.Observable Universe",
   "type": "module",
   "_main": "dist/cjs/index.cjs",
-  "module": "dist/esm/rimmel.mjs",
+  "module": "dist/esm/index.mjs",
   "types": "dist/esm/types/index.d.ts",
   "paths": {
     "rimmel/ssr": [
@@ -16,7 +16,7 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/esm/rimmel.mjs"
+      "import": "./dist/esm/index.mjs"
     },
     "./internals": {
       "import": "./dist/esm/internals.mjs"

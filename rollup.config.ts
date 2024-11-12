@@ -37,7 +37,7 @@ export default <RollupOptions[]>[
 			exports: 'named',
 			externalLiveBindings: false,
 			dir: './dist/globaljs',
-			entryFileNames: 'rimmel.js',
+			entryFileNames: '[name].mjs',
 			freeze: true,
 			generatedCode: 'es2015',
 			format: 'iife',
@@ -76,7 +76,7 @@ export default <RollupOptions[]>[
 				externalLiveBindings: false,
 				freeze: false,
 				sourcemap: true,
-				entryFileNames: 'rimmel.mjs',
+				entryFileNames: '[name].mjs',
 				format: 'es',
 				dir: './dist/esm',
 				preserveModules: true,
@@ -109,7 +109,7 @@ export default <RollupOptions[]>[
 		output: [
 			{	// CJS SSR
 				dir: './dist/ssr',
-				entryFileNames: 'ssr.cjs',
+				entryFileNames: '[name].mjs',
 				exports: 'named',
 				externalLiveBindings: false,
 				format: 'cjs',

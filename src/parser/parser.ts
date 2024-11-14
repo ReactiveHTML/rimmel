@@ -179,8 +179,8 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 						acc = (prefix +(initialValue ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}
-				} else if(/<\S+(?:\s+[^=>]+(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+))?)*(?:\s+\.\.\.)?$/.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
-                                       // FIXME:                                                                                                  ^    ^^^^^^^^^  why are we doing this?
+				} else if(/<\S+(?:\s+[a-z0-9_][a-z0-9_-]*(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+))?)*(?:\s+\.\.\.)?$/.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
+                    // FIXME:                                                                                                                                  ^    ^^^^^^^^^  why are we doing this?
 					// Mixin Sink
 					// Use Cases:
 					// <some-tag some-attribute="some-value" ${mixin}></some-tag>

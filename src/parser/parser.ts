@@ -6,11 +6,11 @@ import { isSinkBindingConfiguration } from "../types/internal";
 
 import { state, waitingElementHanlders } from "../internal-state";
 import { isFunction } from "../utils/is-function";
+import { takeFirstSync } from "../utils/take-first-sync";
 import { BehaviorSubject, isObservable, MaybeFuture, Observable } from "../types/futures";
 import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
 import { NON_BUBBLING_DOM_EVENTS } from "../definitions/non-bubbling-events";
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUTE, RML_DEBUG } from "../constants";
-import { delegateEvent } from "../lifecycle/event-delegation";
 
 import { PreSink } from "../sinks/index";
 import { sinkByAttributeName } from '../parser/sink-map';
@@ -32,8 +32,8 @@ export const addRef = (ref: string, data: BindingConfiguration) => {
 };
 
 const getEventName = (eventAttributeString: RMLEventAttributeName): RMLEventName | undefined => {
-	const x = /\s+(rml:)?on(?<event>\w+)=['"]?$/.exec(eventAttributeString)?.groups;
-	return x ? <RMLEventName>`${x.prefix??''}${x?.event}` : undefined
+	const x = /\s+(?<attr>(?<prefix>rml:)?on(?<event>\w+))=['"]?$/.exec(eventAttributeString)?.groups;
+	return x ? [<RMLEventName>`${x.prefix??''}${x?.event}`, <RMLEventAttributeName>x.attr] : []
 }
 // GOTCHA: attributes starting with "on" will be treated as event handlers ------------------------------------> HERE <------------------, so avoid any <tag with ongoing="trouble">
 
@@ -45,8 +45,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 		const accPlusString = acc +string;
 		const lastTag = accPlusString.lastIndexOf('<');
 		const expression = expressions[i];
-		const initialValue = (expression as BehaviorSubject<unknown>)?.value; // if it's a BehaviorSubject, pick its initial/current value to render it synchronously
-		const eventName = getEventName(string as RMLEventAttributeName);
+		const [ eventName, eventAttributeName ] = getEventName(string as RMLEventAttributeName);
 		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*(?:>\s*[^<]*|[^>]*)$/);
 		const existingRef = r?.groups?.existingRef;
 		const ref = existingRef ?? `${REF_TAG}${state.refCount++}`;
@@ -75,8 +74,6 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			// remove nullish values except 0, "0", false and "false"
 			// acc = accPlusString +(expression==0 || expression==false ? expression : '');
 			acc = accPlusString;
-		} else if(expression.lazy) {
-			acc = accPlusString +expression.toString();
 		} else if(eventName) {
 			// Event Source
 			// so feed it to an Rx Subject | Observer | Handler Function | POJO | Array
@@ -88,8 +85,6 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			// <input type="text" onchange="${[object, 'attributeToSet']}">   will feed it the .value of the input field
 			// <input type="text" onchange="${[array,  pos]}">    will feed it the .value of the input field
 
-			const isNonBubblingEvent = NON_BUBBLING_DOM_EVENTS.has(eventName);
-
 			const listener = isFunction(expression) ? expression
 				: isObserverSource(expression) ? ObserverSource(expression)
 				: isObjectSource(expression) ? ObjectSource(expression)
@@ -97,16 +92,14 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			;
 
 			if(listener) {
-				// We only use event delegation for bubbling events. Non-bubbling events will have their own listener attached directly.
-				// TODO: shall we support direct, non-delegated event handling, as well (for a little extra performance boost, what else?)
-				isNonBubblingEvent || delegateEvent(eventName);
 				addRef(ref, <SourceBindingConfiguration<typeof eventName>>{ type: 'source', listener, eventName });
 			} // TODO: shall we add some notifications, otherwise, rather than silently ignore?
 
 			acc = accPlusString
-				//+(eventName == 'mount' || isNonBubblingEvent ? ref : '')
+				//.replace(new RegExp(`\\s${eventAttributeName}=(['"]?)$`), ` _${eventAttributeName}=$1`)
+				.replace(/\s((?:rml:)?on\w+=['"]?)$/, ' _$1')
 				+(!listener || existingRef ? '' : `${ref}" ${RESOLVE_ATTRIBUTE}="${ref}`);
-			// TODO: support {once: true}, {capture: true} and { passive: true }?
+			// TODO: support options such as {once: true}, {capture: true} and { passive: true }?
 		} else {
 			// Data Sink.
 			// Determine its type before connecting.
@@ -124,14 +117,17 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 				// Static expressions, no data binding. Just concatenate
 				acc = accPlusString +expression;
 			} else if(Array.isArray(expression)) {
-				// If sinking an array, we're likely just mapping t
+				// If sinking an array, we're likely just mapping it
 				acc = accPlusString +expression.join('');
 			} else {
-				// what if  !expression?
-
 				// expression is a future or an object
 
 				const nextString = strings[i+1];
+				// if it's a BehaviorSubject or any other sync stream (e.g.: startWith operator), pick its initial/current value to render it synchronously
+				const initialValue = (expression as BehaviorSubject<unknown>)?.value
+					// ?? ((<RMLTemplateExpressions.SourceExpression<any>>expression).source && takeFirstSync((<Observable<any>>expression).source))
+					// ?? takeFirstSync(expression)
+				;
 
 				const isAttribute = /(?<attribute>[:a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(accPlusString);
 				// const isAttribute = /<[a-z][a-z0-9\-_]+\s+.*\s+(?<attribute>[:a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(accPlusString);
@@ -183,7 +179,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 						acc = (prefix +(initialValue ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}
-				} else if(/<\S+(?:\s+[a-z0-9_][a-z0-9_-]*(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+))?)*(?:\s+\.\.\.)?$/.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
+				} else if(/<\S+(?:\s+[^=>]+(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+))?)*(?:\s+\.\.\.)?$/.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
                                        // FIXME:                                                                                                  ^    ^^^^^^^^^  why are we doing this?
 					// Mixin Sink
 					// Use Cases:
@@ -226,7 +222,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 					// and then subscribe to subsequent emissions
 					// FIXME: any chance an expression could be mistaken for a BehaviorSubject here? A Generator, or other stuff??? May want to have a better isBehaviorSubject check here...
 					const _source = <MaybeFuture<HTMLString>>(initialValue
-						? expression.pipe?.( skip(1) )
+						? (expression?.source ?? expression)?.pipe?.( skip(1) )
 						: sinkExpression
 					);
 

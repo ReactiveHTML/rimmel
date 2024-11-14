@@ -2,9 +2,10 @@ import type { RMLEventName } from "../types/dom";
 import type { SourceBindingConfiguration } from "../types/internal";
 
 import { NON_BUBBLING_DOM_EVENTS } from "../definitions/non-bubbling-events";
-import { DELEGATE_EVENTS, INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_SELECTOR, RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
+import { DELEGATE_EVENTS, INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUTE, RESOLVE_SELECTOR, RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
 
 import { delegatedEventHandlers, subscriptions, waitingElementHanlders } from "../internal-state";
+import { delegateEvent } from "../lifecycle/event-delegation";
 import { isSinkBindingConfiguration } from "../types/internal";
 import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
@@ -18,15 +19,14 @@ const elementNodes = (n: Node): n is Element => n.nodeType == 1;
 const errorHandler = console.error;
 
 export const Rimmel_Bind_Subtree = (node: Element): void => {
-	const intermediateInteractiveNodes: Node[] = []; // Text nodes in a tag;
+	// Data-to-be-bound text nodes in an element (<div>${thing1} ${thing2}</div>);
+	const intermediateInteractiveNodes: Node[] = [];
 
-	// const hasInteractiveTextNodes = node.innerHTML.includes(INTERACTIVE_NODE_START);
 	const hasInteractiveTextNodes = [...node.childNodes].some(n => {
 		return n.nodeType == 3 && n.nodeValue?.includes(INTERACTIVE_NODE_START);
 	});
 
 	// Interactive text nodes
-	//const splat = hasRef && node.innerHTML.split(value as string) || []; // FIXME: it's unsafe to split by #REFn, as the same text may legitimately be in the page. Use some invisible unprintable codes
 	if(hasInteractiveTextNodes) {
 		const nodes = <(Node | string)[]>[];
 		for (const n of node.childNodes) {
@@ -54,112 +54,84 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 		node.append(...nodes);
 	}
 
-	[...node.attributes as unknown as Attr[]]
-		.forEach(attr => {
-			const key = attr.nodeName;
-			const value = attr.nodeValue;
-			if(value == null) {
-				// FIXME: is this ever actually going to be null???
-				return;
+	const bindingRef = <string>node.getAttribute(RESOLVE_ATTRIBUTE);
+	(waitingElementHanlders.get(bindingRef) ?? []).forEach(function Rimmel_Bind_Element(bindingConfiguration) {
+		const debugThisNode = node.hasAttribute(RML_DEBUG);
+		if(tracing && debugThisNode) {
+			/* Stopped at data binding */
+			debugger;
+		}
+
+		if (isSinkBindingConfiguration(bindingConfiguration)) {
+			// DATA SINKS
+
+			// TODO: bindingConfiguration.sinkParams may itself be a promise or an observable, so need to subscribe to it
+			const targetNode = intermediateInteractiveNodes.shift() ?? node;
+			const { sink, t } = bindingConfiguration;
+			const sinkFn = sink(targetNode, bindingConfiguration.params);
+
+			// A pre-sink step that can show the above sinkFn in a stack trace for debugging
+			const loggingSinkFn = (...data: any) => {
+				console.groupCollapsed('RML: Sinking', t, data);
+				console.log(bindingConfiguration);
+				console.trace('Stack Trace (from Source to Sink), data=', data);
+				sinkFn(...data)
+				console.groupEnd();
+			};
+
+			// This is the actual sink that will be bound to a source
+			const sinkFn2 = tracing && debugThisNode ? loggingSinkFn : sinkFn;
+
+			// #IFDEF DEBUG
+			if(tracing && debugThisNode) {
+				console.groupCollapsed('RML: Binding', t, targetNode);
+				console.dir(targetNode);
+				// console.trace('Rimmel_Bind_Element')
+				console.debug('Node: %o', targetNode);
+				console.debug('Conf: %o', bindingConfiguration);
+				console.debug('Sink: %o', sinkFn2);
+				console.groupEnd();
 			}
-			const eventName = <RMLEventName>key.replace(/^(rml:)?on/, '$1'); // TODO: based on the convention onsomething = on::something. Is this 100% ok?
-			const isOnMount = /^(?:rml:)?onmount$/.test(key);
-			const isEventSource = eventName !== key;
-			const hasRef = value.includes(REF_TAG);
+			// #ENDIF
 
-			// if (hasRef || isOnMount || isEventSource) {
-			if (hasRef) {
-				node.removeAttribute(key);
-				(waitingElementHanlders.get(value) ?? [])
-					.forEach(function Rimmel_Bind_Element(bindingConfiguration) {
+			const sourceStream = bindingConfiguration.source;
 
-						const debugThisNode = node.hasAttribute(RML_DEBUG);
-						if(tracing && debugThisNode) {
-							/* Stopped binding data */
-							debugger;
-						}
+			subscribe(targetNode, sourceStream, sinkFn2, bindingConfiguration.error ?? errorHandler, bindingConfiguration.termination ?? terminationHandler);
+		} else {
+			// EVENT SOURCES
 
-						if (isSinkBindingConfiguration(bindingConfiguration)) {
-							// DATA SINKS
+			const sourceBindingConfiguration = <SourceBindingConfiguration<typeof eventName>>bindingConfiguration;
+			const { eventName } = bindingConfiguration;
 
-							// TODO: bindingConfiguration.sinkParams may itself be a promise or an observable, so need to subscribe to it
-							const targetNode = intermediateInteractiveNodes.shift() ?? node;
-							const sink = bindingConfiguration.sink;
-							const sinkFn = sink(targetNode, bindingConfiguration.params);
-
-							// A pre-sink step that can show the above sinkFn in a stack trace for debugging
-							const loggingSinkFn = (...data: any) => {
-								console.groupCollapsed('RML: Sinking', value, data);
-								console.log(bindingConfiguration);
-								console.trace('Stack Trace (from Source to Sink), data=', data);
-								sinkFn(...data)
-								console.groupEnd();
-							};
-
-							// This is the actual sink that will be bound to a source
-							const sinkFn2 = tracing && debugThisNode ? loggingSinkFn : sinkFn;
-
-							// #IFDEF DEBUG
-							if(tracing && debugThisNode) {
-								console.groupCollapsed('RML: Binding', value, targetNode);
-								console.dir(targetNode);
-								// console.trace('Rimmel_Bind_Element')
-								console.debug('Node: %o', targetNode);
-								console.debug('Conf: %o', bindingConfiguration);
-								console.debug('Sink: %o', sinkFn2);
-								console.groupEnd();
-							}
-							// #ENDIF
-
-							const sourceStream = bindingConfiguration.source;
-
-							subscribe(targetNode, sourceStream, sinkFn2, bindingConfiguration.error ?? errorHandler, bindingConfiguration.termination ?? terminationHandler);
-						} else /* if (isSource(bindingConfiguration)) { // || isOnMount) { */ {
-							// EVENT SOURCES
-
-							const sourceBindingConfiguration = <SourceBindingConfiguration<typeof eventName>>bindingConfiguration;
-
-							const listener = sourceBindingConfiguration.listener;
-							// listener was bound in the parser...
-							// const boundListener =
-							// 	isFunction(listener) ? (<EventListenerFunction>listener).bind(node) :
-							// 	isFunction((<Observer<unknown>>listener).next) ? (<Observer<unknown>>listener).next.bind(listener) :
-							// 	null
-							// ;
-
-							// We add an event listener for all those events who don't bubble by default (as we're delegating them to the top)
-							// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
-							console.log('[data binding] adding event listener', node, 'eventName=', eventName, listener);
-							node.addEventListener(eventName, listener, { capture: true });
-							if (!DELEGATE_EVENTS || NON_BUBBLING_DOM_EVENTS.has(eventName) || node.getRootNode() instanceof ShadowRoot) {
-								// We add an event listener for all those events who don't bubble by default (as we're delegating them to the top)
-								// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
-								(USE_DOM_OBSERVABLES && node.when)
-									? node.when?.(eventName)
-										.subscribe(listener)
-									: node.addEventListener(eventName, listener, { capture: true });
-							}
-							// if it's an event source (like onclick, etc)
-							// Object.keys(conf).length && handlers.set(node, ([] as RMLTemplateExpression<typeof node>[]).concat(handlers.get(node) || [], <RMLTemplateExpression<typeof node>>{ ...(conf as BindingConfiguration<typeof node>), handler: boundHandler }));
-
-							// if (Object.keys(conf).length) {
-							// if (!Object.keys(conf).length) {
-							// 	console.warn('EMPTY CONF', node, conf)
-							// }
-							delegatedEventHandlers.get(node)?.push(sourceBindingConfiguration) ?? delegatedEventHandlers.set(node, [sourceBindingConfiguration])
-						}
-
-				});
-
-				waitingElementHanlders.delete(value);
-
-				if (isOnMount) {
-					// Will need to bubble so that it can be captured by the delegated event handler
-					setTimeout(() => node.dispatchEvent(new CustomEvent('rml:mount', { bubbles: true, detail: {} })), 0);
-					//node.dispatchEvent(new CustomEvent('mount', {bubbles: true, detail: {}}))
+			// We only use event delegation for bubbling events. Non-bubbling events will have their own listener attached directly.
+			// TODO: shall we support direct, non-delegated event handling, as well (for a little extra performance boost, what else?)
+			if (!DELEGATE_EVENTS || NON_BUBBLING_DOM_EVENTS.has(eventName) || node.getRootNode() instanceof ShadowRoot) {
+				// We add an event listener for all those events who don't bubble by default (as we're delegating them to the top)
+				// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
+				if(USE_DOM_OBSERVABLES && node.when) {
+					node.when(eventName).subscribe(sourceBindingConfiguration.listener);
+				} else {
+					 node.addEventListener(eventName, sourceBindingConfiguration.listener);
 				}
+			} else {
+				const isNonBubblingEvent = NON_BUBBLING_DOM_EVENTS.has(eventName);
+				if(!isNonBubblingEvent && DELEGATE_EVENTS) {
+					delegateEvent(eventName);
+				}
+				delegatedEventHandlers.get(node)?.push(sourceBindingConfiguration) ?? delegatedEventHandlers.set(node, [sourceBindingConfiguration])
 			}
-		});
+
+			if (eventName == 'rml:mount') {
+				// Will need to bubble so that it can be captured by the delegated event handler
+				setTimeout(() => node.dispatchEvent(new CustomEvent('rml:mount', { bubbles: true, detail: {} })), 0);
+				//node.dispatchEvent(new CustomEvent('mount', {bubbles: true, detail: {}}))
+			}
+		}
+
+	});
+
+	node.removeAttribute(RESOLVE_ATTRIBUTE);
+	waitingElementHanlders.delete(bindingRef);
 };
 
 export const removeListeners = (node: Element) => {

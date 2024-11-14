@@ -1,5 +1,5 @@
 import type { RMLEventName } from "../types/dom";
-import { DELEGATE_EVENTS, RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
+import { RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
 
 // #IFDEF DEBUG
 import { tracing } from "../debug";
@@ -7,7 +7,7 @@ import { tracing } from "../debug";
 import { delegatedEvents, delegatedEventHandlers } from "../internal-state";
 
 export const delegateEvent = (eventName: RMLEventName) => {
-	if (DELEGATE_EVENTS && !delegatedEvents.has(eventName)) {
+	if (!delegatedEvents.has(eventName)) {
 		// TODO: allow registering deletegated event handlers at different levels than document
 		// TODO: register at root element level, instead of document?
 
@@ -39,14 +39,15 @@ export const delegateEvent = (eventName: RMLEventName) => {
 			;
 		};
 
-		(USE_DOM_OBSERVABLES && document.when)
-			? document.when(eventName)
-				.subscribe(handlerFn)
-			: document.addEventListener(eventName, handlerFn , {capture: true})
+		if(USE_DOM_OBSERVABLES && document.when) {
+			document.when(eventName).subscribe(handlerFn);
+		} else {
+			document.addEventListener(eventName, handlerFn, { capture: true });
+		}
 
-			// doing it once would also need to add it multiple times!
-			//, eventName == 'mount' ? {once: true} : undefined)
-			// Are we capturing to also catch non-bubbling events?
+		// doing it once would also need to add it multiple times!
+		//, eventName == 'mount' ? {once: true} : undefined)
+		// Are we capturing to also catch non-bubbling events?
 
 		delegatedEvents.add(eventName);
 	}

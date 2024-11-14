@@ -1,5 +1,6 @@
-export const REF_TAG: string = '#REF';
-export const REF_REGEXP: RegExp = /^#REF\d+$/;
+window.RMLREF=''
+export const REF_TAG: string = 'RMLREF+';
+export const REF_REGEXP: RegExp = /^RMLREF+\d+$/;
 
 // custom attribute and corresponding selector to find just-mounted elements
 // that need any data binding
@@ -19,8 +20,10 @@ export const SINK_TAG: string = 'sink';
 
 // Use a single, delegated event listener at the root level
 // or attach individual event listeners or event observers to each node?
-export const DELEGATE_EVENTS: boolean = false;
+export var DELEGATE_EVENTS: boolean = false;
+export const set_DELEGATE_EVENTS = (x =>  DELEGATE_EVENTS = x);
 
 // Use the new native Web Platform Observables instead of addEventListener when available
-export const USE_DOM_OBSERVABLES: boolean = !true;
+export var USE_DOM_OBSERVABLES: boolean = false;
+export const set_USE_DOM_OBSERVABLES = (x =>  USE_DOM_OBSERVABLES = x);
 

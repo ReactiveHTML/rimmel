@@ -45,6 +45,7 @@ export { Value, ValueAsDate, ValueAsNumber } from './sources/value-source';
 // Data Sinks
 export { AnyContentSink } from "./sinks/content-sink";
 export { AttributeObjectSink } from "./sinks/attribute-sink";
+// Data Sinks
 export { AppendHTML } from './sinks/append-html-sink';
 export { Blur } from './sinks/blur-sink';
 export { Checked } from './sinks/checked-sink';
@@ -75,6 +76,7 @@ export { source, sink } from './utils/input-pipe';
 // Other Low-Level Utilities
 export { Rimmel_Bind_Subtree, Rimmel_Mount } from './lifecycle/data-binding';
 export { RESOLVE_SELECTOR, RML_DEBUG, SINK_TAG } from './constants';
+export { set_DELEGATE_EVENTS, set_USE_DOM_OBSERVABLES } from './constants';
 
 // Main entries
 export { rml } from './parser/parser';

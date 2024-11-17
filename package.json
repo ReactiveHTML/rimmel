@@ -16,7 +16,8 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/esm/index.mjs"
+      "import": "./dist/esm/index.mjs",
+      "types": "./dist/esm/types/index.d.ts"
     },
     "./internals": {
       "import": "./dist/esm/internals.mjs"

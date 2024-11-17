@@ -100,8 +100,8 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 		} else {
 			// EVENT SOURCES
 
-			const sourceBindingConfiguration = <SourceBindingConfiguration<typeof eventName>>bindingConfiguration;
-			const { eventName } = bindingConfiguration;
+			const sourceBindingConfiguration = <SourceBindingConfiguration<RMLEventName>>bindingConfiguration;
+			const { eventName } = sourceBindingConfiguration;
 
 			// We only use event delegation for bubbling events. Non-bubbling events will have their own listener attached directly.
 			// TODO: shall we support direct, non-delegated event handling, as well (for a little extra performance boost, what else?)
@@ -109,7 +109,9 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 				// We add an event listener for all those events who don't bubble by default (as we're delegating them to the top)
 				// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
 				if(USE_DOM_OBSERVABLES && node.when) {
-					node.when(eventName).subscribe(sourceBindingConfiguration.listener);
+					const l = sourceBindingConfiguration.listener;
+					const source = node.when(eventName)
+					source.subscribe(l.native ? l(source) : l);
 				} else {
 					 node.addEventListener(eventName, sourceBindingConfiguration.listener);
 				}

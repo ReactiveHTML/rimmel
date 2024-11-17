@@ -24,7 +24,7 @@ export interface BindingConfiguration {
 export interface SourceBindingConfiguration<T extends RMLEventName> {
 	type: 'source';
 	listener: EventListenerOrEventListenerObject<EventType<T>>;
-	eventName?: RMLEventName;
+	eventName: RMLEventName;
 	// error?: EventListener;
 	// termination?: EventListener;
 }
@@ -34,6 +34,7 @@ export interface SourceBindingConfiguration<T extends RMLEventName> {
  */
 export interface SinkBindingConfiguration<E extends Element> extends BindingConfiguration {
 	type: 'sink';
+	t: string;
 	source: Future<unknown>;
 	sink: Sink<E>;
 	params?: any;

@@ -31,7 +31,7 @@ export const addRef = (ref: string, data: BindingConfiguration) => {
 	waitingElementHanlders.get(ref)?.push(data) ?? waitingElementHanlders.set(ref, [data]);
 };
 
-const getEventName = (eventAttributeString: RMLEventAttributeName): RMLEventName | undefined => {
+const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventName, RMLEventAttributeName] | [] => {
 	const x = /\s+(?<attr>(?<prefix>rml:)?on(?<event>\w+))=['"]?$/.exec(eventAttributeString)?.groups;
 	return x ? [<RMLEventName>`${x.prefix??''}${x?.event}`, <RMLEventAttributeName>x.attr] : []
 }

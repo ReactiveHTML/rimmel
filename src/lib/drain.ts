@@ -45,7 +45,11 @@ export const subscribe = <T extends Event>(node: Node, source: MaybeFuture<T>, n
 	if (isObservable(source)) {
 		// TODO: should we handle promise cancellations (cancellable promises?) too?
 		// TODO: should we handle function cancellations (removeEventListener) too?
-		const subscription = source.subscribe(<EventListener>nextFn, catchFn, endFn);
+		const subscription = source.subscribe({
+			next: <EventListener>nextFn,
+			error: catchFn,
+			complete: endFn
+		});
 		subscriptions.get(node)?.push(subscription) ?? subscriptions.set(node, [subscription]);
 		return subscription;
 	} else if (isPromise(source)) {

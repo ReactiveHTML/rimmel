@@ -111,7 +111,7 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 				if(USE_DOM_OBSERVABLES && node.when) {
 					const l = sourceBindingConfiguration.listener;
 					const source = node.when(eventName)
-					source.subscribe(l.native ? l(source) : l);
+					source.subscribe(l);
 				} else {
 					 node.addEventListener(eventName, sourceBindingConfiguration.listener);
 				}

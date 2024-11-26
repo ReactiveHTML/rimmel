@@ -3,25 +3,30 @@
 
 [![npm](https://img.shields.io/npm/v/rimmel.svg)](https://www.npmjs.com/package/rimmel)
 
-With Rimmel you can create a whole new world of powerful HTML templates and webapps using Observables and Promises as first-class citizens.<br>
+With Rimmel you can create webapps that are:
+1. **Faster** than equivalent webapps built with popular "Virtual DOM" or "Change-Detection" based frameworks (e.g.: React, Vue, Angular)
+2. 50-90% **lighter** than equivalent applications written with many other imperative frameworks (e.g.: Angular, React, Vue, SOLID, Svelte)
+3. More easily **testable** than equivalent applications written with most other imperative frameworks (e.g.: Angular, React, Vue, SOLID, Svelte, Nue, VanJS)
+
+Really?<br>
+Yes, this is why:
+1. Rimmel only uses reactive primitives that make direct DOM manipulation, without the need of any tree-traversal logic or similar overhead
+2. It's fairly normal for larger Rimmel webapps to be only about 100-200KB of total minzipped JavaScript code
+3. Rimmel supports the functional-reactive paradigm which not only makes it easier to test functionality, but it actually needs less testing for the same code quality
 
 <br>
 
-- When a DOM event is triggered an Observer reacts
-- When an Observable emits the DOM gets updated
-
-<br>
-
+Rimmel is built around the Observable and Observer patterns.<br>
+To put it simply, DOM events are Observables, everything else (innerHTML, class names, attributes) is Observers.
 
 ```html
-<button onclick="${anObserver}">click me</button>
+<button onclick="${observer1}">click me</button>
 
-<span class="${anObservable}"></span>
-<div style="color: ${anObservable};"></div>
-<div>${anObservable}</div>
+<span class="${observable1}"></span>
+<div style="color: ${observable2};"></div>
+<div>${observable3}</div>
 ```
 
-<br>
 
 No need for JSX, Virtual DOM, Babel, HyperScript, Webpack, React.<br>
 No need to "set up" or "tear down" observables in your components, so you can keep them pure.<br>
@@ -217,7 +222,7 @@ Finally, we have two sinks where the data ends up; one as the innerHTML of the <
 
 The rationale is that "state", as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow. You only need those when certain events happen, in order to respond.
 
-After that everything should go quiet, including your CPU, to keep your laptop cool until the next UI event occurs.
+After that, everything should go quiet, including your CPU, to keep your laptop cool until the next UI event occurs.
 
 This is, in summary, the _discrete-functional-reactive_ paradigm behind Observables and RxJS (as opposed to the functional-reactive paradigm in general in which state is more like a continuous flow of data).
 
@@ -229,27 +234,27 @@ Event-driven reactivity as modelled by Observables is therefore the perfect way 
 
 Modelling your state as one or more observable streams will give you fine-grained control over async events and their coordination, thanks to the full range of RxJS operators you can use.
 
-All Rimmel does is binding your observable streams to the UI with a seamless integration that will result in improved code quality, scale, testability and performance.
+All Rimmel does is binding your observable streams to the UI in a seamless integration that will result in improved code quality, scale, testability and performance.
+
+## Global State? It's just another Stream
+Rimmel doesn't need any "global state manager" other than plain-old RxJS.<br>
+Just create your own /lib/something, expose relevant Observables or Observers and use them from anywhere.
 
 
 ## "Lifecycle Events" are dead (you have streams)
-Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless, redudant and discouraged here.
+Component lifecycle events such as `onmount`, `beforeunmount`, present in most other impera// Style
+const stream = new Subject<CSSStyleObject>();
+target.innerHTML = rml`<div style="${stream}"></div>`;
+
+tive frameworks quickly become useless, redudant and discouraged here.
 Streams and other listeners get connected and disconnected automatically for you when a component is mounted/unmounted. If you think about it, this is exactly what you would normally do in your init/onmount functions, so you no longer have to deal with these tiny details.
 
 Since you only declare streams now and let Rimmel connect them to the DOM and each-other, your code will be immensely more concise, cleaner and more testable.
 
 Rimmel still has a `rml:onmount` event, but its use is only left as a last resort to integrate imperative, non-Rimmel components (some old jQuery plugins, etc?)
 
-## Side Effects are gone (that's what a framework is for)
+## Side Effects are put aside (that's what a framework is for)
 You may have already realised that writing UI components with Rimmel means you no longer have to deal with side effects, which makes it trivial to make your code purely functional.
-
-## Migrating from/to other frameworks and libraries
-This might sound unusual, but Rimmel can actually coexist with other frameworks. Your Rimmel component can be embedded in a React component and have children made in Vue, or even jQuery plugins or sit inside a larger jQuery application, or the other way around.
-
-If you are planning to perform a progressive framework migration, this is one way you can do it, one component at a time.
-
-
-<br>
 
 # Sources vs. Sinks
 There are two key concepts used by Rimmel: sources and sinks.
@@ -390,7 +395,7 @@ Other sinks can be specified explicitly when it's not obvious from the context o
 <div>${YourCustomSink(stream)}</div>
 ```
 
-### Examples:
+### Examples (using sinks):
 
 ```ts
 // InnerHTML (this is implicit, from the context)
@@ -408,6 +413,10 @@ target.innerHTML = rml`<div class="${stream}"></div>`;
 // Style
 const stream = new Subject<CSSStyleObject>();
 target.innerHTML = rml`<div style="${stream}"></div>`;
+
+// CSS
+const stream = new Subject<string>();
+target.innerHTML = rml`<div style="color: ${stream};"></div>`;
 
 // Data Attribute
 const stream = new Subject<string>();
@@ -447,7 +456,7 @@ target.innerHTML = rml`<div>${UpperCase(stream)}</div>`;
 Dynamic sinks, on the other hand, are optimised for size and designed for convenience. They can take anyhing as input and figure out how to update the DOM at runtime.
 
 
-## Extensible Components (AKA: Mixins)
+## Extensible Components (Mixins)
 Mixins are an exciting by-product of dynamic sinks, which allow you to inject pretty much anything at any time (event listeners, classes, attributes, etc) into the target "host" element by means of emitting a `DOM Object`­— a plain-old object whose properties and methods represent DOM attributes and event listeners.
 
 <br>
@@ -601,6 +610,12 @@ const WaitingComponent = () => {
 <a href="https://stackblitz.com/edit/rimmel-suspense"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://stackblitz.com/edit/rimmel-suspense">Suspense</a> on Stackblitz.
 
 
+## Migrating from/to other frameworks
+It might sound unusual, but Rimmel can actually coexist with other frameworks.
+Your Rimmel component can be embedded in a React component and have children made in Vue, or even jQuery plugins or sit inside a larger jQuery application, or any other way around.
+
+If you are planning a progressive framework migration, you can do it one component at a time.
+
 ## Use with AI assistants/LLMs
 We are creating a few experimental AI assistants like [RimmelGPT.js](https://chat.openai.com/g/g-L01pb60It-rimmelgpt-js), to help you convert existing components, create new ones or just get started and have fun. 
 
@@ -618,23 +633,24 @@ Here's a version of Tic Tac Toe made with Observable Streams
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/tic-tac-toe-rimmeljs)
 
+## A Colour Picker component
+In a component like a colour picker there's a lot of derived state to manage, from various inputs and controls, mouse and touch actions, copy-paste, drag'n'drop.
+RxJS can handle these without blinking an eye whilst Rimmel just glues them together.
 
-# Building and testing
-To work with Rimmel locally, check it out then either with bun or other runtimes:
+Remember, this is complex by nature and without RxJS it would be much worse!
 
-```bash
-bun install
-bun run build
-bun test
-```
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-color-picker)
 
-There is a "kitchen sink" app you can use to play around locally, which should showcase most of what you can do with Rimmel:
-```bash
-cd examples/kitchen-sink
-vite
-```
 
-<br>
+<hr>
+
+[![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
+
+# Get in touch!
+Rimmel is a young project built with ardent passion, meticulous attention to detail and a bold vision: building a web ecosystem that "just works", using the functional-reactive paradigm.
+
+Share the passion? Would like to help? That'd be hugely appreciated!<br>
+Come say Hi, there's a lot of work to do. The Roadmap is below.
 
 # Roadmap
 - Completion handlers (what should happen when observables complete?)
@@ -646,26 +662,29 @@ vite
 - EventEmitter support?
 - Separate memory-optimised and speed-optimised sinks
 - Convenience vs Performance sinks
-- Compiled Templates (because it's never fast enough, right?)
+- Compiled Templates (because it's never fast and light enough, right?)
 - JSX/ESX support?
 - Plugin support
 - Sink pipelines (just like you have rendering pipelines in computer graphics)
 - RML Security (leverage sink pipelines to weed out XSS and other dirt)
 - i18n (leverage sink pipelines to make localisation trivial)
 
-<br>
+# Building, testing and hacking
+To work with Rimmel locally, check it out then either with bun or other runtimes:
 
-## Web Standards
-There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and the more recent [Observable DOM](https://github.com/WICG/observable).
+```bash
+npm install
+npm run test
+npm run build
+```
+
+There is a "kitchen sink" app you can use to play around locally, which should showcase most of what you can do with Rimmel:
+```bash
+cd examples/kitchen-sink
+vite
+```
+
+# Web Standards
+There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and especially the more recent [Observable DOM](https://github.com/WICG/observable).
 
 Rimmel is closely following these initiatives and aims to align with them as they develop.
-
-<br>
-
-## Contributing
-
-[![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
-
-
-If you like Rimmel and would like to help the functional-reactive world grow in the JavaScript land, come say hi and let's talk.
-

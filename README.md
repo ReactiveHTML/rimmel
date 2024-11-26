@@ -242,11 +242,7 @@ Just create your own /lib/something, expose relevant Observables or Observers an
 
 
 ## "Lifecycle Events" are dead (you have streams)
-Component lifecycle events such as `onmount`, `beforeunmount`, present in most other impera// Style
-const stream = new Subject<CSSStyleObject>();
-target.innerHTML = rml`<div style="${stream}"></div>`;
-
-tive frameworks quickly become useless, redudant and discouraged here.
+Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless, redudant and discouraged here.
 Streams and other listeners get connected and disconnected automatically for you when a component is mounted/unmounted. If you think about it, this is exactly what you would normally do in your init/onmount functions, so you no longer have to deal with these tiny details.
 
 Since you only declare streams now and let Rimmel connect them to the DOM and each-other, your code will be immensely more concise, cleaner and more testable.

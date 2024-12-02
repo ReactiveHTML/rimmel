@@ -2,11 +2,11 @@ Rimmel is a FRP UI library built around the Observable and Observer patterns.<br
 To put it simply, DOM events are Observables, the rest (innerHTML, class names, attributes) are Observers.
 
 ```html
-<button onclick="${observer1}">click me</button>
+<button onclick="${stream1}">click me</button>
 
-<span class="${observable1}"></span>
-<div style="color: ${observable2};"></div>
-<div>${observable3}</div>
+<span class="${stream2}"></span>
+<div style="color: ${stream3};"></div>
+<div>${stream4}</div>
 ```
 
 

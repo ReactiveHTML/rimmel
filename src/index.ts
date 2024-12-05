@@ -31,6 +31,7 @@ export { feed, feedIn, inputPipe, pipeIn } from './utils/input-pipe';
 // Event Sources
 export { All, qs } from './sources/all-source';
 export { Dataset } from './sources/dataset-source';
+export { Cut } from './sources/cut-source';
 export { Numberset } from './sources/numberset-source';
 export { EventData } from './sources/event-data';
 export { EventTarget } from './sources/event-target';

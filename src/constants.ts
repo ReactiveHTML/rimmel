@@ -4,7 +4,7 @@ export const REF_REGEXP: RegExp = /^RMLREF+\d+$/;
 
 // custom attribute and corresponding selector to find just-mounted elements
 // that need any data binding
-export const RESOLVE_ATTRIBUTE: string = 'RESOLVE';
+export const RESOLVE_ATTRIBUTE: string = 'resolve'; // keep lowercase for SVG
 export const RESOLVE_SELECTOR: string = `[${RESOLVE_ATTRIBUTE}]`;
 
 // An equivalent of the "debugger;" JavaScript expression, for templates

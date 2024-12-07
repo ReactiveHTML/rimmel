@@ -35,7 +35,6 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
 	const x = /\s+(?<attr>(?<prefix>rml:)?on(?<event>\w+))=['"]?$/.exec(eventAttributeString)?.groups;
 	return x ? [<RMLEventName>`${x.prefix??''}${x?.event}`, <RMLEventAttributeName>x.attr] : []
 }
-// GOTCHA: attributes starting with "on" will be treated as event handlers ------------------------------------> HERE <------------------, so avoid any <tag with ongoing="trouble">
 
 export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateExpression[]): HTMLString {
 	let acc = '';
@@ -46,7 +45,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 		const lastTag = accPlusString.lastIndexOf('<');
 		const expression = expressions[i];
 		const [ eventName, eventAttributeName ] = getEventName(string as RMLEventAttributeName);
-		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*RESOLVE="(?<existingRef>[^"]+)"\s*[^>]*(?:>\s*[^<]*|[^>]*)$/);
+		const r = (accPlusString).match(/<\w[\w-]*\s+[^>]*resolve="(?<existingRef>[^"]+)"\s*[^>]*(?:>\s*[^<]*|[^>]*)$/);
 		const existingRef = r?.groups?.existingRef;
 		const ref = existingRef ?? `${REF_TAG}${state.refCount++}`;
 
@@ -108,7 +107,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			// 	?????
 			// 	addRef(ref, <RMLTemplateExpressions.GenericHandler>{ type: 'sink', sink: expression.sink });
 			// 	// addRef(ref, expression);
-			// 	acc = accPlusString.replace(/<(\w[\w-]*)\s*([^>]*)(>?)\s*$/, `<$1 ${existingRef?'':`RESOLVE="${ref}" `}$2$3`);
+			// 	acc = accPlusString.replace(/<(\w[\w-]*)\s*([^>]*)(>?)\s*$/, `<$1 ${existingRef?'':`resolve="${ref}" `}$2$3`);
 
 			// // } else if(typeof ((<Observable<unknown>>expression).subscribe ?? (<Promise<unknown>>expression).then)  == 'function' && i<strings.length -1 || typeof expression == 'object') {
 			// } else if(

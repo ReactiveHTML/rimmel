@@ -30,18 +30,20 @@ export { feed, feedIn, inputPipe, pipeIn } from './utils/input-pipe';
 
 // Event Sources
 export { All, qs } from './sources/all-source';
-export { Dataset } from './sources/dataset-source';
-export { Cut } from './sources/cut-source';
+export { CheckedState } from './sources/checked-source';
+export { Cut, cut } from './sources/cut-source';
+export { Dataset, DatasetObject } from './sources/dataset-source';
 export { Numberset } from './sources/numberset-source';
-export { EventData } from './sources/event-data';
+export { EventData, eventData } from './sources/event-data';
 export { EventTarget } from './sources/event-target';
-export { Form } from './sources/form-data-source';
+export { Form, form } from './sources/form-data-source';
 export { Key } from './sources/keyboard-source';
 export { Update } from './sources/object-source';
 export { ClientXY } from './sources/client-xy-source';
 export { OffsetXY } from './sources/offset-xy-source';
 export { LastTouchXY } from './sources/last-touch-xy-source';
-export { Value, ValueAsDate, ValueAsNumber } from './sources/value-source';
+export { Swap } from './sources/swap-source';
+export { Value, ValueAsDate, ValueAsNumber, value, valueAsString, valueAsDate, valueAsNumber } from './sources/value-source';
 
 // Data Sinks
 export { AnyContentSink } from "./sinks/content-sink";

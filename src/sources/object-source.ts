@@ -1,10 +1,16 @@
 import type { EventListenerFunction } from "../types/dom";
 import type { RMLTemplateExpression } from "../types/internal";
+import type { Source } from '../types/source';
 
+import { autoValue } from '../utils/auto-value';
+
+export type ObjectKey = string | number | symbol;
 export type TargetObject = object | Array<string | number | object | Function>; // Record<string, unknown>;
-export type ObjectSourceExpression<T extends TargetObject> = [target: T, key: keyof T];
+export type ObjectSourceExpression<T extends TargetObject> = [key: keyof T, target: T];
 
-export const isObjectSource = <T extends TargetObject>(expression: RMLTemplateExpression): expression is ObjectSourceExpression<T> =>
+export const isObjectSource =
+  <T extends TargetObject>
+  (expression: RMLTemplateExpression): expression is ObjectSourceExpression<T> =>
     Array.isArray(expression) && expression.length == 2;
 
 /**
@@ -13,26 +19,33 @@ export const isObjectSource = <T extends TargetObject>(expression: RMLTemplateEx
  * @param expression an [object, 'property'] or [array, index] pair to update
  * @returns A data source
  * @example <input oninput="${[obj, 'property']}">
- * @example <input oninput="${ObjectSource([obj, 'property'])}">
- * @example <input oninput="${ObjectSource([arr, 4])}">
+ * @example <input oninput="${ObjectSource('property', obj)}">
+ * @example <input oninput="${ObjectSource(4, arr)}">
  */
-export const ObjectSource = <E extends Event, T extends TargetObject>(expression: ObjectSourceExpression<T>) =>
-    <EventListenerFunction<E>>((e: E) => {
-        // Only <input> elements are supported for this source
-        const t = (<HTMLInputElement>e.target)
-        const valueSource = t.type == 'checkbox' ? t.checked : t.tagName == 'INPUT' ? t.value : t.innerText;
-        const [target, key] = <[Record<string, unknown>, string] | [Array<T>, number]>expression;
-        (target as any)[key] = valueSource;
-    })
+export const ObjectSource =
+  <E extends Event, T extends TargetObject>
+  (key: ObjectKey, targetObject?: T) => {
+    const handler = ((targetObject: T, e: E) => {
+      const t = e.target as HTMLInputElement;
+      (targetObject as any)[key] = autoValue(t);
+    });
+
+    return (targetObject
+      ? handler.bind(null, targetObject as T) as EventListenerFunction<E>
+      : (t2: T)=>(handler.bind(null, t2) as EventListenerFunction<E>)
+    );
+  }
 ;
 
 /**
  * A data source that updates an object's property from an <input> element when
  * a certain event occurs
- * @param object The object to update
  * @param property A property to update in the given object
- * @returns An event handler stream
+ * @param object The object to update
+ * @returns An event handler
  */
-export const Update = <E extends Element, T extends TargetObject, I extends Event, O extends never>(object: T, property: keyof T): EventListenerFunction<I> =>
-    ObjectSource<I, T>([object, property])
+export const Update =
+  <E extends Element, T extends TargetObject, I extends Event, O extends never>
+  (property: ObjectKey, object?: T): ((t2: T) => EventListenerFunction<I>) | EventListenerFunction<I> | Source<I, O> =>
+    ObjectSource<I, T>(property, object)
 ;

@@ -52,7 +52,7 @@ export const isSourceExpression = <T>(e: unknown): e is RMLTemplateExpressions.S
  * An Object's property or an Array's index
  */
 export type property = string | number | symbol;
-
+export type QuerySelectorString = string;
 export type SourceAttributeName = RMLEventAttributeName;
 export type SinkAttributeName<T = string> = T extends RMLEventAttributeName ? never : string;
 export type AttributeName = SourceAttributeName | SinkAttributeName;
@@ -63,7 +63,9 @@ export type AttributeValue = SinkAttributeValue | SourceAttributeValue;
 export type AttributeObject = {
   [K in string]: K extends SourceAttributeName ? SourceAttributeValue : SinkAttributeValue;
 };
-
+export type DOMSubtreeObject = {
+  [K in QuerySelectorString]: AttributeObject;
+}
 
 export namespace RMLTemplateExpressions {
 	/**

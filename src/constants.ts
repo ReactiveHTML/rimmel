@@ -1,4 +1,10 @@
-window.RMLREF=''
+declare global {
+  interface Window {
+    RMLREF: string;
+  }
+}
+self.RMLREF='';
+
 export const REF_TAG: string = 'RMLREF+';
 export const REF_REGEXP: RegExp = /^RMLREF+\d+$/;
 

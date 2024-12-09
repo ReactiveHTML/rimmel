@@ -1,3 +1,4 @@
+import type * as ObservableDOM from "../types/dom-observable";
 import type { RMLEventName } from "../types/dom";
 import type { SourceBindingConfiguration } from "../types/internal";
 
@@ -18,6 +19,8 @@ const elementNodes = (n: Node): n is Element => n.nodeType == 1;
 
 const errorHandler = console.error;
 
+const isEventListenerObject = (l: EventListenerOrEventListenerObject): l is EventListenerObject => typeof l == 'object' && 'handleEvent' in l
+
 export const Rimmel_Bind_Subtree = (node: Element): void => {
 	// Data-to-be-bound text nodes in an element (<div>${thing1} ${thing2}</div>);
 	const intermediateInteractiveNodes: Node[] = [];
@@ -27,6 +30,7 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 	});
 
 	// Interactive text nodes
+	// TODO: shall we use some ad-hoc container elements, instead? <text-wrapper>
 	if(hasInteractiveTextNodes) {
 		const nodes = <(Node | string)[]>[];
 		for (const n of node.childNodes) {
@@ -110,8 +114,10 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 				// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
 				if(USE_DOM_OBSERVABLES && node.when) {
 					const l = sourceBindingConfiguration.listener;
-					const source = node.when(eventName)
-					source.subscribe(l);
+					if(!isEventListenerObject(l)) {
+						const source = node.when(eventName)
+						source.subscribe(l);
+					}
 				} else {
 					 node.addEventListener(eventName, sourceBindingConfiguration.listener);
 				}

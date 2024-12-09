@@ -15,8 +15,8 @@ describe('Parser', () => {
             const handlerFn = () => {};
             const template = rml`<div onclick="${handlerFn}">Hello</div>`;
 
-            expect(template).toEqual('<div onclick="#REF0" RESOLVE="#REF0">Hello</div>');
-            expect(waitingElementHanlders.get('#REF0')).toEqual([{
+            expect(template).toEqual('<div _onclick="RMLREF+0" resolve="RMLREF+0">Hello</div>');
+            expect(waitingElementHanlders.get('RMLREF+0')).toEqual([{
                  eventName: 'click',
                  listener: handlerFn,
                  type: 'source',

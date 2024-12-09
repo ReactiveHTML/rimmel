@@ -28,7 +28,8 @@ const sanitizeNode = (node: Element | DocumentFragment) => {
 
 function sanitizeInput(input: HTMLString, target: Element) {
   const tempElement = document.createElement('div');
-  tempElement.innerHTML = input;
+  tempElement.textContent = input;
+
   const fragment = document.createDocumentFragment();
   fragment.append(...tempElement.childNodes);
 

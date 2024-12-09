@@ -1,6 +1,6 @@
 {
   "name": "rimmel",
-  "version": "1.2.5",
+  "version": "1.3.1",
   "description": "A Functional-Reactive UI library for the Rx.Observable Universe",
   "type": "module",
   "_main": "dist/cjs/index.cjs",
@@ -31,10 +31,11 @@
     "dist/",
     "favicon.svg"
   ],
-  "sideEffects": false,
+  "sideEffects": true,
   "scripts": {
     "build": "rimraf dist && rollup --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",
     "dev": "rimraf dist && rollup -w --bundleConfigAsCjs --config rollup.config.ts --configPlugin typescript",
+    "kitchen-sink": "cd examples/kitchen-sink && vite",
     "website:local": "bundle exec jekyll serve",
     "test": "bun test"
   },

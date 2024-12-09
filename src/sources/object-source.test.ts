@@ -1,14 +1,13 @@
 import { MockElement, MockEvent } from '../test-support';
-import { isObjectSource, ObjectSource, ObjectSourceExpression } from './object-source';
+import { isObjectSource, ObjectSource } from './object-source';
 
 describe('Object Source', () => {
 
-    describe('Given a [target, attribute] pair', () => {
+    describe('Given a [attribute, target] pair', () => {
 
         it('Creates an Object Source', () => {
             const object: any = {};
             const testAttribute = 'someAttribute';
-            const data = <ObjectSourceExpression<typeof object>>[object, testAttribute];
             const newData = 'new value';
 
             const el = MockElement({
@@ -20,7 +19,7 @@ describe('Object Source', () => {
                 target: el as HTMLInputElement
             });
 
-            const source = ObjectSource(data).bind(el);
+            const source = ObjectSource(testAttribute, object).bind(el);
 
             source(eventData);
             expect(object[testAttribute]).toEqual(newData);
@@ -29,8 +28,7 @@ describe('Object Source', () => {
         it('Creates an Array Source', () => {
             const arr = [0, 1, 2, 3, 4];
             const testAttribute = 2;
-            const data = <ObjectSourceExpression<typeof arr>>[arr, testAttribute];
-            const newData = 'new value';
+            const newData = 'new stuff';
 
             const el = MockElement({
                 tagName: 'INPUT',
@@ -42,8 +40,9 @@ describe('Object Source', () => {
                 target: el as HTMLInputElement
             });
 
-            const source = ObjectSource(data).bind(el);
+            const source = ObjectSource(testAttribute, arr).bind(el);
 
+            // @ts-ignore
             source(eventData);
             expect(arr[testAttribute]).toEqual(newData);
         });
@@ -53,7 +52,6 @@ describe('Object Source', () => {
           it('Creates a boolean Object Source', () => {
               const object: any = {};
               const testAttribute = 'someAttribute';
-              const data = <ObjectSourceExpression<typeof object>>[object, testAttribute];
               const newData = true;
 
               const el = MockElement({
@@ -65,7 +63,7 @@ describe('Object Source', () => {
                   target: el as HTMLInputElement
               });
 
-              const source = ObjectSource(data).bind(el);
+              const source = ObjectSource(testAttribute, object).bind(el);
 
               source(eventData);
               expect(object[testAttribute]).toEqual(newData);
@@ -78,7 +76,6 @@ describe('Object Source', () => {
           it('Creates an Object Source from its content', () => {
               const object: any = {};
               const testAttribute = 'someAttribute';
-              const data = <ObjectSourceExpression<typeof object>>[object, testAttribute];
               const newData = 'some content';
 
               const el = MockElement({
@@ -89,7 +86,7 @@ describe('Object Source', () => {
                   target: el
               });
 
-              const source = ObjectSource(data).bind(el);
+              const source = ObjectSource(testAttribute, object).bind(el);
 
               source(eventData);
               expect(object[testAttribute]).toEqual(newData);

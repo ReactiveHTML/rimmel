@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "moduleResolution": "node",
-    "lib": [ "ESNext", "DOM", "DOM.Iterable" ],
+    "lib": [ "ESNext", "DOM", "DOM.Iterable", "DOM.AsyncIterable" ],
     "module": "ESNext",
     "target": "ESNext",
     "types": [ "node", "jest" ],
@@ -11,7 +11,8 @@
     },
     "strict": true,
     "sourceMap": true,
-    "removeComments": true,
+    "declarationMap": true,
+    "removeComments": false,
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

@@ -43,6 +43,8 @@ export const inputPipe = <I, O=unknown>(...pipeline: OperatorPipeline<I, O>) =>
 export const feed = pipeIn;
 export const feedIn = pipeIn;
 
+export const reversePipe = inputPipe;
+
 // WIP, TBC
 export const source = (...reversePipeline: [...OperatorPipeline<any, any>, Observer<any>]) => pipeIn(<Observer<any>>reversePipeline.pop(), ...<OperatorPipeline<any, any>>reversePipeline);
 export const sink = (source: MaybeFuture<any>, ...pipeline: OperatorPipeline<any, any>) => source.pipe(...pipeline);

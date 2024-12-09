@@ -4,33 +4,32 @@
 [![npm](https://img.shields.io/npm/v/rimmel.svg)](https://www.npmjs.com/package/rimmel)
 
 With Rimmel you can create webapps that are:
-1. **Faster** than equivalent webapps built with popular "Virtual DOM" or "Change-Detection" based frameworks (e.g.: React, Vue, Angular)
-2. 50-90% **lighter** than equivalent applications written with many other imperative frameworks (e.g.: Angular, React, Vue, SOLID, Svelte)
-3. More easily **testable** than equivalent applications written with most other imperative frameworks (e.g.: Angular, React, Vue, SOLID, Svelte, Nue, VanJS)
+1. **Outperforming** equivalent webapps built with popular "Virtual DOM" or "Change-Detection" based frameworks (e.g.: React, Vue, Angular)
+2. 50-90% **Lighter** than equivalent applications written with many other imperative frameworks (e.g.: Vue, SOLID, Angular, React, Svelte)
+3. More **Eeasily Testable** compared to most imperative frameworks (e.g.: Svelte, React, Vue, SOLID )
 
-Really?<br>
-Yes, this is why:
-1. Rimmel only uses reactive primitives that make direct DOM manipulation, without the need of any tree-traversal logic or similar overhead
-2. It's fairly normal for larger Rimmel webapps to be only about 100-200KB of total minzipped JavaScript code
-3. Rimmel supports the functional-reactive paradigm which not only makes it easier to test functionality, but it actually needs less testing for the same code quality
+Really? Yes, here's why:
+1. It bypasses heavy and overcomplicated tree-traversal overhead by only using reactive primitives that can make direct DOM manipulation
+2. It's fairly normal for larger Rimmel webapps to be less than 200KB of total minzipped JavaScript code. The use of RxJS and Observables guarantee that
+3. Adopting the functional-reactive paradigm, with no side-effects, not only makes it easier to test functionality, but it actually requires far less test cases to match the same code coverage
 
 <br>
 
 Rimmel is built around the Observable and Observer patterns.<br>
-To put it simply, DOM events are Observables, everything else (innerHTML, class names, attributes) is Observers.
+To put it simply, DOM events are Observables, the rest (innerHTML, class names, attributes) are Observers.
 
 ```html
-<button onclick="${observer1}">click me</button>
+<button onclick="${stream1}">click me</button>
 
-<span class="${observable1}"></span>
-<div style="color: ${observable2};"></div>
-<div>${observable3}</div>
+<span class="${stream2}"></span>
+<div style="color: ${stream3};"></div>
+<div>${stream4}</div>
 ```
 
 
 No need for JSX, Virtual DOM, Babel, HyperScript, Webpack, React.<br>
 No need to "set up" or "tear down" observables in your components, so you can keep them pure.<br>
-No need to unsubscribe or dispose of observers or perform any manual memory cleanup.
+No need to subscribe, unsubscribe or dispose of observers or perform any manual memory cleanup.
 
 <br>
 
@@ -38,7 +37,7 @@ Rimmel works with standard JavaScript/TypeScript template literals tagged with `
 <br>
 
 ## 👋 Hello World 👋
-The modern "Hello World" for reactive interfaces is the click counter: one button, you click it, he counts it.<br>
+The "Hello World" for reactive interfaces is the click counter: one button, you click it, he counts it.<br>
 This is how it works:
 
 <img src="docs/assets/how-rimmel-works.png" alt="How RimmelJS Works">
@@ -264,9 +263,8 @@ Sinks are most often the place where you want to display any information in the 
 With RML/Rimmel you can treat most DOM elements as sources, sinks, or both.
 
 ## Event Sources
-Rimmel supports event listeners from all DOM elements.
-Static values are treated as non-observable values and no data-binding will be created.
-Observers such as Subjects and BehaviorSubjects will receive events as emitted by the DOM.
+Rimmel supports event native and synthetic listeners from all DOM elements.
+All Observers such as event listener functions, Subjects and BehaviorSubjects will receive events as emitted by the DOM.
 
 ### Examples:
 
@@ -299,7 +297,7 @@ target.innerHTML = rml`
 ### Event Adapters
 In normal circumstances your event handlers receive a native DOM `Event` object, such as `MouseEvent`, `PointerEvent`, etc.
 
-To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Mappers, or Event Adapters to feed your event handlers or Observable streams the exact data they need, in the format they expect it, rather than the generic, raw DOM Event objects.
+To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Adapters to feed your event handlers or Observable streams the exact data they need, in the format they expect it, rather than the generic, raw DOM Event objects.
 
 Do you only need the relative `[x, y]` mouse coordinates when hovering an element?<br>
 Use `<div onmousemove="${ OffsetXY(handler) }">`
@@ -308,17 +306,21 @@ Do you want the last typed character when handling keyboard events?
 Use `<input oninput="${ Key(handler) }">`
 
 Rimmel comes with a handful of Event Adapters out of the box, but you can create your own with ease.
+Event Adapters become particularly useful when you have a main data stream that you want to feed from different elements of different types that emit different events. Using an adapter for each, you can make sure you always get data in a unified format in your main data stream.
+
+### Event Adapter Operators
+In certain cases it can be useful to have an Event Adapter made of multiple steps.
+Adapter Operators are simple RxJS operators that make it possible to create whole event adapter pipelines to better suit mode advanced needs.
 
 If you know how to use the <a href="https://rxjs.dev/api/index/function/pipe">`pipe()`</a> function from RxJS, then you almost know how to use `source(...operators, target)` from Rimmel.
-It works like `pipe()`, except it applies the same operators to data coming in, rather than going out of an Observable stream.
+It works like `pipe()`, except it applies the same operators to data coming in, rather than going out of an Observable stream: `source(...operators, targetObserver)`
 
-`source(...operators, targetObserver)`
 
 ```js
 import { rml, source } from 'rimmel';
 
-const DatasetValue = map((e: Event) => Number(e.target.dataset.value));
-const ButtonClick = filter((e: Event) => e.target.tagName == 'BUTTON');
+const datasetValue = map((e: Event) => Number(e.target.dataset.value));
+const buttonClick = filter((e: Event) => e.target.tagName == 'BUTTON');
 
 const Component = () => {
   const total = new Subject<number>().pipe(
@@ -326,7 +328,7 @@ const Component = () => {
   );
 
   return rml`
-    <div onclick="${source(ButtonClick, DatasetValue, total)}">
+    <div onclick="${source(buttonClick, datasetValue, total)}">
 
       <button data-value="1">add one</button>
       <button data-value="2">add two</button>
@@ -342,6 +344,52 @@ const Component = () => {
 As you can see, the main data model, which is the observable stream called `total`, receives `number` and emits `number`.
 The `DatasetValue` Event Adapter translates raw DOM events into the plain numbers required by the model.
 Finally, we're leveraging the DOM's standard Event Delegation by only adding one listener to the container, rather than to each button. We're making sure only button clicks are captured by using the `ButtonClick` filter
+
+
+### Conventions to distinguish Event Adapters from Adapter Operators
+The main difference between Event Adapters and Adapter Operators is that the former are designed for simplicity and convenience. Their name begins with an uppercase letter.
+Adapter Operators follow the practice of other RxJS operators, their name is camelcased and can be composed together just like other RxJS operators.
+
+Rimmel often exports both. For instance, the `Cut` Adapter, or the `cut` Operator clear the value of a text input before emitting its value. They are convenient ways to let users repeatedly enter information and clean up a text field for the next input.
+
+The following example illustrates the use of the `Cut` Event Adapter to feed a simple text stream. 
+
+```js
+import { rml, Cut } from 'rimmel';
+import { Subject } from 'rxjs';
+
+const Component = () => {
+  const stream1 = new Subject<string>();
+
+  return rml`
+    <input onchange="${Cut(stream1)}"> <br>
+
+    Input text: <span>${stream1}</span>
+  `;
+};
+```
+
+The following example, will instead use the `cut` Operator, combined with an `onEnterKey` filter and a `toUpperCase` operator to only emit and clean up the field's value when the user presses `Enter`.
+
+
+```js
+import { map, filter } from 'rxjs';
+import { rml, source, cut } from 'rimmel';
+
+const Component = () => {
+  const onEnterKey = filter((e: KeyboardEvent) => e.key == 'Enter');
+  const toUpperCase = map(s: string) => s.toUpperCase();
+
+  const stream2 = new Subject<string>();
+
+  return rml`
+    <input onchange="${source(onEnterKey, cut, toUpperCase, stream2)}"> <br>
+
+    Uppercased input text entered: <span>${stream2}</span>
+  `;
+};
+```
+Please note how the last parameter of `source()` is `stream2` the actual target of the input pipeline.
 
 <br>
 
@@ -676,9 +724,11 @@ npm run build
 
 There is a "kitchen sink" app you can use to play around locally, which should showcase most of what you can do with Rimmel:
 ```bash
-cd examples/kitchen-sink
+npm run kitchen-sink
 vite
 ```
+
+Or you can just run it with one click [on StackBlitz](https://stackblitz.com/~/github.com/ReactiveHTML/rimmel?file=examples/kitchen-sink/index.ts&startScript=kitchen-sink)
 
 # Web Standards
 There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and especially the more recent [Observable DOM](https://github.com/WICG/observable).

@@ -16,7 +16,7 @@ import { PreSink } from "../sinks/index";
 import { sinkByAttributeName } from '../parser/sink-map';
 import { DOMAttributePreSink, FixedAttributePreSink, WritableElementAttribute } from "../sinks/attribute-sink";
 import { Mixin } from "../sinks/mixin-sink";
-import { ObjectSource, isObjectSource } from "../sources/object-source";
+import { ObjectSource, ObjectSourceExpression, isObjectSource } from "../sources/object-source";
 import { ObserverSource, isObserverSource } from "../sources/observer-source";
 
 import { isPromise } from '../types/futures';
@@ -50,6 +50,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 		const ref = existingRef ?? `${REF_TAG}${state.refCount++}`;
 
 		// Determine in which template context is any given expression appearing
+		// Then, depending on the context, call matching parser modules and (yet-to-be-created) registered parser plugins
 		//const context =
 		//	/>\s*$/.test(string) && /^\s*<\s*/.test(nextString) ? 'child/subtree'
 		//	: /(?<attribute>[a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(resultPlusString) ? 'attribute'
@@ -86,7 +87,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 			const listener = isFunction(expression) ? expression
 				: isObserverSource(expression) ? ObserverSource(expression)
-				: isObjectSource(expression) ? ObjectSource(expression)
+				: isObjectSource(expression) ? ObjectSource(...(expression as ObjectSourceExpression<typeof expression[1]>))
 				: null // We allow it to be empty. If so, ignore, and don't connect any source. Perhaps add a warning in debug mode?
 			;
 
@@ -112,7 +113,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			// // } else if(typeof ((<Observable<unknown>>expression).subscribe ?? (<Promise<unknown>>expression).then)  == 'function' && i<strings.length -1 || typeof expression == 'object') {
 			// } else if(
 			const expressionType = typeof expression;
-			if(['string', 'number'].includes(expressionType)) {
+			if(['string', 'number', 'boolean'].includes(expressionType)) {
 				// Static expressions, no data binding. Just concatenate
 				acc = accPlusString +expression;
 			} else if(Array.isArray(expression)) {
@@ -146,7 +147,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						let handler: SinkBindingConfiguration<HTMLElement | SVGElement>;
 						const attributeName = isAttribute.groups!.attribute;
 						if(attributeName == 'style') {
-							const CSSAttribute = /;?(?<key>[a-z][a-z0-9\-_]*)\s*:\s*$/.exec(string)?.groups?.key;
+							const CSSAttribute = /;?(?<key>[a-z\-][a-z0-9\-_]*)\s*:\s*$/.exec(string)?.groups?.key;
 							sink = CSSAttribute ? StylePreSink(CSSAttribute): StyleObjectSink;
 							handler = PreSink<HTMLElement | SVGElement>('StyleObject', sink, expression, CSSAttribute);
 						} else {
@@ -178,7 +179,8 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 						acc = (prefix +(initialValue ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}
-				} else if(/<\S+(?:\s+[a-z0-9_][a-z0-9_-]*(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+))?)*(?:\s+\.\.\.)?$/.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
+				//} else if(/<\S+(?:\s+[a-z0-9_][a-z0-9_-]*(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+))?)*(?:\s+\.\.\.)?$/.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
+				} else if(/[a-z0-9_][a-z0-9_-][^>]+(?:\s+\.\.\.)?$/ig.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
                     // FIXME:                                                                                                                                  ^    ^^^^^^^^^  why are we doing this?
 					// Mixin Sink
 					// Use Cases:

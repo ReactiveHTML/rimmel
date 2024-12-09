@@ -1,20 +1,20 @@
 import type { RMLEventMap } from './dom';
 
 interface Observable<T> {
-  subscribe: (observer: (value: T) => void) => void;
+  subscribe: (observer: (e: T) => void) => void;
 }
 
 declare global {
   interface Document {
-    when<T>(event: keyof RMLEventMap): Observable<T>;
+    when<T extends Event>(event: keyof RMLEventMap): Observable<T>;
   }
 
   interface Element {
-    when<T>(event: keyof RMLEventMap): Observable<T>;
+    when<T extends Event>(event: keyof RMLEventMap): Observable<T>;
   }
 
   interface Window {
-    when<T>(event: keyof RMLEventMap): Observable<T>;
+    when<T extends Event>(event: keyof RMLEventMap): Observable<T>;
   }
 
 }

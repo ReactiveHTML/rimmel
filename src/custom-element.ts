@@ -44,7 +44,8 @@ class RimmelElement extends HTMLElement {
 		super();
 		this.component = component;
 		// this.#events = {};
-		this.attachShadow({ mode: 'open' });
+		const shadow = this.attachShadow({ mode: 'open' });
+		// shadow.adoptedStyleSheets = [...];
 
 		const [attrs, events] = [...(<RMLNamedNodeMap>this.attributes)].reduce((a, b) => {
 			const isEvent = <0 | 1>+b.nodeName.startsWith('on');

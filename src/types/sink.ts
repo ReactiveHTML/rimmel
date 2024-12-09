@@ -1,8 +1,8 @@
 import type { CSSClassName } from "./style";
 import type { MaybeFuture } from "./futures";
-import type { HTMLString } from './dom';
+import type { HTMLContainerElement, HTMLString } from './dom';
 import type { FocusableElement } from './rml';
-import { AttributeObject, SinkBindingConfiguration } from "./internal";
+import { AttributeObject, DOMSubtreeObject, SinkBindingConfiguration } from "./internal";
 
 /**
  * The mounted part of a Sink who performs the actual work, e.g.: DOM updates, console.logs, etc.
@@ -98,6 +98,10 @@ export type SinkElementTypes = {
     'removed': {
         elements: HTMLElement | SVGElement | MathMLElement;
         types: boolean | 'true' | 'removed';
+    };
+    'subtree': {
+        elements: HTMLContainerElement | SVGElement | MathMLElement;
+        types: DOMSubtreeObject;
     };
     'text': {
         elements: HTMLElement;

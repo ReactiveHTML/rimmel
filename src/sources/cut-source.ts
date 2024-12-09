@@ -1,33 +1,30 @@
-import type { RMLTemplateExpressions } from '../types/internal';
-import type { Observer } from '../types/futures';
-import type { Source } from '../types/source';
-
 import { map } from "rxjs";
-import { inputPipe } from '../utils/input-pipe';
 import { autoValue } from '../utils/auto-value';
+import { inputPipe } from '../utils/input-pipe';
 
 /**
- * An Event Source that "cuts" the value of the underlying <input> element
- * @param handler A handler function or observer to send events to
+ * An Event operator that "cuts" the value of the underlying <input> element
+ * This operator has side effects, as it will directly modify the underlying element
+ * @param target A target function or observer to send events to
+ * @returns EventSource<string>
+ */
+export const cut = 
+	map(<T extends (HTMLInputElement | HTMLElement), I extends Event, O extends string | number | Date | null>(e: I): O => {
+		const t = (<T>e.target);
+		const v = <O>autoValue(t);
+		(t as HTMLInputElement).value = '';
+		// TODO: t.innerText = '' for contenteditable items?
+		return v
+	})
+;
+
+/**
+ * An Event Adapter that "cuts" the value of the underlying <input> element
+ * @param target A target function or observer to send events to
  * @returns EventSource<string>
  */
 export const Cut =
-	<T extends HTMLElement, I extends Event, O extends string | number | date>
-	(source?: RMLTemplateExpressions.SourceExpression<I>): Source<I> | Observer<I> | EventListenerFunction<I> => {
-		const handler = inputPipe<I, O>(
-			map((e: I) => {
-				const t = (<HTMLInputElement>e.target);
-				const v = <O>autoValue(t);
-				t.value = '';
-				return v
-			})
-		);
-
-		return (
-			source
-			? handler(source)
-			: handler
-		);
-	}
+	inputPipe<Event, string | number | Date | null>(
+		cut
+	)
 ;
-

@@ -1,37 +1,168 @@
 import type { HTMLString, SinkBindingConfiguration, Stream } from '../../src/index';
 
-import { BehaviorSubject, Observable, Subject, interval, filter, map, merge, mergeWith, of, pipe, scan, startWith, switchMap, take, tap, throwError, withLatestFrom, catchError, ObservedValueOf } from 'rxjs';
-import { rml, All, feedIn, source, sink, inputPipe, AppendHTML, InnerText, InnerHTML, Removed, Sanitize, TextContent, Update, Suspend } from '../../src/index';
-import { Value, ValueAsDate, ValueAsNumber, Dataset, EventData, Form, JSONDump, Target, Key, OffsetXY, Numberset, inputPipe, pipeIn } from '../../src/index';
+import {
+  BehaviorSubject,
+  Subject,
+
+  catchError,
+  filter,
+  interval,
+  map,
+  merge,
+  mergeWith,
+  Observable,
+  of,
+  scan,
+  startWith,
+  take,
+  tap,
+} from 'rxjs';
+
+import {
+  rml,
+
+  inputPipe,
+  pipeIn,
+
+  AppendHTML,
+  cut,
+  Cut,
+  Dataset,
+  DatasetObject,
+  eventData,
+  EventData,
+  form,
+  Form,
+  InnerHTML,
+  InnerText,
+  JSONDump,
+  Key,
+  Numberset,
+  OffsetXY,
+  Removed,
+  Sanitize,
+  sink,
+  source,
+  Swap,
+  TextContent,
+  Update,
+  Value,
+  ValueAsDate,
+  ValueAsNumber,
+  value,
+} from '../../src/index';
+import { set_USE_DOM_OBSERVABLES } from '../../src/index';
 import { char } from '../../src/types/basic';
 import { RegisterElement } from '../../src/custom-element';
 
-const log = (p) => tap(x=>console.log(p, x))
-
-RegisterElement('custom-element', ({ title, content, onbuttonclick, onput }) => {
-	const handle = e => {
-		console.log('Internal event', e);
-		onput.next(e);
-	}
-
-	return rml`
-		<div class="cls1">
-			<h3>${title}</h3>
-			<p>${content}</p>
-			Custom Element Works!<br>
-			<input type="text" onchange="${Value(handle)}">
-			<button type="button" data-foo="bar1" onclick="${Dataset('foo', handle)}">click me</button>
-		</div>
-	`;
+const Log = (p) => tap(x=>console.log(p, x))
+const log = tap(console.log);
+const step = tap(x => {
+	debugger;
 });
+const upperCase = map((s: string)=>s.toUpperCase());
 
-// const defer = (...x: any) => new Promise<typeof x>((resolve, reject) => setTimeout(resolve, 5000, ...x));
+const timer = interval(1000);
+
+
 const defer = <T>(x: T, timeout: number = 500): Promise<T> =>
 	new Promise<T>(resolve => setTimeout(resolve, timeout, x));
 
 ////////////////////////////////////////////////
 
 const sources = {
+	DOM_OBSERVABLES: () => {
+		const NativeStream = () => {
+			const subscribers = [];
+			const o = new window.Observable(subscriber => {
+				const pos = subscribers.push(subscriber);
+				const unsub = () => {
+					subscribers.splice(pos, 1);
+				};
+				unsub.unsubscribe = unsub;
+				return unsub;
+				// signal = observer.signal
+			});
+			o.next = (data) => {
+				subscribers.forEach(l=>l.next ? l.next(data) : l(data));
+			}
+			o.error = (e) => output?.error(data);
+			o.complete = () => output?.complete();
+			o.subscribe = (l) => {
+				const pos = subscribers.push(l);
+				const unsub = () => {
+					subscribers.splice(pos, 1);
+				};
+				unsub.unsubscribe = unsub;
+				return unsub;
+			}
+			return o;
+		}
+
+		const input = NativeStream();
+		const output = input.map(s=>s.toUpperCase());
+
+		output.subscribe({
+			next: x=>console.log('>>>', x)
+		});
+
+		const strHTML = rml`
+			<input oninput="${Value(input)}">
+			<div>${output}</div>
+		`;
+
+		set_USE_DOM_OBSERVABLES(true);
+		setTimeout(()=>set_USE_DOM_OBSERVABLES(false), 10);
+		return strHTML;
+	},
+
+	SYNC_RENDERING: () => {
+		const stream = new Subject().pipe(
+			startWith('initial value'),
+		);
+
+		const strHTML = rml`
+			<button onclick="${() => stream.next('next value')}">next value</button>
+			<div>${stream}</div>
+		`;
+
+		console.log('Initial HTML:', strHTML);
+		return strHTML;
+	},
+
+	MULTILINE: () => {
+		const id = 'xxx';
+		const stream = interval(1000);
+
+		const strHTML = rml`
+			<div
+				id="${id}"
+				style="margin-top: ${stream}px;"
+				rml:focus="${stream}"
+			>
+				${InnerText(stream)}
+			</div>
+		`;
+
+		console.log('HTML:', strHTML);
+		return strHTML;
+	},
+
+	SVG: () => {
+		const stream = interval(50).pipe(
+			take(21),
+			map(i => `<path d="M 0,${100-10*i} 100,${10*i}">`)
+		);
+
+		const strHTML = rml`
+			<svg version="1.1" viewBox="0 0 100 100">
+				<g style="stroke:#0000ffff; stroke-width: .2;">${AppendHTML(stream)}</g>
+			</svg>
+		`;
+
+		return strHTML;
+	},
+
 	ObjectSourceImplicit: () => {
 		const data = {
 			prop1: undefined
@@ -43,7 +174,7 @@ const sources = {
 
 		return rml`
 			Updating a non-reactive property of an object<br>
-			<input onchange="${[data, 'prop1']}"><br>
+			<input onchange="${['prop1', data]}"><br>
 
 			<button onclick="${stream}">check</button>
 			data.prop1 = <span>${stream}</span>
@@ -62,7 +193,7 @@ const sources = {
 
 		return rml`
 			Updating a non-reactive property of an object<br>
-			<input onchange="${Update(data, 'prop1')}"><br>
+			<input onchange="${Update('prop1', data)}"><br>
 
 			<button onclick="${stream}">check</button>
 			data.prop1 = <span>${stream}</span>
@@ -90,24 +221,78 @@ const sources = {
 	},
 
 	ValueAsDateSource: () => {
-		const stream = new Subject<Date | null>().pipe(
+		const stream = new Subject<Date | null>()
+		const yesterday = stream.pipe(
 			map(d=> {
-				d?.setDate(d.getDate() + 1);
+				d?.setDate(d.getDate() -1);
+				return d?.toDateString() ?? '';
+			})
+		);
+		const tomorrow = stream.pipe(
+			map(d=> {
+				d?.setDate(d.getDate() +1);
 				return d?.toDateString() ?? '';
 			})
 		);
 
 		return rml`
 			Today is: <input type="date" oninput="${ValueAsDate(stream)}" autofocus><br>
-			Tomorrow: <span>${stream}</span>
+			Yesterday: <span>${yesterday}</span><br>
+			Tomorrow: <span>${tomorrow}</span><br>
 		`;
 	},
 
-	FormDataSource: () => {
+	Cut: () => {
 		const stream = new Subject<string>();
 
 		return rml`
-			<form onsubmit="${Form(stream)}" action="">
+			<input type="text" onchange="${Cut(stream)}" autofocus>
+			[ <span>${stream}</span> ]
+		`;
+	},
+
+	CutPipeline: () => {
+		const stream = new Subject<string>();
+
+		return rml`
+			<input type="text" onchange="${source(log, cut, log, upperCase, log, stream)}" autofocus>
+			[ <span>${stream}</span> ]
+		`;
+	},
+
+	UpperCut: () => {
+		const stream = new Subject<string>();
+		const UpperCut = inputPipe(cut, upperCase);
+
+		return rml`
+			<input type="text" onchange="${UpperCut(stream)}" autofocus>
+			[ <span>${stream}</span> ]
+		`;
+	},
+
+	Swap: () => {
+		const stream = new Subject<string>();
+
+		return rml`
+			<input type="text" onchange="${Swap('SWAPPED', stream)}" autofocus>
+			[ <span>${stream}</span> ]
+		`;
+	},
+
+	Swap_Fn: () => {
+		const stream = new Subject<string>();
+
+		return rml`
+			<input type="text" onchange="${Swap(v=>v.toUpperCase(), stream)}" autofocus>
+			[ <span>${stream}</span> ]
+		`;
+	},
+
+	Form: () => {
+		const stream = new Subject<string>();
+
+		return rml`
+			<form method="dialog" onsubmit="${Form(stream)}" action="">
 				<input name="field1" value="a">
 				<input name="field2" value="b">
 				<input name="field3" value="c">
@@ -118,6 +303,20 @@ const sources = {
 		`;
 	},
 
+	form: () => {
+		const stream = new Subject<string>();
+
+		return rml`
+			<form method="dialog" onsubmit="${source(form, stream)}" action="">
+				<input name="field1" value="a">
+				<input name="field2" value="b">
+				<input name="field3" value="c">
+				<button>submit</button>
+				<input type="submit" value="submit">
+			</form>
+			Result: <span>${JSONDump(stream)}</span>
+		`;
+	},
 
 	pipeIn: () => {
 		const stream = new Subject<string>();
@@ -145,12 +344,23 @@ const sources = {
 
 		return rml`
 			Stream: <span>${stream}</span><br>
-			<input oninput="${UNDERSPLIT(stream)}">
+			<input oninput="${UNDERSPLIT(stream)}" autofocus>
 		`;
 	},
 
 
-	DatasetSource: () => {
+	Dataset: () => {
+		const stream = new Subject<string>();
+
+		return rml`
+			<button data-foo="bar" onclick="${Dataset('foo', stream)}">click me</button>
+			<br>
+			data-foo = <span>${stream}</span>
+		`;
+	},
+
+
+	Dataset_Curried: () => {
 		const stream = new Subject<string>();
 		const JustFoo = Dataset('foo');
 
@@ -161,16 +371,13 @@ const sources = {
 		`;
 	},
 
-	Source_Stream_Pipelines: () => {
-		const dataset = map((e: Event)=>(<HTMLElement>e.target).dataset)
-		const JSONPrint = map(s=>`<pre>${JSON.stringify(s, null, 2)}</pre>`)
-
+	DatasetObject: () => {
 		const stream = new Subject<string>();
 
 		return rml`
-			<button data-foo="bar" onclick="${source(dataset, stream)}">click me</button>
+			<button data-foo="bar" data-baz="bat" onclick="${DatasetObject(stream)}">click me</button>
 			<br>
-			data-foo = <span>${sink(stream, JSONPrint)}</span>
+			dataset = <span>${sink(stream, JSONDump)}</span>
 		`;
 	},
 
@@ -202,7 +409,7 @@ const sources = {
 		`;
 	},
 
-	'KeyboardSource_EventData': () => {
+	'EventData': () => {
 		const stream = new Subject<char>();
 
 		return rml`
@@ -210,6 +417,16 @@ const sources = {
 			<div>Last key pressed: <strong>${stream}</strong></div>
 		`;
 	},
+
+	'eventData': () => {
+		const stream = new Subject<char>();
+
+		return rml`
+			<input oninput="${source(eventData, stream)}" style="background-color: #ffff80; padding: 3rem;">
+			<div>Last key pressed: <strong>${stream}</strong></div>
+		`;
+	},
+
 
 	'KeyboardSource (Key)': () => {
 		const stream = new Subject<char>();
@@ -248,20 +465,12 @@ const sinks = {
 		return rml`<button onclick="${()=>alert('clicked')}">click me</button>`
 	},
 
-	ZeroInitial: () => {
-		const bs = new BehaviorSubject(0).pipe(
-			mergeWith(interval(1000).pipe(map(x=>x+2))),
-		);
-
-		return rml`Outpuut: <span>${bs}</span>`;
-	},
-
 	EmptyInitial: () => {
 		const bs = new BehaviorSubject('').pipe(
 			mergeWith(interval(1000)),
 		);
 
-		return rml`Outpuut: <span>${bs}</span>`;
+		return rml`Output: <span>${bs}</span>`;
 	},
 
 	ClassSink: () => {
@@ -303,13 +512,14 @@ const sinks = {
 	CustomElement: () => {
 		const notify = (key: string) => void console.log('Notify', key);
 
-		const titleStream = interval(100).pipe(
+		const titleStream = interval(1000).pipe(
 			map(i => `title ${i}`),
 		);
 
 		return rml`
 			Should be a custom element
-			<custom-element title="${titleStream}" content="hello" data-foo="bar2" oninput="${EventData(notify)}" onclick="${Dataset('foo')(notify)}" />
+			<p class="red">red</p>
+			<custom-element class="css-through" style="--color: green" title="${titleStream}" content="hello" data-foo="bar2" oninput="${EventData(notify)}" onclick="${Dataset('foo')(notify)}" />
 		`;
 	},
 
@@ -340,7 +550,7 @@ const sinks = {
 		`;
 	},
 
-	AddUpPipeInDelegation: () => {
+	EventDelegation: () => {
 		const n = new BehaviorSubject<number>(0);
 
 		const count = n.pipe(
@@ -412,7 +622,7 @@ const sinks = {
 	BlurSink: () => {
 		const keyStream = new Subject();
 		const blur = keyStream.pipe(
-			log('KEY'),
+			Log('KEY'),
 			filter(k => k == 'Enter')
 		);
 
@@ -571,6 +781,37 @@ const sinks = {
 		`;
 	},
 
+	Mixin_Subtree: () => {
+		const counter = interval(1000);
+
+		const mix = (args?: any) => {
+			const subtree = {
+				'.grandchild span': {
+					innerHTML: counter,
+					style: {color: 'red'},
+				}
+			};
+
+			return {
+				subtree,
+			};
+		};
+
+		return rml`
+			<div ...${mix()}>
+				<div class="child">
+					Child element
+					<div class="grandchild">
+						Grandchild element <span />
+					</div>
+					<div class="grandchild">
+						Grandchild element <span />
+					</div>
+				</child>
+			</div>
+		`
+	},
+
 	'Removed (Implicit)': () => {
 		const removed = new Subject<Event>();
 
@@ -657,18 +898,25 @@ const sinks = {
 		`;
 	},
 
+	Confusions: () => {
+		const disabled = false;
+		return rml`
+			<button rml:disabled="${disabled}">disabled=${disabled}</button>
+		`;
+	},
+
+
 	SyncDisabled__: () => {
 		const disabled = false;
-		const clicked$ = new Subject().pipe(
-			tap(x=>console.log('in', x)),
-			map(() => 'clicked!'),
-			tap(x=>console.log('out', x)),
+		const click = new Subject().pipe(
+			scan(x => x+1, 0),
 		);
 
 		return rml`
-			<button disabled="${disabled}" onclick="${clicked$}">disabled=false</button>
+			<button disabled="${disabled}"  onclick="${click}">disabled ${disabled}</button>
+			<button disabled="${!disabled}" onclick="${click}">disabled ${disabled}</button>
 			<br><br>
-			<div>Clicked? [<span>${clicked$}</span>]</div>
+			<div>Clicked? <span>${click}</span></div>
 		`;
 	},
 
@@ -1084,6 +1332,14 @@ const component = () => {
 				margin-block: .2rem;
 			}
 
+			.red {
+				color: red;
+			}
+
+			custom-element .red {
+				color: blue;
+			}
+
 			.class1::before {
 				display: inline-block;
 				content: attr(data-deferred);
@@ -1126,9 +1382,10 @@ const component = () => {
 					color: #eee;
 				}
 
+				a.btn:target,
 				button:active,
 				button:focus {
-					background-color: #888;
+					background-color: #33e;
 					color: #111;
 				}
 			}
@@ -1170,5 +1427,31 @@ const component = () => {
 
 	`;
 }
+
+RegisterElement('custom-element', ({ title, content, onbuttonclick, onput }) => {
+	const handle = e => {
+		console.log('Internal event', e);
+		onput.next(e);
+	}
+
+	return rml`
+		<div class="cls1">
+			<style>
+			:host {
+			}
+			:host-context(.css-through) {
+				.red {
+					color: var(--color);
+				}
+			}
+			</style>
+			<h3>${title}</h3>
+			<p class="red">${content}</p>
+			Custom Element Works!<br>
+			<input type="text" class="red" onchange="${Value(handle)}">
+			<button type="button" data-foo="bar1" onclick="${Dataset('foo', handle)}">click me</button>
+		</div>
+	`;
+});
 
 document.body.innerHTML = component();

@@ -1,3 +1,4 @@
+import type * as ObservableDOM from "../types/dom-observable";
 import type { RMLEventName } from "../types/dom";
 import { RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
 
@@ -11,7 +12,7 @@ export const delegateEvent = (eventName: RMLEventName) => {
 		// TODO: allow registering deletegated event handlers at different levels than document
 		// TODO: register at root element level, instead of document?
 
-		const handlerFn = (event: Event) => {
+		const handlerFn = <E extends Event>(event: E) => {
 			for (
 				var handledTarget = event.target, h = delegatedEventHandlers.get(event.target as Element);
 				// TODO: use a Map to avoid h.some(conf=>conf.eventName == event.type)

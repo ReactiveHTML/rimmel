@@ -20,22 +20,25 @@ export const asap = (fn: SinkFunction, arg: MaybeFuture<unknown>) => {
  * @param error? An error handler on the sink side
  * @param complete? a finalisation function
  */
-export const subscribe = <T extends Event>(node: Node, source: MaybeFuture<T>, next: EventListenerOrEventListenerObject<T>, error?: (e: Error) => void, complete?: () => void) => {
-	if (isObservable(source)) {
-		// TODO: should we handle promise cancellations (cancellable promises?) too?
-		const subscription = source.subscribe({
-			next: <EventListener>next,
-			error,
-			complete,
-		});
+export const subscribe =
+	<T extends Event>
+	(node: Node, source: MaybeFuture<T>, next: EventListenerOrEventListenerObject<T>, error?: (e: Error) => void, complete?: () => void) => {
+		if (isObservable(source)) {
+			// TODO: should we handle promise cancellations (cancellable promises?) too?
+			const subscription = source.subscribe({
+				next: <EventListener>next,
+				error,
+				complete,
+			});
 
-		subscriptions.get(node)?.push(subscription) ?? subscriptions.set(node, [subscription]);
+			subscriptions.get(node)?.push(subscription) ?? subscriptions.set(node, [subscription]);
 
-		return subscription;
-	} else if (isPromise(source)) {
-		source.then(<EventListener>next, error).finally(complete);
-	} else {
-		// TODO: should we handle function cancellations (removeEventListener) too?
-		(<EventListener>next)(source);
+			return subscription;
+		} else if (isPromise(source)) {
+			source.then(<EventListener>next, error).finally(complete);
+		} else {
+			// TODO: should we handle function cancellations (removeEventListener) too?
+			(<EventListener>next)(source);
+		}
 	}
-}
+;

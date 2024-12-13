@@ -26,6 +26,11 @@ export interface Observer<I> {
     complete?: ObserverCompleteFunction;
 };
 
+export interface Observature {
+    [Symbol.for('observature')]: any,
+	addSource: <T>(source: Observable<T>) => void,
+}
+
 export type Subscription = {
     unsubscribe: () => void;
 };

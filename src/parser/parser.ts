@@ -17,7 +17,7 @@ import { sinkByAttributeName } from '../parser/sink-map';
 import { DOMAttributePreSink, FixedAttributePreSink, WritableElementAttribute } from "../sinks/attribute-sink";
 import { Mixin } from "../sinks/mixin-sink";
 import { ObjectSource, ObjectSourceExpression, isObjectSource } from "../sources/object-source";
-import { ObserverSource, isObserverSource } from "../sources/observer-source";
+import { ObserverSource, isObserverSource, ObservatureSource, isObservatureSource } from "../sources/observer-source";
 
 import { isPromise } from '../types/futures';
 
@@ -85,8 +85,10 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			// <input type="text" onchange="${[object, 'attributeToSet']}">   will feed it the .value of the input field
 			// <input type="text" onchange="${[array,  pos]}">    will feed it the .value of the input field
 
-			const listener = isFunction(expression) ? expression
+			const listener =
+				isObservatureSource(expression) ? ObservatureSource(expression)
 				: isObserverSource(expression) ? ObserverSource(expression)
+				: isFunction(expression) ? expression
 				: isObjectSource(expression) ? ObjectSource(...(expression as ObjectSourceExpression<typeof expression[1]>))
 				: null // We allow it to be empty. If so, ignore, and don't connect any source. Perhaps add a warning in debug mode?
 			;

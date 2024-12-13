@@ -28,8 +28,7 @@
     }
   },
   "files": [
-    "dist/",
-    "favicon.svg"
+    "dist/"
   ],
   "sideEffects": true,
   "scripts": {

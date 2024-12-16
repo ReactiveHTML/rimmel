@@ -11,7 +11,6 @@ export const numberset = (key: string) => map((e: Event) => Number((<HTMLElement
 
 /**
  * An Event Source emitting a numerical dataset value from the underlying element instead of a regular DOM Event object
- * @param handler A handler function or observer to send events to
  * @returns EventSource<number>
  * @example <button data-foo="123" onclick="${Numberset('foo', stream)}"> ... </button>
  * @example <button data-foo="123" onclick="${Numberset('foo', handlerFn)}"> ... </button>

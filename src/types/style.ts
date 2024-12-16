@@ -18,11 +18,13 @@ export type CSSWritableDeclaration = {
   [K in keyof CSSStyleDeclaration as IsWritable<K>]?: NonNullable<CSSValue<K>>;
 };
 
-// Helper type to check if a property is writable
-type IsWritable<K extends keyof CSSStyleDeclaration> = 
+/*
+ * Helper type to check if a CSS property is writable
+ **/
+export type IsWritable<K extends keyof CSSStyleDeclaration> = 
   { -readonly [P in K]: CSSStyleDeclaration[K] } extends { [P in K]: CSSStyleDeclaration[K] } 
-  ? K 
-  : never
+    ? K 
+    : never
 ;
 
 export type CSSWritableProperty = Omit<CSSWritableDeclaration, 'length' | 'parentRule'>;
@@ -36,7 +38,16 @@ export type CSSFuture = {
   };
 
 /**
- * Just a friendly alias for CSSStyleDeclaration
+ * Just an easier-to-remember alias for CSSStyleDeclaration
+ *
+ * ## Example
+ *
+ * ```ts
+ * const styles = {
+ *   font-family: 'system-ui',
+ *   color: Promise.resolve('red'),
+ *   'text-decoration': Observable.of('underline'),
+ * };
  */
 export type CSSObject = CSSDeclaration | CSSFuture;
 

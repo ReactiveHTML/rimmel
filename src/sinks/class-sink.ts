@@ -69,35 +69,36 @@ export const ExperimentalClassObjectSink: Sink<Element> = (node: Element) => {
 
 /**
  * A specialised sink to toggle individual classes on a given element
- * @description Will toggle the specified class name on the specified element, whenever the source emits. The actual value of the source will be ignored, as it's the emissions which will cause the class toggling.
+ * Will toggle the specified class name on the specified element, whenever the source emits. The actual value of the source will be ignored, as it's the emissions which will cause the class toggling.
  * @param source A present or future string
  * @param className The class name to toggle
  * @returns RMLTemplateExpression A template expression for the "className" attribute
- * @example <div class="${ClassName(stringPromise)}">
- * @example <div class="${ClassName(stringObservable)}">
+ * @example <div class="${ToggleClassName('class1', stringPromise)}">
+ * @example <div class="${ToggleClassName('class2', stringObservable)}">
 **/
-export const ToggleClass: ExplicitSink<'class'> = (source: RMLTemplateExpressions.Any, className: CSSClassName) =>
+export const ToggleClass: ExplicitSink<'class'> =
+  (source: RMLTemplateExpressions.Any, className: CSSClassName) =>
     <SinkBindingConfiguration<HTMLElement | SVGElement>>({
-        type: SINK_TAG,
-        t: 'ToggleClass',
-        source,
-        sink: ToggleClassSink(className),
+      type: SINK_TAG,
+      t: 'ToggleClass',
+      source,
+      sink: ToggleClassSink(className),
     })
 ;
 
 /**
  * A specialised sink for the "className" HTML attribute
- * @description Will set the whole className of an element to the string emitted by the source
+ * Will set the whole className of an element to the string emitted by the source
  * @param source A present or future string
  * @returns RMLTemplateExpression A template expression for the "className" attribute
  * @example <div class="${ClassName(stringPromise)}">
  * @example <div class="${ClassName(stringObservable)}">
 **/
 export const ClassName: ExplicitSink<'class'> = (source: RMLTemplateExpressions.ClassName) =>
-    <SinkBindingConfiguration<HTMLElement | SVGElement>>({
-        type: SINK_TAG,
-        t: 'ClassName',
-        source,
-        sink: ClassNameSink,
-    })
+  <SinkBindingConfiguration<HTMLElement | SVGElement>>({
+    type: SINK_TAG,
+    t: 'ClassName',
+    source,
+    sink: ClassNameSink,
+  })
 ;

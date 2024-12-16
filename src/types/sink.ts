@@ -13,16 +13,16 @@ export type SinkFunction = (values?: any) => void;
 /**
  * Allowed types of DOM nodes that sinks can work on
  */
-type SinkableNode =
-    | Element
-    // | HTMLElement
-    // | HTMLInputElement
-    // | HTMLTextAreaElement
-    // | HTMLSelectElement
-    // | HTMLButtonElement
-    | MathMLElement
-    | SVGElement
-	| Text
+export type SinkableNode =
+  | Element
+  // | HTMLElement
+  // | HTMLInputElement
+  // | HTMLTextAreaElement
+  // | HTMLSelectElement
+  // | HTMLButtonElement
+  | MathMLElement
+  | SVGElement
+  | Text
 ;
 
 /**
@@ -30,14 +30,14 @@ type SinkableNode =
  * @param T The type of HTML element the sink can be applied to
  */
 export interface Sink<T extends SinkableNode> extends Function {
-    // FIXME: move node as last parameter to facilitate currying
-    (node: T, ...args: any[]): SinkFunction;
-    // [Symbol.sink]?: string;
+  // FIXME: move node as last parameter to facilitate currying
+  (node: T, ...args: any[]): SinkFunction;
+  // [Symbol.sink]?: string;
 }
 
 // TODO: use a Symbol instead of .sink?
 export const isSink = (x: any): x is Sink<any> =>
-    !!(x?.sink);
+  !!(x?.sink);
 
 export type HTML = MaybeFuture<HTMLString>;
 
@@ -47,70 +47,70 @@ export type TextString = MaybeFuture<string>;
  * A list of possible Sink types, the elements they can be used on and the type of data they can receive
  */
 export type SinkElementTypes = {
-    'attribute': {
-        elements: HTMLElement | SVGElement | MathMLElement;
-        types: number | string;
-    };
-    'checked': {
-        elements: HTMLInputElement;
-        types: boolean | 'true' | 'checked';
-    };
-    'class': {
-        elements: HTMLElement | SVGElement;
-        types: CSSClassName;
-    };
-    'closed': {
-        elements: HTMLDialogElement;
-        types: boolean | 'true' | 'closed';
-    };
-    'content': {
-        elements: HTMLElement | SVGElement | MathMLElement;
-        types: HTMLString;
-    };
-    'textcontent': {
-        elements: HTMLElement;
-        types: HTMLString;
-    };
-    'rml:focus': {
-        elements: FocusableElement;
-        types: boolean ;
-    };
-    'rml:blur': {
-        elements: FocusableElement;
-        types: any ;
-    };
-    'disabled': {
-        elements: HTMLButtonElement | HTMLFieldSetElement | HTMLOptGroupElement | HTMLOptionElement | HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement;
-        types: boolean | 'true' | 'disabled';
-    };
-    'mixin': {
-        elements: HTMLElement | SVGElement | MathMLElement;
-        types: AttributeObject;
-    };
-    'object': {
-        elements: HTMLElement | SVGElement | MathMLElement;
-        types: Object;
-    };
-    'readonly': {
-        elements: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-        types: boolean | 'true' | 'readonly';
-    };
-    'removed': {
-        elements: HTMLElement | SVGElement | MathMLElement;
-        types: boolean | 'true' | 'removed';
-    };
-    'subtree': {
-        elements: HTMLContainerElement | SVGElement | MathMLElement;
-        types: DOMSubtreeObject;
-    };
-    'text': {
-        elements: HTMLElement;
-        types: string | number;
-    };
-    'value': {
-        elements: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-        types: number | string;
-    };
+  'attribute': {
+    elements: HTMLElement | SVGElement | MathMLElement;
+    types: number | string;
+  };
+  'checked': {
+    elements: HTMLInputElement;
+    types: boolean | 'true' | 'checked';
+  };
+  'class': {
+    elements: HTMLElement | SVGElement;
+    types: CSSClassName;
+  };
+  'closed': {
+    elements: HTMLDialogElement;
+    types: boolean | 'true' | 'closed';
+  };
+  'content': {
+    elements: HTMLElement | SVGElement | MathMLElement;
+    types: HTMLString;
+  };
+  'textcontent': {
+    elements: HTMLElement;
+    types: HTMLString;
+  };
+  'rml:focus': {
+    elements: FocusableElement;
+    types: boolean ;
+  };
+  'rml:blur': {
+    elements: FocusableElement;
+    types: any ;
+  };
+  'disabled': {
+    elements: HTMLButtonElement | HTMLFieldSetElement | HTMLOptGroupElement | HTMLOptionElement | HTMLSelectElement | HTMLTextAreaElement | HTMLInputElement;
+    types: boolean | 'true' | 'disabled';
+  };
+  'mixin': {
+    elements: HTMLElement | SVGElement | MathMLElement;
+    types: AttributeObject;
+  };
+  'object': {
+    elements: HTMLElement | SVGElement | MathMLElement;
+    types: Object;
+  };
+  'readonly': {
+    elements: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    types: boolean | 'true' | 'readonly';
+  };
+  'removed': {
+    elements: HTMLElement | SVGElement | MathMLElement;
+    types: boolean | 'true' | 'removed';
+  };
+  'subtree': {
+    elements: HTMLContainerElement | SVGElement | MathMLElement;
+    types: DOMSubtreeObject;
+  };
+  'text': {
+    elements: HTMLElement;
+    types: string | number;
+  };
+  'value': {
+    elements: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+    types: number | string;
+  };
 };
 
 /**
@@ -118,6 +118,6 @@ export type SinkElementTypes = {
  * @param T The type of HTML element the sink can work on
  */
 export type ExplicitSink<T extends keyof SinkElementTypes> =
-    (source: MaybeFuture<SinkElementTypes[T]['types']>, ...data: any[]) =>
-        SinkBindingConfiguration<T extends keyof SinkElementTypes ? SinkElementTypes[T]['elements'] : Element>
+  (source: MaybeFuture<SinkElementTypes[T]['types']>, ...data: any[]) =>
+    SinkBindingConfiguration<T extends keyof SinkElementTypes ? SinkElementTypes[T]['elements'] : Element>
 ;

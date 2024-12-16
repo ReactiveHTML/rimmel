@@ -22,9 +22,10 @@ export const swap =	<E extends Event>(replacement: string | Function) =>
 ;
 
 /**
- * An Event Source that "cuts" the value of the underlying <input> element
+ * An Event Source that "cuts" the value of the underlying &lt;input&gt; element
  * and resets it to the provided value or empty otherwise
- * @param handler A handler function or observer to send events to
+ * @param replacement A new value to swap the current element's value with
+ * @param source A handler function or observer to send events to
  * @returns EventSource<string>
  */
 export const Swap =

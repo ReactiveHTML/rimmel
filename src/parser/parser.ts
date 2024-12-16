@@ -2,7 +2,7 @@ import type { AttributeObject, BindingConfiguration, RMLTemplateExpression, RMLT
 import type { Sink } from "../types/sink";
 import type { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
 
-import { isSinkBindingConfiguration } from "../types/internal";
+import { isSinkBindingConfiguration, isSourceBindingConfiguration } from "../types/internal";
 
 import { state, waitingElementHanlders } from "../internal-state";
 import { isFunction } from "../utils/is-function";
@@ -36,6 +36,29 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
 	return x ? [<RMLEventName>`${x.prefix??''}${x?.event}`, <RMLEventAttributeName>x.attr] : []
 }
 
+/**
+ * rml — the main entry point for Rimmel.js
+ *
+ * rml is a tag function. You call it by tagging it with an ES6 template literal
+ * of HTML text interleaved with references to any JavaScript entity that's in scope.
+ *
+ * By using components that use rml to return HTML strings, you have a monad you can use to compse a whole web application
+ *
+ * ## Example
+ *
+ * ```ts
+ * import { rml } from 'rimmel';
+ *
+ * const Component = () => {
+ *   const num = 5;
+ *
+ *   return rml`
+ *     <div>${number}</div>
+ *   `;
+ * };
+ * ```
+ *
+ **/
 export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateExpression[]): HTMLString {
 	let acc = '';
 	const strlen = strings.length -1;
@@ -85,21 +108,26 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			// <input type="text" onchange="${[object, 'attributeToSet']}">   will feed it the .value of the input field
 			// <input type="text" onchange="${[array,  pos]}">    will feed it the .value of the input field
 
-			const listener = isFunction(expression) ? expression
-				: isObserverSource(expression) ? ObserverSource(expression)
-				: isObjectSource(expression) ? ObjectSource(...(expression as ObjectSourceExpression<typeof expression[1]>))
-				: null // We allow it to be empty. If so, ignore, and don't connect any source. Perhaps add a warning in debug mode?
-			;
+			let listener;
+			if(isSourceBindingConfiguration(expression)) {
+				listener = expression.listener;
+				addRef(ref, <SourceBindingConfiguration<typeof eventName>>{ ...expression, eventName });
+			} else {
+				listener = isFunction(expression) ? expression
+					: isObserverSource(expression) ? ObserverSource(expression)
+					: isObjectSource(expression) ? ObjectSource(...(expression as ObjectSourceExpression<typeof expression[1]>))
+					: null // We allow it to be empty. If so, ignore, and don't connect any source. Perhaps add a warning in debug mode?
+				;
 
-			if(listener) {
-				addRef(ref, <SourceBindingConfiguration<typeof eventName>>{ type: 'source', listener, eventName });
-			} // TODO: shall we add some notifications, otherwise, rather than silently ignore?
+				if(listener) {
+					addRef(ref, <SourceBindingConfiguration<typeof eventName>>{ type: 'source', listener, eventName });
+				} // TODO: shall we add some notifications, otherwise, rather than silently ignore?
+			}
 
 			acc = accPlusString
 				//.replace(new RegExp(`\\s${eventAttributeName}=(['"]?)$`), ` _${eventAttributeName}=$1`)
 				.replace(/\s((?:rml:)?on\w+=['"]?)$/, ' _$1')
 				+(!listener || existingRef ? '' : `${ref}" ${RESOLVE_ATTRIBUTE}="${ref}`);
-			// TODO: support options such as {once: true}, {capture: true} and { passive: true }?
 		} else {
 			// Data Sink.
 			// Determine its type before connecting.
@@ -161,7 +189,9 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						// TODO: remove boolean attributes if they are bound to streams: disabled="${stream}"
 						// should not be disabled by its mere presence, but depending on the value emitted by the stream.
 
-						const prefix = isBooleanAttribute && !initialValue
+						isBooleanAttribute && console.log('>>>>>>>', initialValue, expression);
+
+						const prefix = isBooleanAttribute && (!initialValue || !expression)
 							? accPlusString.replace(new RegExp(`${attributeName}=['"]+$`), `_${attributeName}="`) // TODO: or maybe clean it up completely?
 							: accPlusString
 						;

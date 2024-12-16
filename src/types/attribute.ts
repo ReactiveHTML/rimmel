@@ -6,8 +6,8 @@ import { StyleObject } from "./style";
 import { ContentAttribute } from "./content";
 // import { ValueAttribute } from "./value";
 
-type HTMLStandardAttributes = Partial<HTMLElement>;
-type ExcludeKeys = keyof EventObject | keyof ClassAttribute | keyof DatasetObject | keyof StyleObject | keyof ContentAttribute | 'value';
+export type HTMLStandardAttributes = Partial<HTMLElement>;
+export type ExcludeKeys = keyof EventObject | keyof ClassAttribute | keyof DatasetObject | keyof StyleObject | keyof ContentAttribute | 'value';
 
 /**
  * Any generic HTML that's not a class, style, data-* or event attribute 

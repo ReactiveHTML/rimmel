@@ -14,9 +14,9 @@ import type { MaybeFuture } from "./futures";
 export type Mixin = (args?: any) => MaybeFuture<DocumentObject>;
 
 /**
- * A RML component returns template literals tagged with rml
- * @example () => rml`
+ * A RML component returns template literals tagged with `rml`
+ * @example const Component = () => rml`
  *     <div>${content}</div>
- * `
+ * `;
  */
 export type Component = (inputs?: Record<string, any>, effects?: Record<string, any>) => HTMLString;

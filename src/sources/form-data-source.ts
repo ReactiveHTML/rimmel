@@ -6,11 +6,10 @@ import { map, tap } from 'rxjs';
  * @returns OperatorFunction<Event, FormData>
  * @example <form onsubmit="${source(isValid, form, stream)}"> ... </form>
 **/
-export const form=	map((e: Event) => Object.fromEntries(new FormData(<HTMLFormElement>e.currentTarget)));
+export const form = map((e: Event) => Object.fromEntries(new FormData(<HTMLFormElement>e.currentTarget)));
 
 /**
  * An Event Adapter emitting a FormData object from the underlying form element instead of a regular DOM Event object
- * @param handler A handler function or observer to send events to
  * @returns EventSource<string>
  * @example <form action="dialog" onsubmit="${Form(stream)}"> ... </form>
  * @example <form action="dialog" onsubmit="${Form(handlerFn)}"> ... </form>

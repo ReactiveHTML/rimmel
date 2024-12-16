@@ -47,6 +47,8 @@ export const isObserver = (x: any): x is Observer<any> =>
 /**
  * An in-out stream, also known as an Observable Subject
  * that's both an Observable and an Observer
+ * @template I the input type
+ * @template O the output type
  */
 export type Stream<I, O=I> = Observer<I> & Observable<O>;
 // export interface Stream<I, O=I> extends Observable<I>, Observer<O> {};
@@ -70,6 +72,9 @@ export type MaybeSubject<T> = Partial<Subject<T>>;
 export type MaybeBehaviorSubject<T> = Partial<BehaviorSubject<T>>;
 export type MaybeTransformer<I, O> = Partial<Transformer<I, O>>;
 
+/**
+ * Any type that's not a Future (e.g.: not a Promise, not an Observable)
+ **/
 export type Present<T> = T;
 export type Future<T> = Promise<T> | Observable<T>;
 export type MaybeFuture<T> = Present<T> | Future<T>;

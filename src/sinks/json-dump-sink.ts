@@ -11,7 +11,7 @@ export const JSONDumpSink: Sink<Element> = (node: Element) =>
 ;
 
 /**
- * A specialised sink print source data as JSON strings
+ * A specialised sink to print source data as JSON strings
  * @param source A present or future JavaScript Object
  * @returns RMLTemplateExpression An HTML-subtree RML template expression
  * @example <div>${JSONDump(objectStream)}</div>

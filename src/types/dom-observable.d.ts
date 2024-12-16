@@ -6,15 +6,15 @@ interface Observable<T> {
 
 declare global {
   interface Document {
-    when<T extends Event>(event: keyof RMLEventMap): Observable<T>;
+    when<T extends Event>(event: keyof RMLEventMap, options?: ObservableEventListenerOptions): Observable<T>;
   }
 
   interface Element {
-    when<T extends Event>(event: keyof RMLEventMap): Observable<T>;
+    when<T extends Event>(event: keyof RMLEventMap, options?: ObservableEventListenerOptions): Observable<T>;
   }
 
   interface Window {
-    when<T extends Event>(event: keyof RMLEventMap): Observable<T>;
+    when<T extends Event>(event: keyof RMLEventMap, options?: ObservableEventListenerOptions): Observable<T>;
   }
 
 }

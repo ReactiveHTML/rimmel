@@ -115,11 +115,11 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 				if(USE_DOM_OBSERVABLES && node.when) {
 					const l = sourceBindingConfiguration.listener;
 					if(!isEventListenerObject(l)) {
-						const source = node.when(eventName)
+						const source = node.when(eventName, sourceBindingConfiguration.options)
 						source.subscribe(l);
 					}
 				} else {
-					 node.addEventListener(eventName, sourceBindingConfiguration.listener);
+					 node.addEventListener(eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options);
 				}
 			} else {
 				const isNonBubblingEvent = NON_BUBBLING_DOM_EVENTS.has(eventName);

@@ -9,28 +9,46 @@ import { isObserverSource } from "../sources/observer-source";
 import { Sink } from "./sink";
 import type { CSSClassName, CSSObject, CSSValue } from "./style";
 
-type ErrorHandler = (e: Error) => void;
+export type ErrorHandler = (e: Error) => void;
 /**
  * Data binding configuration for event sources or data sinks
- * Used to describe a binding between a source and a sink when mounting a template
+ *
+ * @remarks Used to describe a binding between a source and a sink when mounting a template
+ * effectively telling Rimmel where to bind what on mount
  */
 export interface BindingConfiguration {
 	type: 'source' | 'sink';
 }
 
 /**
- * Binding configuration for an event source
+ * This tells Rimmel how to bind an EventTarget to an event handler.
+ *
+ * Objects of this type are normally returned by Source functions
  */
 export interface SourceBindingConfiguration<T extends RMLEventName> {
 	type: 'source';
 	listener: EventListenerOrEventListenerObject<EventType<T>>;
+	options?: AddEventListenerOptions;
 	eventName: RMLEventName;
 	// error?: EventListener;
 	// termination?: EventListener;
 }
 
 /**
- * Binding configuration for an event source
+ * This tells Rimmel how to sink a Promise or an Observable to the DOM.
+ * Objects of this type are normally returned by Sink functions, or chosen
+ * automatically by the Rimmel parser based on the context
+ * ## Examples
+ *
+ * ### Set the value of a textbox from a Promise
+ *
+ * Here when the Promise resolves, the value of the text box will be set
+ *
+ * ```ts
+ * const p = new Promise(resolve => setTimeout(() =>resolve('hello'), 2000));
+ * const template = rml`
+ *   <input value="${p}">
+ * `;
  */
 export interface SinkBindingConfiguration<E extends Element> extends BindingConfiguration {
 	type: 'sink';
@@ -95,6 +113,9 @@ export namespace RMLTemplateExpressions {
 	 */
 	export type ClassObject = MaybeFuture<Record<CSSClassName, boolean>>;
 
+	/**
+	 * A simple HTML string or a Future resolving to it
+	 */
 	export type HTMLText = MaybeFuture<HTMLString>;
 	export type TextString = MaybeFuture<string | number>;
 	export type StringLike = MaybeFuture<string | number | Array<string | number>>;
@@ -115,16 +136,9 @@ export namespace RMLTemplateExpressions {
 	export type SinkExpression = Sink<Element | Text>;
 	// export type Empty = MaybeFuture<undefined | null | ''>;
 
-
-	export type _TargetEventHandler<T> =
-		| Partial<Observer<T>>
-		// | MonoTypeOperatorFunction<T>
-		| ((data: T) => void)
-	;
-
 	export type TargetEventHandler<T> =
-		| _TargetEventHandler<T>
-		| Observable<T> // FIXME: This is incorrect. Should only be Observer or a plain function. Only added to support Subject and BehaviorSubject in rx
+		| ((data: T) => void)
+		| Observer<T>
 	;
 
 	/**
@@ -170,6 +184,8 @@ export type RMLTemplateExpression =
 
 /**
  * A RML template expression
+ *
+ * This includes anything that can be passed in RML templates
  */
 export type Handler<E extends Element, T extends RMLEventName=any> =
 	| undefined
@@ -187,3 +203,14 @@ export type Handler<E extends Element, T extends RMLEventName=any> =
 	| Observer<unknown>
 	| BindingConfiguration
 ;
+
+export type Inputs = Record<string, RMLTemplateExpression>;
+export type Effects = Record<string, any>;
+/**
+ * A Rimmel Component
+ *
+ * A plain function that takes an object of named input parameters and returns an HTML string
+ * @param inputs also referred to as "Props" in other frameworks, a simple object containing all parameters of the Component. Those can be static values, Promises, Observables, Event Handlers, literally anything the Component wants to use
+ **/
+export type RimmelComponent = (inputs: Inputs) => HTMLString;
+

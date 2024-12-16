@@ -9,7 +9,7 @@ import { MaybeFuture } from "./futures";
 import { RMLTemplateExpressions } from "./internal";
 import { BOOLEAN_ATTRIBUTES, BooleanAttribute } from "../definitions/boolean-attributes";
 
-type RemovePrefix<TPrefix extends string, TString extends string> = TString extends `${TPrefix}${infer T}` ? T : TString extends `rml:${TPrefix}${infer T}` ? `rml:${T}` : never;
+export type RemovePrefix<TPrefix extends string, TString extends string> = TString extends `${TPrefix}${infer T}` ? T : TString extends `rml:${TPrefix}${infer T}` ? `rml:${T}` : never;
 
 
 /**
@@ -38,7 +38,7 @@ export type RMLEventName = RemovePrefix<'on', RMLEventAttributeName>;
 /**
  * An element lifecycle event, such as mount, onmount, etc
  */
-export interface LifecycleEvent extends Event {
+export interface LifecycleEvent extends CustomEvent {
 };
 
 /**
@@ -58,6 +58,7 @@ export type EventType<N extends string> = N extends keyof RMLEventMap ? RMLEvent
 
 /**
  * A string representing HTML code
+ * @example const str = '<div>Hello</div>' as HTMLString;
  */
 export type HTMLString = string & { _HTMLStringBrand: never };
 // export interface JSONArray extends Array<JSON> {};
@@ -86,13 +87,17 @@ export const isNumericFieldElement = (e: Element): e is HTMLNumericFieldElement 
 
 // TODO use EventListenerOrEventListenerObject (or not, because it's not a generic in the DOM, but we want it to be?)
 export type EventListenerFunction<E extends Event = Event> = (event: E, handledTarget?: EventTarget | null) => void;
-export interface EventListenerObject<E extends Event> {
+export interface EventListenerObject<E extends Event | any> {
     handleEvent(e: E): void;
 };
 
 export type EventListener<E extends Event> = EventListenerFunction<E> | EventListenerObject<E>;
 export type EventListenerOrEventListenerObject<E extends Event> = EventListener<E>;
 
+// /**
+//  * A generic equivalent of the DOM's EventListenerOrEventListenerObject
+//  */
+// export type EventListenerOrEventListenerObject<T = Event> = ((evt: T) => void) | { handleEvent: (evt: T) => void };
 
 export type BooleanAttributeValue<T extends BooleanAttribute> = MaybeFuture<boolean | T | 'true'>;
 
@@ -102,16 +107,16 @@ type DisabledType = 'disabled';
 // export type DocumentObject<E extends HTMLElement> = EventObject & ClassAttribute & DatasetObject & StyleObject & ValueAttribute<E> & ContentAttribute & GenericAttribute;
 
 /**
- * An object that represents changes to apply to existing elements
+ * A Document Object, or DOM Object that represents changes to apply to existing elements
  * 
- * properties of this object will be applied to the element
- * properties starting with on will be treated as event listeners
- * properties starting with data- will be treated as data attributes
- * the style property will be used to set the element's style
- * the class property will be used to set or clear class names
- * the value property will be treated as value
- * innerHTML, innerText, textContent and appendHTML properties will trigger corresponding functionality
-* all other properties will be treated as generic attributes 
+ * - properties of this object will be applied to the element
+ * - properties starting with on will be treated as event listeners
+ * - properties starting with data- will be treated as data attributes
+ * - the style property will be used to set the element's style
+ * - the class property will be used to set or clear class names
+ * - the value property will be treated as value
+ * - innerHTML, innerText, textContent and appendHTML properties will trigger corresponding functionality
+ * - all other properties will be treated as generic attributes 
  */
 export interface BaseDocumentObject {
     class?: ClassAttribute;
@@ -130,8 +135,12 @@ export interface BaseDocumentObject {
     value?: string | MaybeFuture<string>;
 };
 
-type BooleanAttributesMap = {
+export type BooleanAttributesMap = {
     [K in BooleanAttribute]: RMLTemplateExpressions.BooleanAttributeValue<K>;
 };
 
+/**
+ * Attribuend, or DOM Object, or Document Object
+ * A simple record of valid DOM attributes including class or style, plus event handlers or anything that can be set as an attribute of an element
+ **/
 export type DocumentObject = BaseDocumentObject & EventObject & BooleanAttributesMap & GenericAttribute;

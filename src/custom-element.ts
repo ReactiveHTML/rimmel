@@ -1,7 +1,9 @@
+import type { HTMLString } from "./types/dom";
+import type { Inputs, RimmelComponent } from './types/internal';
+import type { SourceBindingConfiguration } from "./types/internal";
+
 import { RESOLVE_SELECTOR } from "./constants";
-import { SourceBindingConfiguration } from "./types/internal";
 import { Rimmel_Bind_Subtree, Rimmel_Mount } from "./lifecycle/data-binding";
-import { HTMLString } from "./types/dom";
 import { subscribe } from "./lib/drain";
 import { waitingElementHanlders } from "./internal-state";
 
@@ -15,9 +17,6 @@ export type CustomElementDefinition = {
 	attributeChangedCallback?: (this: HTMLElement, name: string, oldValue: string, newValue: string) => void;
 }
 
-export type Inputs = Record<string, any>;
-export type Effects = Record<string, any>;
-export type RimmelComponent = (inputs: Inputs, effects?: Effects) => HTMLString;
 interface RMLNamedNodeMap extends NamedNodeMap {
 	resolve: Attr;
 }
@@ -34,9 +33,6 @@ const SubjectProxy = (defaults: Record<string | symbol, any> = {}) => {
 class RimmelElement extends HTMLElement {
 	component: RimmelComponent;
 	attrs: Inputs;
-	// #inputs: Inputs;
-	// #effects?: Effects;
-	// #events?: Effects;
 	#externalMutationObserver?: MutationObserver;
 	#internalMutationObserver?: MutationObserver;
 
@@ -102,6 +98,24 @@ class RimmelElement extends HTMLElement {
 	}
 };
 
+/**
+ * Register a Rimmel Component as a Custom Element in the DOM
+ *
+ * ## Examples
+ *
+ * ### Create a simple "Hello, World" web component
+ *
+ * ```ts
+ * import { rml, RegisterElement } from 'rimmel';
+ *
+ * RegisterElement('custom-element', () => {
+ *   return rml`
+ *     <h1>Hello, world</h1>
+ *   `;
+ * }
+ * ```
+ *
+ **/
 export const RegisterElement = (tagName: string, component: RimmelComponent) => {
 	// FIXME: prevent redefinition...
 	// TODO: UnregisterElement?

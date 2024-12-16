@@ -14,9 +14,9 @@ export const isObjectSource =
     Array.isArray(expression) && expression.length == 2;
 
 /**
- * A data source that updates an object's property from an <input> element when 
+ * A data source that updates an object's property from an &lt;input&gt; element when 
  * a certain event occurs
- * @param expression an [object, 'property'] or [array, index] pair to update
+ * @param key an ['property', object] or [index, array] pair to update
  * @returns A data source
  * @example <input oninput="${[obj, 'property']}">
  * @example <input oninput="${ObjectSource('property', obj)}">
@@ -38,7 +38,7 @@ export const ObjectSource =
 ;
 
 /**
- * A data source that updates an object's property from an <input> element when
+ * A data source that updates an object's property from an &lt;input&gt; element when
  * a certain event occurs
  * @param property A property to update in the given object
  * @param object The object to update

@@ -20,13 +20,26 @@ export const setRoot = (e: Element): RML => {
 init();
 
 // Types
-export * from './types/sink';
-export * from './types/internal';
-export * from './types/futures';
+export * from './types/attribute';
+export * from './types/coords';
 export * from './types/dom';
+export * from './types/event-listener';
+export * from './types/futures';
+export * from './types/internal';
+export * from './types/rml';
+export * from './types/sink';
+export * from './types/source';
+export * from './types/style';
+export * from './definitions/boolean-attributes';
+export * from './utils/input-pipe';
+export * from './sources/object-source';
 
 // Event Mapping Functions
 export { feed, feedIn, inputPipe, pipeIn } from './utils/input-pipe';
+
+// Event Source Modifiers
+export { Active } from './sources/modifiers/active';
+export { Passive } from './sources/modifiers/passive';
 
 // Event Sources
 export { All, qs } from './sources/all-source';
@@ -37,7 +50,7 @@ export { Numberset } from './sources/numberset-source';
 export { EventData, eventData } from './sources/event-data';
 export { EventTarget } from './sources/event-target';
 export { Form, form } from './sources/form-data-source';
-export { Key } from './sources/keyboard-source';
+export { Key, key } from './sources/keyboard-source';
 export { Update } from './sources/object-source';
 export { ClientXY } from './sources/client-xy-source';
 export { OffsetXY } from './sources/offset-xy-source';
@@ -59,6 +72,7 @@ export { Catch } from './sinks/error-sink';
 export { Focus } from './sinks/focus-sink';
 export { InnerHTML } from './sinks/inner-html-sink';
 export { InnerText } from './sinks/inner-text-sink';
+export { Mixin } from './sinks/mixin-sink';
 export { JSONDump } from './sinks/json-dump-sink';
 export { PrependHTML } from './sinks/prepend-html-sink';
 //export { Readonly } from './sinks/readonly-sink';
@@ -71,8 +85,8 @@ export { TextContent } from './sinks/text-content-sink';
 export { RegisterElement } from './custom-element';
 
 // Utilities (Will take them out to the framework)
-export type { Component, Mixin } from './types/constructs';
-export type { RMLTemplateExpressions } from './types/internal';
+export type { Component } from './types/constructs';
+export type { RimmelComponent, RMLTemplateExpressions } from './types/internal';
 
 export { source, sink } from './utils/input-pipe';
 

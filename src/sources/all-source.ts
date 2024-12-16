@@ -6,11 +6,11 @@ import { pipeIn } from '../utils/input-pipe';
 
 /**
  * An Event Source emitting the "[event.clientX, event.clientY]" mouse coordinates
- * @param handler A handler function or observer to send events to
- * @returns EventSource<string>
+ * @param qs A query selector to select nodes from the underlying element's subtree
+ * @param target A handler function or observer to send events to
  */
 export const All =
-	<T>(qs: CSSSelector | CSSSelector[], target: RMLTemplateExpressions._TargetEventHandler<Element[]>) =>
+	<T>(qs: CSSSelector | CSSSelector[], target: RMLTemplateExpressions.TargetEventHandler<Element[]>) =>
 		pipeIn<Event, Element[]>(target,
 			map((e: Event) => {
 				const t = <Element>e.currentTarget;

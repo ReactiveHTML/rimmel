@@ -1,9 +1,24 @@
 import type { SinkFunction } from "../types/sink";
-import type { EventListenerOrEventListenerObject } from "../types/dom";
-import type { MaybeFuture, Observable, Present } from "../types/futures";
+import type { EventListenerObject, EventListenerOrEventListenerObject } from "../types/dom";
+import type { MaybeFuture, Observable, Observer, Present } from "../types/futures";
 
 import { isObservable, isPromise } from "../types/futures";
 import { subscriptions } from "../internal-state";
+
+/**
+ * Return the "callable" part of an entity:
+ * - the next method of an Observer
+ * - the handleEvent method of an EventListenerObject
+ * - the function itself, if it's a function
+ */
+export const callable = <T>(x: (Observer<T> | EventListenerObject<T> | ((t: T)=>any))) =>
+  (x as Observer<T>).next ?
+    (x as Observer<T>).next.bind(x) :
+  (x as EventListenerObject<T>).handleEvent ?
+    (x as EventListenerObject<T>).handleEvent.bind(x) :
+  (x as (t: T)=>any)
+;
+
 
 // FIXME: remove, use subscribe below instead
 export const asap = (fn: SinkFunction, arg: MaybeFuture<unknown>) => {

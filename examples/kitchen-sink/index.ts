@@ -24,6 +24,7 @@ import {
   inputPipe,
   pipeIn,
 
+  Active,
   AppendHTML,
   cut,
   Cut,
@@ -39,6 +40,7 @@ import {
   Key,
   Numberset,
   OffsetXY,
+  Passive,
   Removed,
   Sanitize,
   sink,
@@ -199,6 +201,41 @@ const sources = {
 			data.prop1 = <span>${stream}</span>
 		`;
 	},
+
+	ActiveListener: () => {
+		const stream = new Subject<string>().pipe(
+			tap((e: Event) => {
+				e.preventDefault()
+			}),
+			map((e: TouchEvent) => {
+				return `Cancelled event: ${e}`
+			}),
+		);
+
+		return rml`
+			This image should not be draggable, as the ontouchstart handler should be registered active, not passive.<br>
+			<img draggable="true" ontouchstart="${Active(stream)}" onmousedown="${Active(stream)}" style="width: 5cm; height: 5cm; background: purple;" alt="image">
+			<div>${stream}</div>
+		`;
+	},
+
+	PassiveListener: () => {
+		const stream = new Subject<string>().pipe(
+			tap((e: Event) => {
+				e.preventDefault()
+			}),
+			map((e: TouchEvent) => {
+				return `Cancelled event: ${e}`
+			}),
+		);
+
+		return rml`
+			This image should indeed be draggable, as the ontouchstart handler should be registered passive now.<br>
+			<img draggable="true" ontouchstart="${Passive(stream)}" onmousedown="${Passive(stream)}" style="width: 5cm; height: 5cm; background: purple;" alt="image">
+			<div>${stream}</div>
+		`;
+	},
+
 
 	ValueSource: () => {
 		const stream = new Subject<string>();

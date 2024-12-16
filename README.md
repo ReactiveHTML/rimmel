@@ -4,9 +4,9 @@
 [![npm](https://img.shields.io/npm/v/rimmel.svg)](https://www.npmjs.com/package/rimmel)
 
 With Rimmel you can create webapps that are:
-1. **Outperforming** equivalent webapps built with popular "Virtual DOM" or "Change-Detection" based frameworks (e.g.: React, Vue, Angular)
-2. 50-90% **Lighter** than equivalent applications written with many other imperative frameworks (e.g.: Vue, SOLID, Angular, React, Svelte)
-3. More **Eeasily Testable** compared to most imperative frameworks (e.g.: Svelte, React, Vue, SOLID )
+1. **Outperforming** equivalent webapps built with popular "Virtual DOM" or "Change-Detection" based frameworks
+2. 50-90% **Lighter** than equivalent applications written with many other imperative frameworks
+3. More **Eeasily Testable** compared to most imperative JS frameworks
 
 Really? Yes, here's why:
 1. It bypasses heavy and overcomplicated tree-traversal overhead by only using reactive primitives that can make direct DOM manipulation
@@ -27,9 +27,9 @@ To put it simply, DOM events are Observables, the rest (innerHTML, class names, 
 ```
 
 
-No need for JSX, Virtual DOM, Babel, HyperScript, Webpack, React.<br>
-No need to "set up" or "tear down" observables in your components, so you can keep them pure.<br>
-No need to subscribe, unsubscribe or dispose of observers or perform any manual memory cleanup.
+No need for JSX, Virtual DOM, Babel, HyperScript, Webpack<br>
+No need to "set up" or "tear down" observables in your components, so you can keep them pure<br>
+No need to subscribe, unsubscribe or dispose of observers or perform any manual memory cleanup
 
 <br>
 
@@ -128,20 +128,7 @@ document.body.innerHTML = rml`
   </main>
 ```
 
-## The little gotcha!
-Never forget to tag your templates with `rml`, otherwise they won't be reactive.
-This is a standard piece of HTML string: 
-```ts
-const str = `<div>hello</div>`
-```
-
-And this is a reactive template managed by Rimmel:
-```ts
-const str = rml`<div>hello</div>`
-```
-
-
-## Forward Refs? An unnecessary evil
+## Forward Refs are a step backward
 Forward refs are a construct used in Imperative-Reactive UI libraries to enable referencing and later modifying DOM elements that don't exist yet (you're writing components that to act on DOM elements that will only exist after they are mounted).
 
 The simple, yet effective functional paradigm used by Rimmel enables you to define any change to a DOM element as a Promise or Observable stream. The mounting and data binding is completely managed by Rimmel. This means when they resolve or emit, the elements will already be there to receive them, effectively making the use of Forward Refs redundant.
@@ -155,9 +142,7 @@ This is a perfect case for reactive grids, spreadsheets, SVG or Canvas drawings,
 
 To display and manage the UI for any dynamic list where you plan to support CRUD operations, perhaps drag'n'drop, you may consider using a `Collection` from [ObservableTypes](https://github.com/reactivehtml/observable-types), which is a rendering-aware extension of `Array`, every method of which is mapped to an optimised UI rendering command, and it also exposes the `Observable` and `Observer` interfaces for seamless reactivity and integration with Rimmel and RxJS.
 
-
 <br>
-
 
 ## 👋 Hello World👋 ++
 Want a more involved example?<br>
@@ -315,7 +300,6 @@ Adapter Operators are simple RxJS operators that make it possible to create whol
 If you know how to use the <a href="https://rxjs.dev/api/index/function/pipe">`pipe()`</a> function from RxJS, then you almost know how to use `source(...operators, target)` from Rimmel.
 It works like `pipe()`, except it applies the same operators to data coming in, rather than going out of an Observable stream: `source(...operators, targetObserver)`
 
-
 ```js
 import { rml, source } from 'rimmel';
 
@@ -346,9 +330,10 @@ The `DatasetValue` Event Adapter translates raw DOM events into the plain number
 Finally, we're leveraging the DOM's standard Event Delegation by only adding one listener to the container, rather than to each button. We're making sure only button clicks are captured by using the `ButtonClick` filter
 
 
-### Conventions to distinguish Event Adapters from Adapter Operators
-The main difference between Event Adapters and Adapter Operators is that the former are designed for simplicity and convenience. Their name begins with an uppercase letter.
-Adapter Operators follow the practice of other RxJS operators, their name is camelcased and can be composed together just like other RxJS operators.
+### Event Adapter Functions vs Event Adapter Operators
+The main difference between Event Adapters and Event Adapter Operators is that the former are designed for simplicity and convenience. Their name begins with an uppercase letter.
+
+Adapter Operators, on the other hand, are simple, plain-old RxJS operators. Their name is camelcased and can be composed together just like other RxJS operators.
 
 Rimmel often exports both. For instance, the `Cut` Adapter, or the `cut` Operator clear the value of a text input before emitting its value. They are convenient ways to let users repeatedly enter information and clean up a text field for the next input.
 
@@ -654,6 +639,18 @@ const WaitingComponent = () => {
 <a href="https://stackblitz.com/edit/rimmel-suspense"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://stackblitz.com/edit/rimmel-suspense">Suspense</a> on Stackblitz.
 
 
+## The little gotcha!
+Never forget to tag your templates with `rml`, otherwise they won't be reactive.
+This is a standard piece of HTML string: 
+```ts
+const str = `<div>hello</div>`
+```
+
+And this is a reactive template managed by Rimmel:
+```ts
+const str = rml`<div>hello</div>`
+```
+
 ## Migrating from/to other frameworks
 It might sound unusual, but Rimmel can actually coexist with other frameworks.
 Your Rimmel component can be embedded in a React component and have children made in Vue, or even jQuery plugins or sit inside a larger jQuery application, or any other way around.
@@ -661,9 +658,9 @@ Your Rimmel component can be embedded in a React component and have children mad
 If you are planning a progressive framework migration, you can do it one component at a time.
 
 ## Use with AI assistants/LLMs
-We are creating a few experimental AI assistants like [RimmelGPT.js](https://chat.openai.com/g/g-L01pb60It-rimmelgpt-js), to help you convert existing components, create new ones or just get started and have fun. 
+We have created a few experimental AI assistants like [RimmelGPT.js](https://chat.openai.com/g/g-L01pb60It-rimmelgpt-js), to help you convert existing components, create new ones or just get started and have fun. 
 
-(Please note these are still highly experimental and various forms of hallucination can happen under different circumstances — YMMV)
+(Please note these are still highly experimental and various forms of severe hallucination can happen under different circumstances — YMMV)
 
 <br>
 
@@ -691,7 +688,7 @@ Remember, this is complex by nature and without RxJS it would be much worse!
 [![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
 
 # Get in touch!
-Rimmel is a young project built with ardent passion, meticulous attention to detail and a bold vision: building a web ecosystem that "just works", using the functional-reactive paradigm.
+Rimmel is a young project built with meticulous attention to detail and a bold vision: building a web ecosystem that "just works", using the functional-reactive paradigm.
 
 Share the passion? Would like to help? That'd be hugely appreciated!<br>
 Come say Hi, there's a lot of work to do. The Roadmap is below.

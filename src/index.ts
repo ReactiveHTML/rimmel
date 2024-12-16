@@ -101,4 +101,5 @@ export { rml as html } from './parser/parser'; // Shall we?
 
 // Experimental stuff
 // export { rml } from 'rml/scandal';
+export { Observature } from 'lib/observature';
 

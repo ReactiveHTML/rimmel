@@ -17,7 +17,7 @@ import { sinkByAttributeName } from '../parser/sink-map';
 import { DOMAttributePreSink, FixedAttributePreSink, WritableElementAttribute } from "../sinks/attribute-sink";
 import { Mixin } from "../sinks/mixin-sink";
 import { ObjectSource, ObjectSourceExpression, isObjectSource } from "../sources/object-source";
-import { ObserverSource, isObserverSource } from "../sources/observer-source";
+import { ObserverSource, isObserverSource, ObservatureSource, isObservatureSource } from "../sources/observer-source";
 
 import { isPromise } from '../types/futures';
 
@@ -113,8 +113,10 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 				listener = expression.listener;
 				addRef(ref, <SourceBindingConfiguration<typeof eventName>>{ ...expression, eventName });
 			} else {
-				listener = isFunction(expression) ? expression
+				listener =
+					isObservatureSource(expression) ? ObservatureSource(expression)
 					: isObserverSource(expression) ? ObserverSource(expression)
+					: isFunction(expression) ? expression
 					: isObjectSource(expression) ? ObjectSource(...(expression as ObjectSourceExpression<typeof expression[1]>))
 					: null // We allow it to be empty. If so, ignore, and don't connect any source. Perhaps add a warning in debug mode?
 				;

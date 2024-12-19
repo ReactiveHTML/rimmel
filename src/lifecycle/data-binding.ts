@@ -1,4 +1,5 @@
-import type * as ObservableDOM from "../types/dom-observable";
+import type { EventListenerFunction } from "../types/dom";
+import type { MonkeyPatchedObservable }	from '../types/monkey-patched-observable';
 import type { RMLEventName } from "../types/dom";
 import type { SourceBindingConfiguration } from "../types/internal";
 
@@ -11,6 +12,7 @@ import { isSinkBindingConfiguration } from "../types/internal";
 import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
 import { tracing } from "../debug";
+import { IObservature, isObservature } from "../lib/observature";
 
 const AUTOREMOVE_LISTENERS_DELAY = 100; // Cleanup event listeners after this much time
 const elementNodes = (n: Node): n is Element => n.nodeType == 1;
@@ -19,7 +21,9 @@ const elementNodes = (n: Node): n is Element => n.nodeType == 1;
 
 const errorHandler = console.error;
 
-const isEventListenerObject = (l: EventListenerOrEventListenerObject): l is EventListenerObject => typeof l == 'object' && 'handleEvent' in l
+const isEventListenerObject = (l: any): l is EventListenerObject =>
+	typeof l == 'object' && 'handleEvent' in l
+;
 
 export const Rimmel_Bind_Subtree = (node: Element): void => {
 	// Data-to-be-bound text nodes in an element (<div>${thing1} ${thing2}</div>);
@@ -113,11 +117,11 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 				// We add an event listener for all those events who don't bubble by default (as we're delegating them to the top)
 				// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
 				if(USE_DOM_OBSERVABLES && node.when) {
-					const l = sourceBindingConfiguration.listener;
+					const l = <EventListenerFunction | IObservature<Event>>sourceBindingConfiguration.listener;
 					if(!isEventListenerObject(l)) {
-						const source = node.when(eventName, sourceBindingConfiguration.options);
-						if(l.Observature || l?[Symbol.for('observature')]) {
-							l.addSource(source);
+						const source = node.when(eventName, <ObservableEventListenerOptions | undefined>sourceBindingConfiguration.options);
+						if(isObservature(l)) {
+							(<IObservature<Event>>l).addSource(source as MonkeyPatchedObservable<Event>);
 						} else {
 							source.subscribe(l);
 						}

@@ -1,6 +1,8 @@
 // import type { BehaviorSubject, Observable, Observer, Subject, Subscription } from 'rxjs';
 // export type { BehaviorSubject, Observable, Observer, OperatorFunction, Subject, Subscription } from 'rxjs';
 
+import { SymbolObservature } from "../constants";
+
 export type Subject<T> = {
     subscribe: (observer: ObserverFunction<T>) => Subscription;
     pipe: (value: T) => void;
@@ -26,9 +28,9 @@ export interface Observer<I> {
     complete?: ObserverCompleteFunction;
 };
 
-export interface Observature {
-    [Symbol.for('observature')]: any,
-	addSource: <T>(source: Observable<T>) => void,
+export interface Observature<I, O=I> {
+    [SymbolObservature]: any,
+	addSource: <I>(source: Observable<I>) => void,
 }
 
 export type Subscription = {

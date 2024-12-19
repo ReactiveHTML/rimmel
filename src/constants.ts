@@ -33,3 +33,4 @@ export const set_DELEGATE_EVENTS = ((x: boolean) =>  DELEGATE_EVENTS = x);
 export var USE_DOM_OBSERVABLES: boolean = false;
 export const set_USE_DOM_OBSERVABLES = ((x: boolean) =>  USE_DOM_OBSERVABLES = x);
 
+export const SymbolObservature = Symbol.for('observature');

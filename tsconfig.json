@@ -1,14 +1,31 @@
 {
-  "extends": "./tsconfig.base",
   "compilerOptions": {
-    "target": "esnext",
-    "lib": ["dom", "dom.iterable", "esnext", "ESNext"],
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist/types",
     "declaration": true,
-    "declarationDir": "./dist/types",
-    "noEmit": true,
-    "noEmitHelpers": true,
+    "declarationMap": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
     "importHelpers": false,
-    "strict": true
+    "lib": [ "DOM", "DOM.Iterable", "DOM.AsyncIterable", "ESNext" ],
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "noEmitHelpers": true,
+    "noEmit": true,
+    "noImplicitThis": false,
+    "paths": {
+      "rimmel": ["./src/index"]
+    },
+    "removeComments": false,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "ESNext"
   },
-  "include": ["rollup.config.ts", "src/types/**/*.d.ts"]
+  "files": ["src/index.ts"],
+  "include": ["rollup.config.ts", "src/types/**/*.d.ts"],
+  "exclude": ["node_modules", "@types", "dist", "build"]
 }

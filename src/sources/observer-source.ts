@@ -2,8 +2,13 @@ import type { Observature, Observer } from "../types/futures";
 import type { RMLTemplateExpression } from "../types/internal";
 import { isFunction } from "../utils/is-function";
 
+import { SymbolObservature } from "../constants";
+
 export interface ObserverSourceHandler {
     next: (value: unknown) => void;
+};
+
+export interface ObservatureSourceHandler extends ObserverSourceHandler {
 };
 
 /**
@@ -23,9 +28,9 @@ export const isObserverSource = (expression: RMLTemplateExpression): expression 
 export const ObserverSource = (handler: ObserverSourceHandler) => handler.next.bind(handler);
 // TODO: we used to just chain handler.next?.bind(handler) ?? .... rather than these type guards. Can we still, somehow?
 
-
 export const isObservatureSource = (expression: RMLTemplateExpression): expression is ObservatureSourceHandler =>
-    expression?.Observature || (<Observature<unknown>>expression)[Symbol.for('observature')]
+    /* @ts-ignore */
+    expression?.Observature || (<Observature<any>>expression)[SymbolObservature]
 ;
 
 export const ObservatureSource = (handler: ObservatureSourceHandler) => handler;

@@ -1,6 +1,5 @@
-import { RollupOptions, OutputOptions } from 'rollup';
+import { RollupOptions } from 'rollup';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
@@ -10,6 +9,13 @@ const terserOptions = {
 	compress: {
 		drop_debugger: false,
 	},
+};
+
+const getTSConfig = async (path: string) => {
+	const tsConfig = (await import('./tsconfig.json', { assert: { type: 'json' } })).default;
+
+	tsConfig.compilerOptions.outDir = path;
+	return tsConfig.compilerOptions;
 };
 
 export default <RollupOptions[]>[
@@ -23,10 +29,8 @@ export default <RollupOptions[]>[
 			nodeResolve({ preferBuiltins: true }),
 			// json(),
 			typescript({
-				tsconfig: './tsconfig.build.json',
+				...await getTSConfig('dist/globaljs'),
 				sourceMap: true,
-				inlineSources: true,
-				// declarationDir: './dist/types',
 				outDir: 'dist/globaljs',
 				declaration: false,
 			}),
@@ -41,15 +45,15 @@ export default <RollupOptions[]>[
 			freeze: true,
 			generatedCode: 'es2015',
 			format: 'iife',
-			name: 'rml',    // The name of your global variable
+			name: 'rml',
 			globals: {
-				'rxjs': 'rxjs',  // Assuming rxjs is an external dependency
+				'rxjs': 'rxjs',
 			},
 			sourcemap: true,
 		}],
 	},
 
-	{
+	{	// ESM
 		external: ['rxjs'],
 		input: './src/index.ts',
 		treeshake: {
@@ -57,15 +61,9 @@ export default <RollupOptions[]>[
 		},
 		plugins: [
 			nodeResolve({ preferBuiltins: true }),
-			commonjs(),
 			json(),
 			typescript({
-				tsconfig: './tsconfig.build.json',
-				sourceMap: true,
-				inlineSources: true,
-				outDir: './dist/esm/modules',
-				declarationDir: './dist/esm/types',
-				declarationMap: true,
+				...await getTSConfig('dist/esm'),
 			}),
 			terser(terserOptions),
 			visualizer({ filename: 'bundle-stats-esm.html' }),
@@ -76,7 +74,7 @@ export default <RollupOptions[]>[
 				externalLiveBindings: false,
 				freeze: false,
 				sourcemap: true,
-				entryFileNames: '[name].mjs',
+				entryFileNames: '[name].js',
 				format: 'es',
 				dir: './dist/esm',
 				preserveModules: true,
@@ -84,7 +82,7 @@ export default <RollupOptions[]>[
 		],
 	},
 
-	{
+	{	// SSR
 		external: ['rxjs'],
 		input: './src/ssr/index.ts',
 		treeshake: {
@@ -93,38 +91,24 @@ export default <RollupOptions[]>[
 		},
 		plugins: [
 			nodeResolve({ preferBuiltins: true }),
-			commonjs(),
 			json(),
 			typescript({
-				tsconfig: './tsconfig.build.json',
+				...await getTSConfig('dist/ssr'),
 				sourceMap: true,
-				inlineSources: true,
-				outDir: './dist/ssr',
-				declarationDir: './dist/ssr/types',
-				declarationMap: true,
+				outDir: 'dist/ssr',
+				declaration: true,
 			}),
 			terser(terserOptions),
 			visualizer({ filename: 'bundle-stats-ssr.html' }),
 		],
 		output: [
-			{	// CJS SSR
+			{
+				exports: 'named',
+				externalLiveBindings: false,
 				dir: './dist/ssr',
 				entryFileNames: '[name].mjs',
-				exports: 'named',
-				externalLiveBindings: false,
-				format: 'cjs',
-				freeze: false,
-				// generatedCode: 'es6',
-				// interop: 'default',
-				sourcemap: true,
-			},
-			{	// ESM SSR
-				exports: 'named',
-				externalLiveBindings: false,
-				freeze: false,
-				dir: './dist/ssr',
-				entryFileNames: 'ssr.mjs',
 				format: 'es',
+				freeze: false,
 				sourcemap: true,
 			}
 		],

@@ -1,4 +1,3 @@
-import type * as ObservableDOM from "../types/dom-observable";
 import type { RMLEventName } from "../types/dom";
 import { RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
 

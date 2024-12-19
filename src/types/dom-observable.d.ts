@@ -1,10 +1,17 @@
+import type { Observer } from './futures';
 import type { RMLEventMap } from './dom';
 
-interface Observable<T> {
-  subscribe: (observer: (e: T) => void) => void;
-}
+type SubscriberFunction<T> = (e: T) => void;
 
 declare global {
+  class Observable<T> {
+    constructor(subscriber: (o: Observer<T>) => void);
+    subscribe: (observer: SubscriberFunction<T> | Observer<T>) => void;
+  }
+
+  export interface ObservableEventListenerOptions extends AddEventListenerOptions {
+  }
+
   interface Document {
     when<T extends Event>(event: keyof RMLEventMap, options?: ObservableEventListenerOptions): Observable<T>;
   }
@@ -16,6 +23,4 @@ declare global {
   interface Window {
     when<T extends Event>(event: keyof RMLEventMap, options?: ObservableEventListenerOptions): Observable<T>;
   }
-
 }
-

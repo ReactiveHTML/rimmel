@@ -4,10 +4,12 @@ import type { MaybeFuture } from "../types/futures";
 
 import { SINK_TAG } from "../constants";
 
+export const JSON_DUMP_SINK_TAG = 'jsonDump';
+
 export const JSONDumpSink: Sink<Element> = (node: Element) =>
-    (data: object) => {
-        node.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`
-    }
+	(data: object) => {
+		node.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`
+	}
 ;
 
 /**
@@ -17,10 +19,10 @@ export const JSONDumpSink: Sink<Element> = (node: Element) =>
  * @example <div>${JSONDump(objectStream)}</div>
  */
 export const JSONDump: ExplicitSink<'object'> = (source: MaybeFuture<Object>) =>
-    <SinkBindingConfiguration<Element>>({
-        type: SINK_TAG,
-        t: 'JSONDump',
-        source,
-        sink: JSONDumpSink,
-    })
+	<SinkBindingConfiguration<Element>>({
+		type: SINK_TAG,
+		t: JSON_DUMP_SINK_TAG,
+		source,
+		sink: JSONDumpSink,
+	})
 ;

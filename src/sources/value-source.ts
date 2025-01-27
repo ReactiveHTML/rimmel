@@ -105,3 +105,12 @@ export const valueAsDate = map((e: Event) => (<HTMLInputElement>e.target).valueA
 export const ValueAsDate = inputPipe<Event, Date | null>(
 	valueAsDate
 );
+
+export const asValue = value;
+export const AsValue = Value;
+export const asStringValue = valueAsString;
+export const AsStringValue = ValueAsString;
+export const asNumericValue = valueAsNumber;
+export const AsNumericValue = ValueAsNumber;
+export const asDateValue = valueAsDate;
+export const AsDateValue = ValueAsDate;

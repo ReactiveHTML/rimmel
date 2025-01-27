@@ -43,9 +43,10 @@ export { Passive } from './sources/modifiers/passive';
 
 // Event Sources
 export { All, qs } from './sources/all-source';
+export { AutoForm } from './sources/autoform-source';
 export { CheckedState } from './sources/checked-source';
 export { Cut, cut } from './sources/cut-source';
-export { Dataset, DatasetObject } from './sources/dataset-source';
+export { Dataset, DatasetObject, datasetObject } from './sources/dataset-source';
 export { Numberset } from './sources/numberset-source';
 export { EventData, eventData } from './sources/event-data';
 export { EventTarget } from './sources/event-target';

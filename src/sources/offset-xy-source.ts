@@ -16,3 +16,6 @@ export const offsetXY = map((e: PointerEvent) => <Coords>[e.offsetX, e.offsetY])
 export const OffsetXY = inputPipe<PointerEvent, Coords>(
 	offsetXY
 );
+
+export const asOffsetXY = offsetXY;
+export const AsOffsetXY = OffsetXY;

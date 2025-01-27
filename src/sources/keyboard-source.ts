@@ -91,3 +91,6 @@ export const key = map((e: KeyboardEvent) => e.key);
 export const Key = inputPipe<KeyboardEvent, string>(
 	key
 );
+
+export const asKey = key;
+export const AsKey = Key;

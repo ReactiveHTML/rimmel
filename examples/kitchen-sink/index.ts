@@ -5,6 +5,7 @@ import {
   Subject,
 
   catchError,
+	combineLatest,
   filter,
   interval,
   map,
@@ -13,6 +14,7 @@ import {
   Observable,
   of,
   scan,
+	share,
   startWith,
   take,
   tap,
@@ -26,6 +28,7 @@ import {
 
   Active,
   AppendHTML,
+  AutoForm,
   cut,
   Cut,
   Dataset,
@@ -57,8 +60,8 @@ import { set_USE_DOM_OBSERVABLES } from '../../src/index';
 import { char } from '../../src/types/basic';
 import { RegisterElement } from '../../src/custom-element';
 
-const Log = (p) => tap(x=>console.log(p, x))
-const log = tap(console.log);
+const log = (p) => tap(x=>console.log(p, x))
+const logData = tap(console.log);
 const step = tap(x => {
 	debugger;
 });
@@ -292,7 +295,7 @@ const sources = {
 		const stream = new Subject<string>();
 
 		return rml`
-			<input type="text" onchange="${source(log, cut, log, upperCase, log, stream)}" autofocus>
+			<input type="text" onchange="${source(logData, cut, logData, upperCase, logData, stream)}" autofocus>
 			[ <span>${stream}</span> ]
 		`;
 	},
@@ -354,6 +357,51 @@ const sources = {
 			Result: <span>${JSONDump(stream)}</span>
 		`;
 	},
+
+	AutoForm: () => {
+		const stream = new Subject<string>();
+
+		return rml`
+			<form method="dialog" onsubmit="${AutoForm(stream)}" action="" oninput="${AutoForm(stream)}" onchange="${AutoForm(stream)}" rml:onmount="${AutoForm(stream)}">
+
+				<input name="text1" value="foo" autofocus> <br>
+				<input name="num1" type="number" value="123"> <br>
+				<input name="date1" type="date" value="2025-01-01"> <br>
+				<input name="color1" type="color" value="#ff8800"> <br>
+				<input name="hidden1" type="hidden" value="100" data-type="number"> <br>
+
+				<input name="check1" type="checkbox" value="12345" checked> <br>
+
+				<select name="select1" data-type="number">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+				</select> <br>
+
+				<select name="select2" data-type="number">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+				</select> <br>
+
+				<select name="multiselect1" multiple format="number">
+					<option value="1"          data-type="number">1</option>
+					<option value="2024/12/31" data-type="date" selected>2</option>
+					<option value="3"          data-type="string" selected>3</option>
+				</select> <br>
+
+				<input name="radio1" type="radio" data-type="number" value="1"> One<br>
+				<input name="radio1" type="radio" data-type="number" value="2"> Two<br>
+				<input name="radio1" type="radio" data-type="number" value="3" checked> Three<br>
+
+
+				<button>submit</button>
+				<input type="submit" value="submit">
+			</form>
+			Result: <span>${JSONDump(stream)}</span>
+		`;
+	},
+
 
 	pipeIn: () => {
 		const stream = new Subject<string>();
@@ -659,7 +707,7 @@ const sinks = {
 	BlurSink: () => {
 		const keyStream = new Subject();
 		const blur = keyStream.pipe(
-			Log('KEY'),
+			log('KEY'),
 			filter(k => k == 'Enter')
 		);
 
@@ -1217,6 +1265,58 @@ const sinks = {
 			<button onclick="${stream}">animate</button>
 		`;
 	},
+	
+	Glitches: () => {
+		const A = interval(1000).pipe(
+			log('A'),
+			share(), // just to avoid double-logging "A"
+		);
+
+		const B = A.pipe(map(x=>x));
+		const C = A.pipe(map(x=>x));
+
+		// With glitches
+		const D = combineLatest([B, C]).pipe(
+			log('D'),
+		);
+
+		return rml`
+			A: <span style="font-size: 60px;">${InnerText(A)}</span> <br>
+			D (with glitches?): <span style="font-size: 60px;">${InnerText(D)}</span> <br>
+			D (with glitches?): <span style="font-size: 60px;">${InnerText(D)}</span> <br>
+			D (with glitches?): <span style="font-size: 60px;">${InnerText(D)}</span> <br>
+			D (with glitches?): <span style="font-size: 60px;">${InnerText(D)}</span> <br>
+			D (with glitches?): <span style="font-size: 60px;">${InnerText(D)}</span> <br>
+			D (with glitches?): <span style="font-size: 60px;">${InnerText(D)}</span> <br>
+		`;
+	},
+
+	BigTable: () => {
+		const start = performance.now();
+		const stream = interval(0).pipe(
+			scan(x=>x+1, -1),
+			tap((x) => {
+				x == 100 && console.log('1k', performance.now()-start);
+			}),
+			share(), // This is needed, so the whole observable pipeline is not re-run deeply every time.
+		);
+
+		const rows = [...Array(50)];
+		const cols = [...Array(50)];
+
+		return rml`
+			<p>Testing ${rows.length *cols.length} observable subscriptions concurrently updating table cells in Rimmel.js</p>
+
+			<table style="font-size: 22px !important;">
+				${rows.map(row=>rml`
+					<tr>${cols.map(col=>rml`
+						<td>${InnerText(stream)}</td>
+					`).join('')}
+					</td>
+				`).join('')}
+			</table>
+		`;
+	},
 
 	ErrorHandling: () => {
 		// Error Catcher Sink
@@ -1342,28 +1442,34 @@ const component = () => {
 				}
 			}
 
-			.twocol {
-				display: grid;
-				align-items: start;
-				grid-template-columns: 1fr 1fr;
-				gap: 1rem;
-			}
-
-			.selector {
-				display: flex;
-				width: 100%;
-				overflow-x: auto;
-			}
-
 			.output {
+				display: flex;
+				flex-direction: column;
+				height: 100vh;
 				margin: 0;
 				padding: 0;
 				background-color: white;
 				border: 2px solid;
 			}
 
-			fieldset {
+			.selector {
+				display: flex;
+				width: 100%;
+				overflow-x: auto;
+				max-height: 20vh;
+				fieldset {
+					overflow: auto;
+				}
 			}
+
+			.twocol {
+				flex: 1;
+				display: grid;
+				align-items: start;
+				grid-template-columns: 1fr 1fr;
+				gap: 1rem;
+			}
+
 
 			li {
 				margin-block: .2rem;

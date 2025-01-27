@@ -80,8 +80,8 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
     return el;
 };
 
-export const MockEvent = (name: string, data: Partial<Event>) =>
- (<Event>{
+export const MockEvent = <E extends Event>(name: string, data: Partial<E>) =>
+ (<E>{
    bubbles: true,
    cancelable: true,
    currentTarget: null,

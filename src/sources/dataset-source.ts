@@ -1,10 +1,6 @@
 import type { RMLTemplateExpressions } from "../types/internal";
-import { EventListenerFunction } from "../types/dom";
-import type { Observer } from "../types/futures";
 
 import { map } from 'rxjs';
-import { inputPipe } from '../utils/input-pipe';
-import { Source } from "../types/source";
 import { curry } from "../utils/curry";
 
 /**
@@ -51,3 +47,8 @@ export const DatasetObject =
   (source?: RMLTemplateExpressions.SourceExpression<I | O>) =>
     curry<I, DOMStringMap>(datasetObject, source)
 ;
+
+export const asDatasetOf = dataset;
+export const AsDatasetOf = Dataset;
+export const asDatasetObject = dataset;
+export const AsDatasetObject = Dataset;

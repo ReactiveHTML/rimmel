@@ -1,23 +1,19 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "outDir": "./dist/types",
+    "allowSyntheticDefaultImports": false,
     "declaration": true,
-    "declarationMap": true,
-    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true,
     "importHelpers": false,
-    "lib": [ "DOM", "DOM.Iterable", "DOM.AsyncIterable", "ESNext" ],
+    "lib": ["DOM", "DOM.Iterable", "DOM.AsyncIterable", "ESNext"],
     "module": "ESNext",
     "moduleResolution": "node",
     "noEmitHelpers": true,
-    "noEmit": true,
     "noImplicitThis": false,
     "paths": {
       "rimmel": ["./src/index"]
     },
+    "rootDir": "./src",
     "removeComments": false,
     "resolveJsonModule": true,
     "sourceMap": true,
@@ -26,6 +22,6 @@
     "target": "ESNext"
   },
   "files": ["src/index.ts"],
-  "include": ["rollup.config.ts", "src/types/**/*.d.ts"],
+  "include": ["vite.config.ts", "rollup.config.ts", "src/**/*", "src/types/**/*.d.ts"],
   "exclude": ["node_modules", "@types", "dist", "build"]
 }

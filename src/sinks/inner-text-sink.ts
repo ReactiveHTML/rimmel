@@ -3,10 +3,12 @@ import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/
 
 import { SINK_TAG } from "../constants";
 
+export const INNER_TEXT_SINK_TAG = 'innerText';
+
 export const InnerTextSink: Sink<HTMLElement> = (node: HTMLElement) =>
-    (html: string) => {
-        node.innerText = html
-    }
+	(html: string) => {
+		node.innerText = html
+	}
 ;
 
 /**
@@ -16,10 +18,10 @@ export const InnerTextSink: Sink<HTMLElement> = (node: HTMLElement) =>
  * @example <div>${InnerText(stream)}</div>
  */
 export const InnerText: ExplicitSink<'text'> = (source: RMLTemplateExpressions.StringLike) =>
-    <SinkBindingConfiguration<HTMLElement>>({
-        type: SINK_TAG,
-        t: 'InnerText',
-        source,
-        sink: InnerTextSink,
-    });
+	<SinkBindingConfiguration<HTMLElement>>({
+		type: SINK_TAG,
+		t: INNER_TEXT_SINK_TAG,
+		source,
+		sink: InnerTextSink,
+	});
 

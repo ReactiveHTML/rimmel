@@ -3,9 +3,11 @@ import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/
 
 import { SINK_TAG } from "../constants";
 
+export const APPEND_HTML_SINK_TAG = 'appendHTML';
+
 export const AppendHTMLSink: Sink<Element> =
-    (node: Element) =>
-        node.insertAdjacentHTML.bind(node, 'beforeend')
+	(node: Element) =>
+		node.insertAdjacentHTML.bind(node, 'beforeend')
 ;
 
 /**
@@ -15,11 +17,12 @@ export const AppendHTMLSink: Sink<Element> =
  * @example <div>${AppendHTML(stream)}</div>
  */
 export const AppendHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressions.HTMLText, pos: InsertPosition = 'beforeend') =>
-    <SinkBindingConfiguration<Element>>({
-        type: SINK_TAG,
-        t: 'AppendHTML',
-        source,
-        sink: AppendHTMLSink,
-        params: pos,
-    });
+	<SinkBindingConfiguration<Element>>({
+		type: SINK_TAG,
+		t: APPEND_HTML_SINK_TAG,
+		source,
+		sink: AppendHTMLSink,
+		params: pos,
+	})
+;
 

@@ -3,13 +3,15 @@ import type { ExplicitSink, Sink } from "../types/sink";
 
 import { SINK_TAG } from "../constants";
 
+export const CLOSED_SINK_TAG = 'closed';
+
 /**
  * A sink that closes a &lt;dialog&gt; element when a source streams emits
  * @param dialogBox an HTMLDialogElement
  * @returns 
  */
 export const ClosedSink: Sink<HTMLDialogElement> = (dialogBox: HTMLDialogElement) =>
-    dialogBox.close.bind(dialogBox)
+	dialogBox.close.bind(dialogBox)
 ;
 
 /**
@@ -81,10 +83,10 @@ export const ClosedSink: Sink<HTMLDialogElement> = (dialogBox: HTMLDialogElement
  * ```
  */
 export const Closed: ExplicitSink<'closed'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'closed'>) =>
-    <SinkBindingConfiguration<HTMLDialogElement>>({
-        type: SINK_TAG,
-        t: 'Closed',
-        source,
-        sink: ClosedSink,
-    })
+	<SinkBindingConfiguration<HTMLDialogElement>>({
+		type: SINK_TAG,
+		t: CLOSED_SINK_TAG,
+		source,
+		sink: ClosedSink,
+	})
 ;

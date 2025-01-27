@@ -4,6 +4,8 @@ import { AttributeObjectSink } from "./attribute-sink";
 
 import { SINK_TAG } from "../constants";
 
+export const MIXIN_SINK_TAG = 'mixin';
+
 /**
  * A specialised sink to create a Mixin in the target element. Immediately on mount, if it's a plain object or whenever it emits any data.
  * @param source A present or future DOM Object whose properties and methods will be merged into the target element
@@ -12,10 +14,11 @@ import { SINK_TAG } from "../constants";
  * @example <div ...${Mixin(source)}">
  */
 export const Mixin: ExplicitSink<'mixin'> = (source: RMLTemplateExpressions.Mixin) => {
-    return <SinkBindingConfiguration<Element>>{
-        type: SINK_TAG,
-        t: 'Mixin',
-        source,
-        sink: AttributeObjectSink,
-    };
+	return <SinkBindingConfiguration<Element>>{
+		type: SINK_TAG,
+		t: MIXIN_SINK_TAG,
+		source,
+		sink: AttributeObjectSink,
+	};
 };
+

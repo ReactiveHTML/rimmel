@@ -23,5 +23,5 @@ export const qs =
 		map((e: Event) => {
 			const t = <Element>e.currentTarget;
 			return (<CSSSelector[]>[]).concat(qs).flatMap(qs=>[...t.querySelectorAll(qs)])
-		});
-
+		})
+;

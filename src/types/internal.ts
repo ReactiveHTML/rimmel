@@ -1,7 +1,7 @@
 import type { BooleanAttribute } from "../definitions/boolean-attributes";
 
 import { ObjectSourceExpression, TargetObject } from "../sources/object-source";
-import { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString  } from "./dom";
+import { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString } from "./dom";
 import { RMLEventName, RMLEventAttributeName } from "./dom";
 import { Future, MaybeFuture, Observable, Observer, Subject } from "./futures";
 import { isFunction } from "../utils/is-function";
@@ -10,6 +10,7 @@ import { Sink } from "./sink";
 import type { CSSClassName, CSSObject, CSSValue } from "./style";
 
 export type ErrorHandler = (e: Error) => void;
+
 /**
  * Data binding configuration for event sources or data sinks
  *
@@ -18,7 +19,7 @@ export type ErrorHandler = (e: Error) => void;
  */
 export interface BindingConfiguration {
 	type: 'source' | 'sink';
-}
+};
 
 /**
  * This tells Rimmel how to bind an EventTarget to an event handler.
@@ -32,7 +33,7 @@ export interface SourceBindingConfiguration<T extends RMLEventName> {
 	eventName: RMLEventName;
 	// error?: EventListener;
 	// termination?: EventListener;
-}
+};
 
 /**
  * This tells Rimmel how to sink a Promise or an Observable to the DOM.
@@ -58,7 +59,7 @@ export interface SinkBindingConfiguration<E extends Element> extends BindingConf
 	params?: any;
 	error?: ErrorHandler;
 	termination?: () => void;
-}
+};
 
 // export type Empty = MaybeFuture<undefined | null | ''>;
 // export type BindingConfigurationType<T> = T extends SinkBindingConfiguration<infer Q> ? SinkBindingConfiguration<Q> : SourceBindingConfiguration<infer Z>;
@@ -79,11 +80,11 @@ export type SinkAttributeValue = boolean | string | number | Promise<any> | Obse
 export type SourceAttributeValue = Observer<any> | Function;
 export type AttributeValue = SinkAttributeValue | SourceAttributeValue;
 export type AttributeObject = {
-  [K in string]: K extends SourceAttributeName ? SourceAttributeValue : SinkAttributeValue;
+	[K in string]: K extends SourceAttributeName ? SourceAttributeValue : SinkAttributeValue;
 };
 export type DOMSubtreeObject = {
-  [K in QuerySelectorString]: AttributeObject;
-}
+	[K in QuerySelectorString]: AttributeObject;
+};
 
 export namespace RMLTemplateExpressions {
 	/**
@@ -139,7 +140,7 @@ export namespace RMLTemplateExpressions {
 	export type TargetEventHandler<T> =
 		| ((data: T) => void)
 		| Observer<T>
-	;
+		;
 
 	/**
 	 * A valid RML template expression which can be:
@@ -187,7 +188,7 @@ export type RMLTemplateExpression =
  *
  * This includes anything that can be passed in RML templates
  */
-export type Handler<E extends Element, T extends RMLEventName=any> =
+export type Handler<E extends Element, T extends RMLEventName = any> =
 	| undefined
 	| number
 	| string

@@ -15,4 +15,3 @@ export const checkedState = map((e: Event) => (<HTMLInputElement>e.target).check
 export const CheckedState = inputPipe<Event, string>(
   checkedState
 );
-

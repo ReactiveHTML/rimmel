@@ -21,11 +21,11 @@ import { ObserverSource, isObserverSource, ObservatureSource, isObservatureSourc
 
 import { isPromise } from '../types/futures';
 
-import { skip } from 'rxjs';
+// import { skip } from 'rxjs';
 import { InnerHTML } from "../sinks/inner-html-sink";
 import { TextContent } from "../sinks/text-content-sink";
 import { ClassRecord } from "../sinks/class-sink";
-import { StyleObjectSink, StylePreSink } from "../sinks/style-sink";
+import { StyleObjectSink, StylePreSink, STYLE_OBJECT_SINK_TAG } from "../sinks/style-sink";
 
 export const addRef = (ref: string, data: BindingConfiguration) => {
 	waitingElementHanlders.get(ref)?.push(data) ?? waitingElementHanlders.set(ref, [data]);
@@ -105,8 +105,14 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			// Use Cases:
 			// <a onclick="${subject}">
 			// <a onclick="${()=>doSomething}">
+			// TODO: do we want the following?
 			// <input type="text" onchange="${[object, 'attributeToSet']}">   will feed it the .value of the input field
 			// <input type="text" onchange="${[array,  pos]}">    will feed it the .value of the input field
+
+			// TODO: Shall we support arrays of streams to feed multiple subscriptions at once? (may conflict with the array syntax above?
+			// <button onclick="${[stream1, stream2, stream3]}">    will feed each of the supplied streams?
+			// or explicitly:
+			// <button onclick="${Multi(stream1, stream2, stream3)}"> with "multi source"
 
 			let listener;
 			if(isSourceBindingConfiguration(expression)) {
@@ -179,10 +185,11 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						if(attributeName == 'style') {
 							const CSSAttribute = /;?(?<key>[a-z\-][a-z0-9\-_]*)\s*:\s*$/.exec(string)?.groups?.key;
 							sink = CSSAttribute ? StylePreSink(CSSAttribute): StyleObjectSink;
-							handler = PreSink<HTMLElement | SVGElement>('StyleObject', sink, expression, CSSAttribute);
+							handler = PreSink<HTMLElement | SVGElement>(STYLE_OBJECT_SINK_TAG, sink, expression, CSSAttribute);
 						} else {
 							isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attributeName);
 							sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName))) || FixedAttributePreSink(attributeName);
+							// TODO: hard-match attributeName with a corresponding SINK_TAG...
 							handler = PreSink(attributeName, sink, expression, attributeName);
 						}
 
@@ -191,7 +198,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						// TODO: remove boolean attributes if they are bound to streams: disabled="${stream}"
 						// should not be disabled by its mere presence, but depending on the value emitted by the stream.
 
-						isBooleanAttribute && console.log('>>>>>>>', initialValue, expression);
+						// isBooleanAttribute && console.log('>>>>>>>', initialValue, expression);
 
 						const prefix = isBooleanAttribute && (!initialValue || !expression)
 							? accPlusString.replace(new RegExp(`${attributeName}=['"]+$`), `_${attributeName}="`) // TODO: or maybe clean it up completely?
@@ -254,10 +261,11 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 					// take its current .value, render is synchronously to avoid reflows
 					// and then subscribe to subsequent emissions
 					// FIXME: any chance an expression could be mistaken for a BehaviorSubject here? A Generator, or other stuff??? May want to have a better isBehaviorSubject check here...
-					const _source = <MaybeFuture<HTMLString>>(initialValue
-						? (expression?.source ?? expression)?.pipe?.( skip(1) )
-						: sinkExpression
-					);
+					// const _source = <MaybeFuture<HTMLString>>(initialValue
+					// 	? (expression?.source ?? expression)?.pipe?.( skip(1) )
+					// 	: sinkExpression
+					// );
+					const _source = <MaybeFuture<HTMLString>>sinkExpression;
 
 					// addRef(ref, <RMLTemplateExpressions.GenericHandler>{ handler, type: sinkType, error: errorHandler, ...sinkType == 'collection' && {attribute: expression} || {} /*, termination: terminationHandler */ });
 					addRef(ref, isSinkBindingConfiguration(_source) ? _source : InnerHTML(_source));

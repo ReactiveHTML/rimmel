@@ -3,15 +3,17 @@ import type { RMLTemplateExpressions, SinkBindingConfiguration } from "../types/
 
 import { SINK_TAG } from "../constants";
 
+export const DISABLED_SINK_TAG = 'disabled';
+
 /**
  * An Element supporting the "disabled" HTML attribute (i.e.: that can be disabled)
  */
 type Disableable = SinkElementTypes["disabled"]["elements"];
 
 export const DisabledSink: Sink<Disableable> = (node: Disableable) =>
-    (value: boolean) => {
-  		node.disabled = value;
-    };
+	(value: boolean) => {
+		node.disabled = value;
+	};
 ;
 
 /**
@@ -23,11 +25,11 @@ export const DisabledSink: Sink<Disableable> = (node: Disableable) =>
  * @example <input type="button" disabled="${Disabled(booleanObservable)}">
  */
 export const Disabled: ExplicitSink<'disabled'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'disabled'>) =>
-  <SinkBindingConfiguration<Disableable>>({
-    type: SINK_TAG,
-    t: 'Disabled',
-    source,
-    sink: DisabledSink,
-  })
+	<SinkBindingConfiguration<Disableable>>({
+		type: SINK_TAG,
+		t: DISABLED_SINK_TAG,
+		source,
+		sink: DisabledSink,
+	})
 ;
 

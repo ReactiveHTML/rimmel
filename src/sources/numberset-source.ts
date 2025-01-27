@@ -20,3 +20,6 @@ export const Numberset = <T extends HTMLElement, I extends Event, O extends numb
 		numberset(key)
 	)
 ;
+
+export const asNumberset = numberset;
+export const AsNumberset = Numberset;

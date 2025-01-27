@@ -10,5 +10,5 @@
  * Experimental sink for terminating observables
  */
 export const terminationHandler = () => {
-  // console.debug('Rimmel: NOOP termination sink called', data);
+	// console.debug('Rimmel: NOOP termination sink called', data);
 };

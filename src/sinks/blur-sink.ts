@@ -4,6 +4,8 @@ import type { FocusableElement } from '../types/rml';
 
 import { SINK_TAG } from "../constants";
 
+export const BLUR_SINK_TAG = 'blur';
+
 export const BlurSink: Sink<FocusableElement> = (node: FocusableElement) =>
 	node.blur.bind(node)
 ;
@@ -19,7 +21,7 @@ export const BlurSink: Sink<FocusableElement> = (node: FocusableElement) =>
 export const Blur: ExplicitSink<'rml:blur'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'rml:blur'>) =>
   <SinkBindingConfiguration<FocusableElement>>({
     type: SINK_TAG,
-    t: 'Blur',
+    t: BLUR_SINK_TAG,
     source,
     sink: BlurSink,
   })

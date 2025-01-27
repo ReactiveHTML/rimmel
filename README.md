@@ -68,20 +68,14 @@ const ClickCounterComponent = () => {
 ```
 
 ## No Virtual DOM
-The concept of Virtual DOM originates from the assumption that the DOM is slow, which might be the case for some frameworks that make large numbers of unnecessary updates or re-renders, in which case it may become less expensive to run those computations outside of the DOM.
+The concept of Virtual DOM originates from the assumption that the DOM is slow, which might appear to be the case for some frameworks or UI libraries that make large numbers of redundant updates or "re-renders". For those, it may be less expensive to just run those computations outside of the DOM.
 
-Since Rimmel never makes any unnecessary DOM update and the concept of a component re-rendering doesn't exist by itself, the whole idea of a Virtual DOM is simply not needed.
+Since Rimmel never causes any unnecessary DOM update and the concept of a component "re-rendering" doesn't even exist, the whole idea of a Virtual DOM is disregarded.
 
 Rimmel uses Sinks, which are memory and/or performance-optimised direct DOM manipulation functions, attached to the Promises or Observable streams you provide. When there is new data, it gets sinked to the DOM. You are in control of when or how often you emit data, so you can also throttle/sample/debounce, use any schedulers as you see fit for your needs. RxJS provides all that, so if you know RxJS, you're ready to make the most of Rimmel.
 
-## No Component Re-rendering
-Several UI libraries and frameworks around have a concept of component re-rendering, which implies running the whole component's function again in order to check its output and diff it against the Virtual DOM.
-Since Rimmel makes use of true reactive streams for state management, everything becomes dramatically simpler.
-
-There is only one time a component is "rendered" and that is when it first lands on the page. After that, only "updates" happen.
-
 ## Conditional Rendering
-If you need to render something based on a condition, plain-old standard JS can help you. No need for further abstractions:
+If you need to render something based on a condition, plain-old standard JS can help you. No further abstractions or custom DSLs used:
 
 ```javascript
 document.body.innerHTML = rml`
@@ -124,23 +118,29 @@ document.body.innerHTML = rml`
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-dynamic-conditional-rendering)
 
 ## No Forward Refs
-Forward refs are a construct used in Imperative UI libraries to enable referencing and later modifying DOM elements that don't exist yet (you're writing components that will act on DOM elements... after they are mounted).
+Forward refs are a construct used in Imperative UI libraries to enable referencing and later modifying DOM elements that don't exist yet (you're writing components that will work on DOM nodes after they will be mounted).
 
 Rimmel enables you to declare future changes to a DOM element by means of a simple Promise or Observable.
 The mounting and data binding is completely managed by Rimmel. This means when they resolve or emit, the elements will already be there to receive them, effectively making the use of Forward Refs redundant.
 
-
 ## Structured Data
 When you're dealing with structured data, like lists or grids of repeated data, the best way to handle it depends on multiple factors, so it's left as an extension opportunity.
 
-You can create your custom, advanced Sinks to render data structures of any complexity and manage any specific aspects of its interactions in the most optimal way for your needs.
-This is a perfect case for reactive grids, spreadsheets, SVG or Canvas drawings, interactive 3D scenes, etc.
+You can create your custom, advanced Sinks to render data structures of any complexity and manage specific aspects of its interactions in the most optimal way for your needs.
+This is a perfect case for reactive grids, spreadsheets, SVG or Canvas drawings, 3D scenes, etc.
+### Dynamic Lists and Collections
+If you just want to display a dynamic list of repeated elements you may want to use a `Collection` from [ObservableTypes](https://github.com/reactivehtml/observable-types), which is a Array+Observable+Observer utility to manage lists trivial with Rimmel.
 
-To display and manage the UI for any dynamic list where you plan to support CRUD operations, perhaps drag'n'drop, you may consider using a `Collection` from [ObservableTypes](https://github.com/reactivehtml/observable-types), which is a rendering-aware extension of `Array`, every method of which is mapped to an optimised UI rendering command, and it also exposes the `Observable` and `Observer` interfaces for seamless reactivity and integration with Rimmel and RxJS.
+The following illustration shows how you can manage a simple list of items.
+
+<img src="docs/assets/observable-types.png" alt="Structured Data with Rimmel.js and Observable Types" style="max-width: 80vw; max-height: 30vh;">
+
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/observable-types-list)
 
 <br>
 
-## 👋 Hello World👋 ++
+## Example: RGB Sliders
 Want a little more involved example of stream usage?<br>
 Let's make a component featuring a Red, Green and Blue slider that get transformed into an #RRGGBB colour string, displayed in a text box and used as the fill colour of an SVG circle:
 
@@ -181,7 +181,7 @@ document.getElementById('root-node').innerHTML = ColorPicker([255, 128, 64])
 <br><br>
 
 <div class="playground-link">
-<a href="https://codepen.io/fourtyeighthours/pen/ExJOObG"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/ExJOObG">Hello World Plus</a> on Codepen
+<a href="https://codepen.io/fourtyeighthours/pen/ExJOObG"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/ExJOObG">RGB Sliders</a> on Codepen
 </div>
 <br>
 
@@ -204,7 +204,7 @@ This is, in summary, the _discrete-functional-reactive_ paradigm behind Observab
 Event-driven reactivity as modelled by Observables is therefore the perfect way to describe state as it changes through the lifetime of an application at the occurrence of various discrete UI events.
 
 
-<img src="docs/assets/how-rimmel-works-9.png" alt="State doesn't exist" style="max-height: 100vh;">
+<img src="docs/assets/how-rimmel-works-9.png" alt="State doesn't exist" style="max-width: 80vw; max-height: 30vh;">
 
 
 Modelling your state as one or more observable streams will give you fine-grained control over async events and their coordination, thanks to the full range of RxJS operators you can use.
@@ -220,7 +220,7 @@ Since you only declare streams now and let Rimmel connect them to the DOM and ea
 Rimmel still has a `rml:onmount` event, but its use is only left as a last resort to integrate imperative, non-Rimmel components (some old jQuery plugins, etc?)
 
 ## No Side Effects (that's what a framework is for)
-You may have already realised that writing UI components with Rimmel means you no longer have to deal with side effects, which makes it trivial to make your code purely functional.
+You may have already realised that writing UI components with Rimmel means you no longer have to deal with UI side effects. That makes it easier to make your code purely functional by default.
 
 # Sources vs. Sinks
 There are two key concepts used by Rimmel: sources and sinks.
@@ -273,11 +273,16 @@ To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Ad
 Do you only need the relative `[x, y]` mouse coordinates when hovering an element?<br>
 Use `<div onmousemove="${ OffsetXY(handler) }">`
 
+
+<img src="docs/assets/event-adapters.png" alt="Event Adapters" style="max-width: 80vw; max-height: 30vh;">
+
+
 Do you want the last typed character when handling keyboard events?
 Use `<input oninput="${ Key(handler) }">`
 
 Rimmel comes with a handful of Event Adapters out of the box, but you can create your own with ease.
 Event Adapters become particularly useful when you have a main data stream that you want to feed from different elements of different types that emit different events. Using an adapter for each, you can make sure you always get data in a unified format in your main data stream.
+
 
 ### Event Adapter Operators
 In certain cases it can be useful to have an Event Adapter made of multiple steps.
@@ -668,7 +673,6 @@ Remember, this is complex by nature and without RxJS it would be much worse!
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-color-picker)
 
-
 <hr>
 
 [![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
@@ -714,6 +718,6 @@ vite
 Or you can just run it with one click [on StackBlitz](https://stackblitz.com/~/github.com/ReactiveHTML/rimmel?file=examples/kitchen-sink/index.ts&startScript=kitchen-sink)
 
 # Web Standards
-There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and especially the more recent [Observable DOM](https://github.com/WICG/observable).
+There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and the more recent [Observable DOM](https://github.com/WICG/observable).
 
-Rimmel is closely following these initiatives and aims to align with them as they develop.
+Rimmel is closely following these initiatives and aims to align with them as they develop,

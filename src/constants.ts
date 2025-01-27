@@ -1,3 +1,5 @@
+import type { RenderingScheduler } from './types/schedulers';
+
 declare global {
   interface Window {
     RMLREF: string;
@@ -34,3 +36,12 @@ export var USE_DOM_OBSERVABLES: boolean = false;
 export const set_USE_DOM_OBSERVABLES = ((x: boolean) =>  USE_DOM_OBSERVABLES = x);
 
 export const SymbolObservature = Symbol.for('observature');
+
+// export var renderingScheduler = '../schedulers/ema-animation-frame';
+export var renderingScheduler: RenderingScheduler | null = null;
+export const setRenderingScheduler = (scheduler: RenderingScheduler) => renderingScheduler = scheduler; 
+
+// export const configure = () => {
+// 	return rml
+// }
+

@@ -1,4 +1,6 @@
-import { Observable, Subject } from 'rxjs';
+import type { Observable } from 'rxjs';
+
+import { Subject } from 'rxjs';
 import { MockElement, MockEvent } from '../test-support';
 import { Cut, cut } from './cut-source';
 
@@ -12,7 +14,7 @@ describe('Cut Event Adapter', () => {
             type: 'text',
             value: oldValue,
         });
-        
+
         const eventData = MockEvent('input', {
             target: el as HTMLInputElement
         });
@@ -37,7 +39,7 @@ describe('cut Event Operator', () => {
             type: 'text',
             value: oldValue,
         });
-        
+
         const eventData = MockEvent('input', {
             target: el as HTMLInputElement
         });

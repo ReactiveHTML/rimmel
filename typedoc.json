@@ -2,12 +2,13 @@
 	"categorizeByGroup": true,
 	"entryPoints": ["src/index.ts"],
 	"groupOrder": ["Sources", "Sinks", "Types", "Utils"],
+	"excludePrivate": true,
 	"excludeExternals": true,
 	"excludeNotDocumented": true,
 	"out": "docs/handbook",
 	"readme": "none",
+	"theme": "./minimal-theme",
 	"tsconfig": "tsconfig.json",
 	"plugin": [
 	]
 }
-

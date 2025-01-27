@@ -13,6 +13,7 @@ import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
 import { tracing } from "../debug";
 import { IObservature, isObservature } from "../lib/observature";
+import { SinkFunction } from "../types";
 
 const AUTOREMOVE_LISTENERS_DELAY = 100; // Cleanup event listeners after this much time
 const elementNodes = (n: Node): n is Element => n.nodeType == 1;
@@ -79,7 +80,7 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 			const sinkFn = sink(targetNode, bindingConfiguration.params);
 
 			// A pre-sink step that can show the above sinkFn in a stack trace for debugging
-			const loggingSinkFn = (...data: any) => {
+			const loggingSinkFn: SinkFunction = (...data: any) => {
 				console.groupCollapsed('RML: Sinking', t, data);
 				console.log(bindingConfiguration);
 				console.trace('Stack Trace (from Source to Sink), data=', data);
@@ -198,6 +199,7 @@ export const Rimmel_Mount: MutationCallback = (mutationsList, observer) => {
 		.filter(elementNodes)
 	;
 
+	// TODO: switch when ready
+	// requestIdleCallback(() => removedNodes.forEach(removeListeners));
 	setTimeout(() => removedNodes.forEach(removeListeners), AUTOREMOVE_LISTENERS_DELAY)
-	;
 };

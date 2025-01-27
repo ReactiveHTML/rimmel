@@ -21,3 +21,6 @@ export const lastTouchXY =
 export const LastTouchXY = inputPipe<TouchEvent, Coords>(
 	lastTouchXY
 );
+
+export const asLastTouchXY = lastTouchXY;
+export const AsLastTouchXY = LastTouchXY;

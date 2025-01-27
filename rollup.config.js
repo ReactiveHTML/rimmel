@@ -1,6 +1,6 @@
-import { RollupOptions } from 'rollup';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
+import { join } from 'path';
 import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
@@ -11,14 +11,15 @@ const terserOptions = {
 	},
 };
 
-const getTSConfig = async (path: string) => {
+const getTSConfig = async (path) => {
 	const tsConfig = (await import('./tsconfig.json', { assert: { type: 'json' } })).default;
 
 	tsConfig.compilerOptions.outDir = path;
+	tsConfig.compilerOptions.declarationDir = join(path, 'types');
 	return tsConfig.compilerOptions;
 };
 
-export default <RollupOptions[]>[
+export default [
 	{	// Global JS
 		external: ['rxjs'],
 		input: './src/index.ts',
@@ -108,6 +109,15 @@ export default <RollupOptions[]>[
 				dir: './dist/ssr',
 				entryFileNames: '[name].mjs',
 				format: 'es',
+				freeze: false,
+				sourcemap: true,
+			},
+			{
+				exports: 'named',
+				externalLiveBindings: false,
+				dir: './dist/ssr',
+				entryFileNames: '[name].cjs',
+				format: 'cjs',
 				freeze: false,
 				sourcemap: true,
 			}

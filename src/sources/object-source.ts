@@ -49,3 +49,6 @@ export const Update =
   (property: ObjectKey, object?: T): ((t2: T) => EventListenerFunction<I>) | EventListenerFunction<I> | Source<I, O> =>
     ObjectSource<I, T>(property, object)
 ;
+
+export const asObjectSource = ObjectSource;
+export const AsObjectSource = ObjectSource;

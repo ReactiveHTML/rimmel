@@ -17,3 +17,6 @@ export const form = map((e: Event) => Object.fromEntries(new FormData(<HTMLFormE
 export const Form = inputPipe<SubmitEvent | Event>(
 	form,
 );
+
+export const asFormData = form;
+export const AsFormData = Form;

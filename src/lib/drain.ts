@@ -1,9 +1,10 @@
 import type { SinkFunction } from "../types/sink";
 import type { EventListenerObject, EventListenerOrEventListenerObject } from "../types/dom";
-import type { MaybeFuture, Observable, Observer, Present } from "../types/futures";
+import type { MaybeFuture, Observable, Observer } from "../types/futures";
 
 import { isObservable, isPromise } from "../types/futures";
 import { subscriptions } from "../internal-state";
+import renderingScheduler from '../schedulers/ema-animation-frame';
 
 /**
  * Return the "callable" part of an entity:
@@ -37,11 +38,16 @@ export const asap = (fn: SinkFunction, arg: MaybeFuture<unknown>) => {
  */
 export const subscribe =
 	<T extends Event>
-	(node: Node, source: MaybeFuture<T>, next: EventListenerOrEventListenerObject<T>, error?: (e: Error) => void, complete?: () => void) => {
+	(node: Node, source: MaybeFuture<T>, next: EventListenerOrEventListenerObject<T>, error?: (e: Error) => void, complete?: () => void, scheduler = renderingScheduler) => {
+
+		// TODO: make this a plugin, in case people don't use anything with handleEvent...
+		const flattenedNext = (next as EventListenerObject<T>).handleEvent?.bind(next) ?? next;
+		const task = scheduler?.(node, <SinkFunction>flattenedNext) ?? flattenedNext;
+
 		if (isObservable(source)) {
 			// TODO: should we handle promise cancellations (cancellable promises?) too?
 			const subscription = source.subscribe({
-				next: <EventListener>next,
+				next: <EventListener>task,
 				error,
 				complete,
 			});
@@ -50,10 +56,10 @@ export const subscribe =
 
 			return subscription;
 		} else if (isPromise(source)) {
-			source.then(<EventListener>next, error).finally(complete);
+			source.then(<EventListener>task, error).finally(complete);
 		} else {
 			// TODO: should we handle function cancellations (removeEventListener) too?
-			(<EventListener>next)(source);
+			(<EventListener>task)(source);
 		}
 	}
 ;

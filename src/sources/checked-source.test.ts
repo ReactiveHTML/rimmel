@@ -1,10 +1,12 @@
-import { Observable, Subject } from 'rxjs';
+import type { Observable } from 'rxjs';
+
+import { Subject } from 'rxjs';
 import { MockElement, MockEvent } from '../test-support';
 import { CheckedState, checkedState } from './checked-source';
 
 describe('CheckedState Event Adapter', () => {
 
-    it('Emites the checked state of an element into a target', () => {
+    it('Emits the checked state of an element into a target', () => {
         const value = true;
 
         const el = MockElement({
@@ -12,7 +14,7 @@ describe('CheckedState Event Adapter', () => {
             type: 'checkbox',
             checked: value,
         });
-        
+
         const eventData = MockEvent('input', {
             target: el as HTMLInputElement
         });
@@ -29,14 +31,14 @@ describe('CheckedState Event Adapter', () => {
 
 describe('checkedState Event Operator', () => {
 
-    it('Emites the checked state of an element into a target', () => {
+    it('Emits the checked state of an element into a target', () => {
         const value = true;
         const el = MockElement({
             tagName: 'INPUT',
             type: 'checkbox',
             checked: value,
         });
-        
+
         const eventData = MockEvent('input', {
             target: el as HTMLInputElement
         });
@@ -45,7 +47,7 @@ describe('checkedState Event Operator', () => {
         const pipeline = new Subject<typeof eventData>().pipe(checkedState) as Observable<boolean> & Subject<typeof eventData>;
         pipeline.subscribe(x=>handlerSpy(x));
         pipeline.next(eventData);
-        
+
         expect(handlerSpy).toHaveBeenCalledWith(value);
     });
 

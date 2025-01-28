@@ -222,6 +222,8 @@ Rimmel still has a `rml:onmount` event, but its use is only left as a last resor
 ## No Side Effects (that's what a framework is for)
 You may have already realised that writing UI components with Rimmel means you no longer have to deal with UI side effects. That makes it easier to make your code purely functional by default.
 
+<img src="docs/assets/isolating-side-effects.png" alt="Isolating side effects" style="max-width: 80vw; max-height: 30vh;">
+
 # Sources vs. Sinks
 There are two key concepts used by Rimmel: sources and sinks.
 
@@ -268,17 +270,20 @@ target.innerHTML = rml`
 ### Event Adapters
 In normal circumstances your event handlers receive a native DOM `Event` object, such as `MouseEvent`, `PointerEvent`, etc.
 
-To enable a better separation of concerns, as of Rimmel 1.2 you can use Event Adapters to feed your event handlers or Observable streams the exact data they need, in the format they expect it, rather than the generic, raw DOM Event objects.
+To enable a better separation of concerns you can use Event Adapters to feed your event handlers or Observable streams the exact data they need, rather than the generic, raw Event objects coming from the DOM.
 
-Do you only need the relative `[x, y]` mouse coordinates when hovering an element?<br>
-Use `<div onmousemove="${ OffsetXY(handler) }">`
+Do you want the last typed character when handling keyboard events?<br>
+Use `<input oninput="${ Key(handler) }">`
+
+Do you only need the value of a text box when it's changed?<br>
+Use `<input onchange="${ Value(handler) }">`
+
+Do you also want to empty it after you've read its value?<br>
+Use `<input onchange="${ Cut(handler) }">`
 
 
 <img src="docs/assets/event-adapters.png" alt="Event Adapters" style="max-width: 80vw; max-height: 30vh;">
 
-
-Do you want the last typed character when handling keyboard events?
-Use `<input oninput="${ Key(handler) }">`
 
 Rimmel comes with a handful of Event Adapters out of the box, but you can create your own with ease.
 Event Adapters become particularly useful when you have a main data stream that you want to feed from different elements of different types that emit different events. Using an adapter for each, you can make sure you always get data in a unified format in your main data stream.

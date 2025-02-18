@@ -8,6 +8,8 @@ export const waitingElementHanlders = <Map<string, BindingConfiguration[]>>new M
 // TODO: Test and verify with WeakRef/FinalizationRegistry
 export const delegatedEventHandlers: WeakMap<Element, SourceBindingConfiguration<RMLEventName>[]> = new WeakMap();
 export const subscriptions: Map<Node, Subscription[]> = new Map();
+// #REF49993849837451
+// export const listeners: WeakMap<Node, EventListener[]> = new WeakMap();
 export const delegatedEvents = new Set();
 
 // FIXME: add a unique prefix to prevent collisions with different dupes of the library running in the same context/app

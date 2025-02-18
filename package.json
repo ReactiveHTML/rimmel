@@ -31,7 +31,8 @@
     "kitchen-sink": "cd examples/kitchen-sink && vite",
     "website": "cd docs && bundle exec jekyll build",
     "website:local": "cd docs && bundle exec jekyll serve",
-    "test": "bun test"
+    "test": "bun test",
+    "test:types": "tsd --files src/**/*.test-d.ts"
   },
   "repository": {
     "type": "git",
@@ -80,6 +81,7 @@
     "rollup-plugin-visualizer": "^5.12.0",
     "rxjs": "^7.8.1",
     "ts-node": "^10.9.2",
+    "tsd": "^0.31.2",
     "tslib": "^2.8.0",
     "typedoc": "^0.27.5",
     "typescript": "^5.7.2",

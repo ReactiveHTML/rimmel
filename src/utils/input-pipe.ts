@@ -15,43 +15,47 @@ export type rxPipe<I, O> = (...pipeline: OperatorPipeline<I, O>) => Pipeline<I, 
  * This works the opposite of RxJS's pipe(), which works on the output of an Observable.
 **/
 export const pipeIn =
-  <I, O=I>(target: RMLTemplateExpressions.TargetEventHandler<O>, ...pipeline: OperatorPipeline<I, O>): Observer<I> => {
-    const source = new Subject<I>();
-    source
-      .pipe(...(<[OperatorFunction<I, O>]>pipeline))
-      .subscribe(<Observer<O>>target)
-    ;
-    // FIXME: will we need to u1n1subscribe? Then store a reference for unsubscription
-    // TODO: can we/should we delay subscription until mounted? Could miss the first events otherwise
+	<I, O=I>(target: RMLTemplateExpressions.TargetEventHandler<O>, ...pipeline: OperatorPipeline<I, O>): Observer<I> => {
+		const source = new Subject<I>();
+		source
+			.pipe(...(<[OperatorFunction<I, O>]>pipeline))
+			.subscribe(<Observer<O>>target)
+		;
 
-    return source;
-  };
+		// FIXME: will we need to unsubscribe? Then store a reference for unsubscription
+		// TODO: can we/should we delay subscription until mounted? Could miss the first events otherwise
+
+		return source;
+	}
+;
 
 /**
  * Create an "input pipe" by prepending operators to an Observer or a Subject
  *
- * @remarks This works the opposite of the pipe() function in RxJS, which transforms the output of an observable.
- * whilst inputPipe transforms the input.
- * You'll typically use these to create Event Adapters
- *
- * @template I the input type of the returned stream
- * @template O the output type of the returned stream
+ * @remarks This works the opposite way to the pipe() function in RxJS, which
+ * transforms the output of an observable whilst this transforms the input.
+ * You normally use an input pipe to create Event Adapters.
+ * @template I the input type of the returned stream (the event adapter)
+ * @template O the output type of the returned stream (= the input type of the actual target stream)
  * @example const MyUsefulEventAdapter = inputPipe(...pipeline);
  * const template = rml`
  *   <input onkeypress="${MyUsefulEventAdapter(targetObserver)}">
  * `;
 **/
 export const inputPipe = <I, O=unknown>(...pipeline: OperatorPipeline<I, O>) =>
-  (target: RMLTemplateExpressions.TargetEventHandler<O>) =>
-    pipeIn<I, O>(target, ...pipeline)
+	(target: RMLTemplateExpressions.TargetEventHandler<O>) =>
+		pipeIn<I, O>(target, ...pipeline)
 ;
-
 
 export const feed = pipeIn;
 export const feedIn = pipeIn;
 
 export const reversePipe = inputPipe;
 
-// WIP, TBC
-export const source = (...reversePipeline: [...OperatorPipeline<any, any>, Observer<any>]) => pipeIn(<Observer<any>>reversePipeline.pop(), ...<OperatorPipeline<any, any>>reversePipeline);
-export const sink = (source: MaybeFuture<any>, ...pipeline: OperatorPipeline<any, any>) => source.pipe(...pipeline);
+// TBC
+export const source = (...reversePipeline: [...OperatorPipeline<any, any>, Observer<any>]) =>
+	pipeIn(<Observer<any>>reversePipeline.pop(), ...<OperatorPipeline<any, any>>reversePipeline);
+
+export const sink = (source: MaybeFuture<any>, ...pipeline: OperatorPipeline<any, any>) =>
+	source.pipe(...pipeline);
+

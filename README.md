@@ -129,7 +129,7 @@ When you're dealing with structured data, like lists or grids of repeated data, 
 You can create your custom, advanced Sinks to render data structures of any complexity and manage specific aspects of its interactions in the most optimal way for your needs.
 This is a perfect case for reactive grids, spreadsheets, SVG or Canvas drawings, 3D scenes, etc.
 ### Dynamic Lists and Collections
-If you just want to display a dynamic list of repeated elements you may want to use a `Collection` from [ObservableTypes](https://github.com/reactivehtml/observable-types), which is a Array+Observable+Observer utility to manage lists trivial with Rimmel.
+If you just want to display a dynamic list of repeated elements you may want to use a `Collection` from [ObservableTypes](https://github.com/reactivehtml/observable-types), which is an Array+Observable+Observer object to make lists trivial to manage with Rimmel.
 
 The following illustration shows how you can manage a simple list of items.
 
@@ -565,6 +565,9 @@ Promises and Observables get merged whenever they resolve/emit.
 <div class="playground-link">
 <a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010">Draggable Mixin</a> on Codepen
 </div>
+
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-draggable)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-draggable-deferred)
 
 <br>
 

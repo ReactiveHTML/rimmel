@@ -64,7 +64,7 @@ export type SinkElementTypes = {
     types: boolean | 'true' | 'closed';
   };
   'content': {
-    elements: HTMLElement | SVGElement | MathMLElement;
+    elements: HTMLContainerElement;
     types: HTMLString;
   };
   'textcontent': {

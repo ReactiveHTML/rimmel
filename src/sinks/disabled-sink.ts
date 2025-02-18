@@ -20,8 +20,9 @@ export const DisabledSink: Sink<Disableable> = (node: Disableable) =>
  * A specialised sink for the "disabled" HTML attribute
  * @param source A present or future boolean value
  * @returns RMLTemplateExpression A template expression for the "disabled" attribute
- * @example <input type="button" disabled="${Disabled(booleanValue)}">
- * @example <input type="button" disabled="${Disabled(booleanPromise)}">
+ * @example <input type="button" disabled="${booleanValue}">
+ * @example <input type="button" disabled="${booleanPromise}">
+ * @example <input type="button" disabled="${booleanObservable}">
  * @example <input type="button" disabled="${Disabled(booleanObservable)}">
  */
 export const Disabled: ExplicitSink<'disabled'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'disabled'>) =>

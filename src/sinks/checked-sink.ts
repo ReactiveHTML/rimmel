@@ -13,10 +13,11 @@ export const CheckedSink: Sink<HTMLInputElement> = (node: HTMLInputElement) =>
 /**
  * A specialised sink for the "checked" HTML attribute
  * @param source A present or future boolean value
- * @returns RMLTemplateExpression A template expression for the "checked" attribute
- * @example <input type="checkbox" checked="${Checked(booleanValue)}">
+ * @returns RMLTemplateExpression A template expression for the "checked" DOM attribute
+ * @example <input type="checkbox" checked="${booleanValue}">
+ * @example <input type="checkbox" checked="${booleanPromise}">
+ * @example <input type="checkbox" checked="${booleanObservable}">
  * @example <input type="checkbox" checked="${Checked(booleanPromise)}">
- * @example <input type="checkbox" checked="${Checked(booleanObservable)}">
  */
 export const Checked: ExplicitSink<'checked'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'checked'>) =>
   <SinkBindingConfiguration<HTMLInputElement>>({

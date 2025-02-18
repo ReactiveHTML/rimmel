@@ -13,7 +13,7 @@ export const AppendHTMLSink: Sink<Element> =
 /**
  * A specialised sink to append HTML to the end of an element
  * @param source A present or future HTML string
- * @returns RMLTemplateExpression An HTML-subtree RML template expression
+ * @returns RMLTemplateExpression An HTML-subtree or RML template expression
  * @example <div>${AppendHTML(stream)}</div>
  */
 export const AppendHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressions.HTMLText, pos: InsertPosition = 'beforeend') =>

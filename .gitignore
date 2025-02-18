@@ -1,3 +1,7 @@
 node_modules
 docs
 dist
+
+.vscode
+bundle-stats*
+

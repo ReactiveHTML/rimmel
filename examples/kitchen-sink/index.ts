@@ -1,61 +1,19 @@
-import type { HTMLString, SinkBindingConfiguration, Stream } from '../../src/index';
+/**
+ * Rimmel.js Kitchen Sink Demo Application
+ *
+ * A messy testbed of stuff you can do with the library.
+ * If you're just starting out, this may feel a bit
+ * overwhelming and you might want to start with some of
+ * the simpler examples around which come with instructions
+ * explanations and everyhing.
+ */
 
-import {
-  BehaviorSubject,
-  Subject,
+import type { HTMLString, SinkBindingConfiguration, Stream, Coords } from '../../src/index';
 
-  catchError,
-	combineLatest,
-  filter,
-  interval,
-  map,
-  merge,
-  mergeWith,
-  Observable,
-  of,
-  scan,
-	share,
-  startWith,
-  take,
-  tap,
-} from 'rxjs';
+import { BehaviorSubject, Subject, catchError, combineLatest, filter, interval, map, merge, mergeWith, Observable, of, scan, share, startWith, take, tap, } from 'rxjs';
 
-import {
-  rml,
-
-  inputPipe,
-  pipeIn,
-
-  Active,
-  AppendHTML,
-  AutoForm,
-  cut,
-  Cut,
-  Dataset,
-  DatasetObject,
-  eventData,
-  EventData,
-  form,
-  Form,
-  InnerHTML,
-  InnerText,
-  JSONDump,
-  Key,
-  Numberset,
-  OffsetXY,
-  Passive,
-  Removed,
-  Sanitize,
-  sink,
-  source,
-  Swap,
-  TextContent,
-  Update,
-  Value,
-  ValueAsDate,
-  ValueAsNumber,
-  value,
-} from '../../src/index';
+import { rml, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Removed, Sanitize, sink, source, Swap, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, } from '../../src/index';
+import { subscribe } from '../../src/lib/drain';
 import { set_USE_DOM_OBSERVABLES } from '../../src/index';
 import { char } from '../../src/types/basic';
 import { RegisterElement } from '../../src/custom-element';
@@ -163,6 +121,31 @@ const sources = {
 			<svg version="1.1" viewBox="0 0 100 100">
 				<g style="stroke:#0000ffff; stroke-width: .2;">${AppendHTML(stream)}</g>
 			</svg>
+		`;
+
+		return strHTML;
+	},
+
+	CANVAS: () => {
+		const s2 = new Subject();
+
+		const stream = interval(2000).pipe(
+			take(21),
+			map(i => [[0, 100 -10*i], [100, 10*i]])
+		);
+
+		const color = new BehaviorSubject('#ff0000');
+		const shadowColor = new BehaviorSubject('#0000ff');
+
+		const strHTML = rml`
+			<input type="color" onchange="${Value(color)}"> <br>
+			<input type="color" onchange="${Value(color)}"> <br>
+
+			<canvas style="width: 100%; height: 100px">
+				<canvas-line color="${color}" shadow-color="${shadowColor}" path="${stream}" onxxx="${s2}" />
+				<!--canvas-rect path="${stream}" onxxx="${s2}" /-->
+			</canvas>
+			<div>${s2}</div>
 		`;
 
 		return strHTML;
@@ -513,7 +496,7 @@ const sources = {
 	},
 
 
-	'KeyboardSource (Key)': () => {
+	'KeyboardSource_(Key)': () => {
 		const stream = new Subject<char>();
 
 		return rml`
@@ -603,8 +586,8 @@ const sinks = {
 
 		return rml`
 			Should be a custom element
-			<p class="red">red</p>
-			<custom-element class="css-through" style="--color: green" title="${titleStream}" content="hello" data-foo="bar2" oninput="${EventData(notify)}" onclick="${Dataset('foo')(notify)}" />
+			<p class="colored">colored</p>
+			<custom-element class="css-through" style="--color: lime" title="${titleStream}" content="lime" data-foo="bar2" oninput="${EventData(notify)}" onclick="${Dataset('foo')(notify)}" />
 		`;
 	},
 
@@ -618,7 +601,7 @@ const sinks = {
 
 		return rml`
 			Should be a custom element
-			<custom-element title="${titleStream}" content="hello" data-foo="bar2" oninput="${EventData(notify)}" onclick="${Foo(notify)}" />
+			<custom-element class="css-through" title="${titleStream}" style="--color: blue" content="blue" data-foo="bar2" oninput="${EventData(notify)}" onclick="${Foo(notify)}" />
 		`;
 	},
 
@@ -1399,35 +1382,39 @@ const component = () => {
 			}
 
 			body {
-				font-size: 8px;
 			}
 
 			code {
 				display: block;
-				background-color: #e0e0e0;
+				margin: 1rem;
 				padding: 1rem;
+				overflow-x: auto;
+				background-color: #e0e0e0;
+				border-radius: .4rem;
+				font-family: monospace;
 				white-space: pre;
 				tab-size: 2;
-				overflow-x: auto;
-			}
 
-			code::before {
-				display: block;
-				margin-bottom: 1rem;
-				content: "Code";
-				border-bottom: 1px solid;
+				&::before {
+					display: block;
+					margin-bottom: 1rem;
+					content: "Code";
+					border-bottom: 2px solid;
+				}
 			}
 
 			.rendered {
+				margin: 1rem;
 				padding: 1rem;
-				background-color: #e0e0f0;
-			}
+				background-color: #e0e0e0;
+				border-radius: .4rem;
 
-			.rendered::before {
-				display: block;
-				margin-bottom: 1rem;
-				content: "Rendered";
-				border-bottom: 1px solid;
+				&::before {
+					display: block;
+					margin-bottom: 1rem;
+					content: "Rendered";
+					border-bottom: 2px solid;
+				}
 			}
 
 			@media(prefers-color-scheme: dark) {
@@ -1442,24 +1429,23 @@ const component = () => {
 				}
 			}
 
-			.output {
-				display: flex;
-				flex-direction: column;
-				height: 100vh;
-				margin: 0;
-				padding: 0;
-				background-color: white;
-				border: 2px solid;
-			}
-
 			.selector {
 				display: flex;
-				width: 100%;
+				flex-direction: row;
 				overflow-x: auto;
-				max-height: 20vh;
-				fieldset {
-					overflow: auto;
+
+				ul {
+					display: flex;
+					flex-direction: row;
+					margin: 0;
+					padding: 0;
+					gap: .4rem;
+
+					a {
+						white-space: nowrap;
+					}
 				}
+
 			}
 
 			.twocol {
@@ -1470,6 +1456,13 @@ const component = () => {
 				gap: 1rem;
 			}
 
+			.tworow {
+				flex: 1;
+				display: grid;
+				align-items: start;
+				grid-template-rows: 1fr 1fr;
+				gap: 1rem;
+			}
 
 			li {
 				margin-block: .2rem;
@@ -1536,7 +1529,7 @@ const component = () => {
 		</style>
 
 		<div class="output" rml:onmount="${autorun}">
-			<div class="selector">
+			<div class="selector twocol">
 				<fieldset>
 					<legend>Sources</legend>
 					<ul style="list-style-type: none;">
@@ -1559,22 +1552,21 @@ const component = () => {
 					</ul>
 				</fieldset>
 			</div>
-			<hr>
-			<div class="twocol">
-				<div class="rendered">
-					${chosenComponent}
-				</div>
-				<code>${InnerText(chosenSource)}</code>
-			</div>
+
+			<div class="rendered">${chosenComponent}</div>
+
+			<code>${InnerText(chosenSource)}</code>
 		</div>
 
 	`;
 }
 
 RegisterElement('custom-element', ({ title, content, onbuttonclick, onput }) => {
+	const internalPut = new Subject();
 	const handle = e => {
 		console.log('Internal event', e);
 		onput.next(e);
+		internalPut.next(e);
 	}
 
 	return rml`
@@ -1583,18 +1575,47 @@ RegisterElement('custom-element', ({ title, content, onbuttonclick, onput }) => 
 			:host {
 			}
 			:host-context(.css-through) {
-				.red {
+				.colored {
 					color: var(--color);
 				}
 			}
 			</style>
 			<h3>${title}</h3>
-			<p class="red">${content}</p>
+			<p class="colored">${content}</p>
 			Custom Element Works!<br>
-			<input type="text" class="red" onchange="${Value(handle)}">
+			<input type="text" class="colored" onchange="${Value(handle)}">
 			<button type="button" data-foo="bar1" onclick="${Dataset('foo', handle)}">click me</button>
+			<br>
+			internal: <span>${internalPut}</span>
 		</div>
 	`;
 });
 
+RegisterElement('canvas-line', null, (element: Element, { color, path }) => {
+	const canvas = element.closest('canvas');
+	const ctx = canvas.getContext('2d');
+	color.subscribe(c=>ctx.strokeStyle = c);
+	ctx.lineWidth = 5;
+
+	path.subscribe(([from, to]) => {
+		ctx.beginPath();
+		ctx.moveTo(...from);
+		ctx.lineTo(...to);
+		ctx.stroke();
+	});
+});
+
+RegisterElement('canvas-rect', null, (element: Element, { path }) => {
+	const canvas = element.closest('canvas');
+	const ctx = canvas.getContext('2d');
+	ctx.strokeStyle = '#60202080';
+
+	path.subscribe(([from, to]) => {
+		ctx.fillRect(...from, ...to);
+		ctx.stroke();
+	});
+});
+
+
 document.body.innerHTML = component();
+

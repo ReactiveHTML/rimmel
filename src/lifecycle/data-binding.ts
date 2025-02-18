@@ -34,9 +34,9 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 		return n.nodeType == 3 && n.nodeValue?.includes(INTERACTIVE_NODE_START);
 	});
 
-	// Interactive text nodes
-	// TODO: shall we use some ad-hoc container elements, instead? <text-wrapper>
 	if(hasInteractiveTextNodes) {
+		// Bind interactive "text nodes"
+		// TODO: shall we use some ad-hoc container elements, instead? <text-wrapper>
 		const nodes = <(Node | string)[]>[];
 		for (const n of node.childNodes) {
 			if(n.nodeType == 3) {
@@ -124,11 +124,16 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 						if(isObservature(l)) {
 							(<IObservature<Event>>l).addSource(source as MonkeyPatchedObservable<Event>);
 						} else {
+							// TODO: Add AbortController
 							source.subscribe(l);
 						}
 					}
 				} else {
-					 node.addEventListener(eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options);
+					node.addEventListener(eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options);
+					// #REF49993849837451
+					// const listenerRef = [eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options];
+					// node.addEventListener(...listenerRef);
+					// listeners.get(node)?.push?.(listenerRef) ?? listeners.set(node, [listenerRef]);
 				}
 			} else {
 				const isNonBubblingEvent = NON_BUBBLING_DOM_EVENTS.has(eventName);
@@ -168,9 +173,16 @@ export const removeListeners = (node: Element) => {
 		// l?.destination?.complete(); // do we need this, BTW?
 
 		// console.debug('Rimmel: Unsubscribing', node, l);
-		l.unsubscribe?.()
+		// FIXME: DOM Observables don't have unsubscribe => Use AbortControllers
+		l?.unsubscribe?.()
 	});
 	subscriptions.delete(node);
+
+	// #REF49993849837451 Just leaving this around, but there's no need to manually
+	// remove listeners. DevTools might suggest otherwise, but HE is holding on to
+	// EventListeners in memory, not Rimmel.
+	// listeners.get(node)?.forEach(ref => node.removeEventListener(...ref));
+	// listeners.delete(node);
 };
 
 /**

@@ -1,6 +1,7 @@
 import type { SinkFunction } from "../types/sink";
 import type { EventListenerObject, EventListenerOrEventListenerObject } from "../types/dom";
 import type { MaybeFuture, Observable, Observer } from "../types/futures";
+import type { RenderingScheduler } from "../types/schedulers";
 
 import { isObservable, isPromise } from "../types/futures";
 import { subscriptions } from "../internal-state";
@@ -23,9 +24,9 @@ export const callable = <T>(x: (Observer<T> | EventListenerObject<T> | ((t: T)=>
 
 // FIXME: remove, use subscribe below instead
 export const asap = (fn: SinkFunction, arg: MaybeFuture<unknown>) => {
-    (<Observable<unknown>>arg)?.subscribe?.(fn) ??
-    (<Promise<unknown>>arg)?.then?.(fn) ??
-    fn(arg);
+	(<Observable<unknown>>arg)?.subscribe?.(fn) ??
+	(<Promise<unknown>>arg)?.then?.(fn) ??
+	fn(arg);
 };
 
 /**
@@ -38,7 +39,7 @@ export const asap = (fn: SinkFunction, arg: MaybeFuture<unknown>) => {
  */
 export const subscribe =
 	<T extends Event>
-	(node: Node, source: MaybeFuture<T>, next: EventListenerOrEventListenerObject<T>, error?: (e: Error) => void, complete?: () => void, scheduler = renderingScheduler) => {
+	(node: Node, source: MaybeFuture<T>, next: EventListenerOrEventListenerObject<T>, error?: (e: Error) => void, complete?: () => void, scheduler: RenderingScheduler | null = null) => {
 
 		// TODO: make this a plugin, in case people don't use anything with handleEvent...
 		const flattenedNext = (next as EventListenerObject<T>).handleEvent?.bind(next) ?? next;

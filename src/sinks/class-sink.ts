@@ -89,11 +89,12 @@ export const ToggleClass: ExplicitSink<'class'> =
 ;
 
 /**
- * A specialised sink for the "className" HTML attribute
+ * A specialised sink for the "class" HTML attribute
  * Will set the whole className of an element to the string emitted by the source
  * @param source A present or future string
  * @returns RMLTemplateExpression A template expression for the "className" attribute
- * @example <div class="${ClassName(stringPromise)}">
+ * @example <div class="${stringPromise}">
+ * @example <div class="${stringObservable}">
  * @example <div class="${ClassName(stringObservable)}">
 **/
 export const ClassName: ExplicitSink<'class'> = (source: RMLTemplateExpressions.ClassName) =>

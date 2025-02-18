@@ -1,8 +1,5 @@
 /**
- * An Element supporting the "rml:focus" RML attribute (i.e.: that can be focused)
+ * An Element supporting the focus attribute (i.e.: that can be focused, like a button, a text box, etc)
  */
-export interface FocusableElement extends Element {
-	focus: () => void;
-	blur: () => void;
-};
+export type FocusableElement = HTMLElement & { focus: () => void; blur: () => void };
 

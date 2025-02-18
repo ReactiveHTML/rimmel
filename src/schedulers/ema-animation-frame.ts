@@ -1,4 +1,4 @@
-import type { RenderingScheduler, RenderingTask } from '../types/schedulers';
+import type { RenderingScheduler } from '../types/schedulers';
 
 const queue = new Map();
 let averageTaskTime = 0;
@@ -35,4 +35,3 @@ export default ((node, task) =>
 		queue.set(node, task.bind(null, ...args)); // Update task in the queue
 	}
 ) as RenderingScheduler;
-

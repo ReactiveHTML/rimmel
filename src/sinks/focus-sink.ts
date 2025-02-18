@@ -15,10 +15,11 @@ export const FocusSink: Sink<FocusableElement> = (node: FocusableElement) =>
 /**
  * A specialised sink for the "rml:focus" RML attribute
  * @param source A present or future boolean value
- * @returns RMLTemplateExpression A template expression for the "disabled" attribute
- * @example <input type="text" rml:focus="${Focus(booleanValue)}">
+ * @returns RMLTemplateExpression A template expression for the "rml:focus" RML attribute
+ * @example <input type="text" rml:focus="${booleanValue}">
+ * @example <input type="text" rml:focus="${booleanPromise}">
+ * @example <input type="text" rml:focus="${booleanObservable}">
  * @example <input type="text" rml:focus="${Focus(booleanPromise)}">
- * @example <input type="text" rml:focus="${Focus(booleanObservable)}">
  */
 export const Focus: ExplicitSink<'rml:focus'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'rml:focus'>) =>
 	<SinkBindingConfiguration<FocusableElement>>({

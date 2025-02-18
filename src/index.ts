@@ -36,6 +36,7 @@ export * from './sources/object-source';
 
 // Event Mapping Functions
 export { feed, feedIn, inputPipe, pipeIn } from './utils/input-pipe';
+export { curry } from './utils/curry';
 
 // Event Source Modifiers
 export { Active } from './sources/modifiers/active';
@@ -81,6 +82,9 @@ export { Removed } from './sinks/removed-sink';
 export { Sanitize } from './sinks/sanitize-html-sink';
 export { Suspend } from './sinks/suspense-sink';
 export { TextContent } from './sinks/text-content-sink';
+
+// Plumbing
+export { asap } from './lib/drain';
 
 // Experimental Web Component support
 export { RegisterElement } from './custom-element';

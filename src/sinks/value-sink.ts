@@ -12,4 +12,3 @@ export const ValueSink: Sink<HTMLInputElement> =
 			node.value = str;
 		}
 ;
-

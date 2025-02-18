@@ -7,6 +7,9 @@ import { inputPipe } from '../utils/input-pipe';
  *
  * This operator has side effects, as it will directly modify the underlying element
  * @category Event Adapter Operators
+ * @template T the type of the target element
+ * @template I the type of Event sourced from the underlying element
+ * @template O the data type emitted into the target stream
  * @returns OperatorFunction<Event, string>
  *
  * For simple, one-step input pipelines, see the {@link Cut | Cut (uppercase)} Event Adapter
@@ -35,7 +38,7 @@ import { inputPipe } from '../utils/input-pipe';
  * };
  * ```
  */
-export const cut = 
+export const cut =
   map(<T extends (HTMLInputElement | HTMLElement), I extends Event, O extends string | number | Date | null>(e: I): O => {
     const t = (<T>e.target);
     const v = <O>autoValue(t);

@@ -1,6 +1,6 @@
 {
   "name": "rimmel",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "A Functional-Reactive UI library for the Rx.Observable Universe",
   "type": "module",
   "_main": "dist/cjs/index.cjs",
@@ -19,7 +19,9 @@
   "files": [
     "dist/"
   ],
-  "sideEffects": ["./src/lifecycle/data-binding.ts"],
+  "sideEffects": [
+    "./src/lifecycle/data-binding.ts"
+  ],
   "scripts": {
     "build": "rimraf dist && rollup --config rollup.config.js",
     "dev": "rimraf dist && rollup -w --config rollup.config.js",

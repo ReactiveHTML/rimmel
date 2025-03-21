@@ -9,7 +9,6 @@ import { isFunction } from "../utils/is-function";
 import { takeFirstSync } from "../utils/take-first-sync";
 import { BehaviorSubject, isObservable, MaybeFuture, Observable } from "../types/futures";
 import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
-import { NON_BUBBLING_DOM_EVENTS } from "../definitions/non-bubbling-events";
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUTE, RML_DEBUG } from "../constants";
 
 import { PreSink } from "../sinks/index";
@@ -21,7 +20,6 @@ import { ObserverSource, isObserverSource, ObservatureSource, isObservatureSourc
 
 import { isPromise } from '../types/futures';
 
-// import { skip } from 'rxjs';
 import { InnerHTML } from "../sinks/inner-html-sink";
 import { TextContent } from "../sinks/text-content-sink";
 import { ClassRecord } from "../sinks/class-sink";

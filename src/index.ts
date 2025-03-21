@@ -99,7 +99,7 @@ export { source, sink } from './utils/input-pipe';
 // Other Low-Level Utilities
 export { Rimmel_Bind_Subtree, Rimmel_Mount } from './lifecycle/data-binding';
 export { RESOLVE_SELECTOR, RML_DEBUG, SINK_TAG } from './constants';
-export { set_DELEGATE_EVENTS, set_USE_DOM_OBSERVABLES } from './constants';
+export { set_USE_DOM_OBSERVABLES } from './constants';
 
 // Main entries
 export { rml } from './parser/parser';

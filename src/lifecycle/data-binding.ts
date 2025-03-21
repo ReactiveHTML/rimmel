@@ -3,11 +3,9 @@ import type { MonkeyPatchedObservable }	from '../types/monkey-patched-observable
 import type { RMLEventName } from "../types/dom";
 import type { SourceBindingConfiguration } from "../types/internal";
 
-import { NON_BUBBLING_DOM_EVENTS } from "../definitions/non-bubbling-events";
-import { DELEGATE_EVENTS, INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUTE, RESOLVE_SELECTOR, RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
+import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, RESOLVE_ATTRIBUTE, RESOLVE_SELECTOR, RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
 
-import { delegatedEventHandlers, subscriptions, waitingElementHanlders } from "../internal-state";
-import { delegateEvent } from "../lifecycle/event-delegation";
+import { subscriptions, waitingElementHanlders } from "../internal-state";
 import { isSinkBindingConfiguration } from "../types/internal";
 import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
@@ -116,35 +114,30 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 			const sourceBindingConfiguration = <SourceBindingConfiguration<RMLEventName>>bindingConfiguration;
 			const { eventName } = sourceBindingConfiguration;
 
-			// We only use event delegation for bubbling events. Non-bubbling events will have their own listener attached directly.
-			// TODO: shall we support direct, non-delegated event handling, as well (for a little extra performance boost, what else?)
-			if (!DELEGATE_EVENTS || NON_BUBBLING_DOM_EVENTS.has(eventName) || node.getRootNode() instanceof ShadowRoot) {
-				// We add an event listener for all those events who don't bubble by default (as we're delegating them to the top)
-				// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
-				if(USE_DOM_OBSERVABLES && node.when) {
-					const l = <EventListenerFunction | IObservature<Event>>sourceBindingConfiguration.listener;
-					if(!isEventListenerObject(l)) {
-						const source = node.when(eventName, <ObservableEventListenerOptions | undefined>sourceBindingConfiguration.options);
-						if(isObservature(l)) {
-							(<IObservature<Event>>l).addSource(source as MonkeyPatchedObservable<Event>);
-						} else {
-							// TODO: Add AbortController
-							source.subscribe(l);
-						}
+			// We add an event listener for all those events who don't bubble by default (as we're delegating them to the top)
+			// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
+			if(USE_DOM_OBSERVABLES && node.when) {
+				const l = <EventListenerFunction | IObservature<Event>>sourceBindingConfiguration.listener;
+				if(!isEventListenerObject(l)) {
+					const source = node.when(eventName, <ObservableEventListenerOptions | undefined>sourceBindingConfiguration.options);
+					if(isObservature(l)) {
+						(<IObservature<Event>>l).addSource(source as MonkeyPatchedObservable<Event>);
+					} else {
+						// TODO: Add AbortController
+						source.subscribe(l);
 					}
-				} else {
-					node.addEventListener(eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options);
-					// #REF49993849837451
-					// const listenerRef = [eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options];
-					// node.addEventListener(...listenerRef);
-					// listeners.get(node)?.push?.(listenerRef) ?? listeners.set(node, [listenerRef]);
 				}
 			} else {
-				const isNonBubblingEvent = NON_BUBBLING_DOM_EVENTS.has(eventName);
-				if(!isNonBubblingEvent && DELEGATE_EVENTS) {
-					delegateEvent(eventName);
-				}
-				delegatedEventHandlers.get(node)?.push(sourceBindingConfiguration) ?? delegatedEventHandlers.set(node, [sourceBindingConfiguration])
+				node.addEventListener(eventName, e=>{
+					if(node.getRootNode() instanceof ShadowRoot) {
+						e.stopPropagation();
+					}
+					sourceBindingConfiguration.listener(e);
+				}, sourceBindingConfiguration.options);
+				// #REF49993849837451
+				// const listenerRef = [eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options];
+				// node.addEventListener(...listenerRef);
+				// listeners.get(node)?.push?.(listenerRef) ?? listeners.set(node, [listenerRef]);
 			}
 
 			if (eventName == 'rml:mount') {

@@ -26,11 +26,6 @@ export const INTERACTIVE_NODE_END   = '\u200C'; // FIXME: can't use this
 export const SOURCE_TAG: string = 'source';
 export const SINK_TAG: string = 'sink';
 
-// Use a single, delegated event listener at the root level
-// or attach individual event listeners or event observers to each node?
-export var DELEGATE_EVENTS: boolean = false;
-export const set_DELEGATE_EVENTS = ((x: boolean) =>  DELEGATE_EVENTS = x);
-
 // Use the new native Web Platform Observables instead of addEventListener when available
 export var USE_DOM_OBSERVABLES: boolean = false;
 export const set_USE_DOM_OBSERVABLES = ((x: boolean) =>  USE_DOM_OBSERVABLES = x);
@@ -44,4 +39,3 @@ export const setRenderingScheduler = (scheduler: RenderingScheduler) => renderin
 // export const configure = () => {
 // 	return rml
 // }
-

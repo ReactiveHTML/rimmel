@@ -34,6 +34,8 @@ export default [
 				sourceMap: true,
 				outDir: 'dist/globaljs',
 				declaration: false,
+				declarationDir: undefined, // Explicitly unset
+				declarationMap: false,     // Explicitly disable
 			}),
 			terser(terserOptions),
 			visualizer({ filename: 'bundle-stats-globaljs.html' }),

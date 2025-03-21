@@ -58,7 +58,7 @@ export { ClientXY } from './sources/client-xy-source';
 export { OffsetXY } from './sources/offset-xy-source';
 export { LastTouchXY } from './sources/last-touch-xy-source';
 export { Swap } from './sources/swap-source';
-export { SwitchToLatest } from './sources/switch-to-latest';
+export { AsLatestFrom } from './sources/as-latest-from';
 export { Value, ValueAsDate, ValueAsNumber, value, valueAsString, valueAsDate, valueAsNumber } from './sources/value-source';
 
 // Data Sinks

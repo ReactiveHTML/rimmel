@@ -1,18 +1,19 @@
 /**
  * Rimmel.js Kitchen Sink Demo Application
  *
- * A messy testbed of stuff you can do with the library.
+ * A messy testbed of all you can do with the library.
  * If you're just starting out, this may feel a bit
  * overwhelming and you might want to start with some of
  * the simpler examples around which come with instructions
  * explanations and everyhing.
+ * Check out https://stackblitz.com/orgs/github/ReactiveHTML/collections/reactivity
  */
 
 import type { HTMLString, SinkBindingConfiguration, Stream, Coords } from '../../src/index';
 
 import { BehaviorSubject, Subject, ReplaySubject, catchError, combineLatest, filter, interval, map, merge, mergeWith, Observable, of, pipe, scan, share, startWith, take, tap, timer } from 'rxjs';
 
-import { rml, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Removed, Sanitize, sink, source, Suspend, Suspender, Swap, SwitchToLatest, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, } from '../../src/index';
+import { rml, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Removed, Sanitize, sink, source, Suspend, Suspender, Swap, AsLatestFrom, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, } from '../../src/index';
 import { subscribe } from '../../src/lib/drain';
 import { set_USE_DOM_OBSERVABLES } from '../../src/index';
 import { char } from '../../src/types/basic';
@@ -219,19 +220,36 @@ const sources = {
 		`;
 	},
 
-	SwitchToLatest: () => {
+	AsLatestFrom: () => {
 		const otherStream = new ReplaySubject(123);
 		const stream = new Subject<any>();
 
-		setTimeout(() =>
-			otherStream.next(234)
+		setInterval(() =>
+			otherStream.next(Math.random())
 		, 1000);
 
 		return rml`
-			<button onclick="${SwitchToLatest(otherStream, stream)}">click me</button>
+			<button onclick="${AsLatestFrom(otherStream, stream)}">click me</button>
 			[ <span>${stream}</span> ]
 		`;
 	},
+
+	AsLatestFrom2: () => {
+		const otherStream = new ReplaySubject(123);
+		const stream = new Subject<any>();
+
+		setInterval(() =>
+			otherStream.next(Math.random())
+		, 1000);
+
+		const AsTheOther = AsLatestFrom(otherStream);
+
+		return rml`
+			<button onclick="${AsTheOther(stream)}">click me</button>
+			[ <span>${stream}</span> ]
+		`;
+	},
+
 
 	ValueSource: () => {
 		const stream = new Subject<string>();
@@ -564,7 +582,7 @@ const sinks = {
 	},
 
 	BehaviorSubject: () => {
-		const bs = new BehaviorSubject('').pipe(
+		const bs = new BehaviorSubject('initial').pipe(
 			mergeWith(interval(1000)),
 		);
 
@@ -872,7 +890,7 @@ const sinks = {
 	},
 
 	Mixin_Subtree: () => {
-		const counter = interval(1000);
+		const counter = timer(0, 1000);
 
 		const mix = (args?: any) => {
 			const subtree = {

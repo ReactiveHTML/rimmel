@@ -1,7 +1,6 @@
 import { type Observable, withLatestFrom, map, of, pipe, from } from "rxjs";
-import type { MaybeFuture, Present } from "../types/futures";
+import type { MaybeFuture, Observer, Present } from "../types/futures";
 import { curry } from "../utils/curry";
-import { inputPipe } from "../utils/input-pipe";
 
 const maybeLift = <T>(v: MaybeFuture<T>): Observable<T> =>
 	(v as Observable<T>).subscribe ? v as Observable<T> :
@@ -13,21 +12,12 @@ const maybeLift = <T>(v: MaybeFuture<T>): Observable<T> =>
  * WIP: don't use yet
  * Emits the latest value coming from the supplied observable
  */
-export const SwitchToLatest = <T>(source: MaybeFuture<T>) =>
-	curry<T, T>(
+export const AsLatestFrom = <I, O>(source: MaybeFuture<I>, target?: Observer<O>) =>
+	curry<I, I>(
 		pipe(
 			withLatestFrom(maybeLift(source)),
 			map(([_, source]) => source),
-		)
+		),
+		target
 	)
 ;
-
-// /**
-//  * WIP: don't use
-//  * Emits the latest value coming from the supplied observable
-//  */
-// export const SwitchTo = <T>(source: Observable<T>) => inputPipe(
-//   withLatestFrom(maybeLift(source)),
-//   map(([_, source]) => source),
-// );
-

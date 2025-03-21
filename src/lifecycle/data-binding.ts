@@ -66,10 +66,13 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 	const bindingRef = <string>node.getAttribute(RESOLVE_ATTRIBUTE);
 	(waitingElementHanlders.get(bindingRef) ?? []).forEach(function Rimmel_Bind_Element(bindingConfiguration) {
 		const debugThisNode = node.hasAttribute(RML_DEBUG);
+
+		// #IFDEF ENABLE_RML_DEBUGGER
 		if(tracing && debugThisNode) {
 			/* Stopped at data binding */
 			debugger;
 		}
+		// #ENDIF ENABLE_RML_DEBUGGER
 
 		if (isSinkBindingConfiguration(bindingConfiguration)) {
 			// DATA SINKS
@@ -88,20 +91,21 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 				console.groupEnd();
 			};
 
+			// #IFDEF ENABLE_RML_DEBUGGER
 			// This is the actual sink that will be bound to a source
 			const sinkFn2 = tracing && debugThisNode ? loggingSinkFn : sinkFn;
 
-			// #IFDEF DEBUG
 			if(tracing && debugThisNode) {
 				console.groupCollapsed('RML: Binding', t, targetNode);
 				console.dir(targetNode);
-				// console.trace('Rimmel_Bind_Element')
 				console.debug('Node: %o', targetNode);
 				console.debug('Conf: %o', bindingConfiguration);
 				console.debug('Sink: %o', sinkFn2);
 				console.groupEnd();
 			}
-			// #ENDIF
+			// #ELSE
+			// const sinkFn2 = sinkFn;
+			// #ENDIF ENABLE_RML_DEBUGGER
 
 			const sourceStream = bindingConfiguration.source;
 

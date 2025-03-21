@@ -11,9 +11,6 @@
       "import": "./dist/esm/index.js",
       "types": "./dist/esm/types/index.d.ts"
     },
-    "./internals": {
-      "import": "./dist/esm/internals.js"
-    },
     "./ssr": {
       "import": "./dist/ssr/index.mjs",
       "require": "./dist/ssr/index.cjs"

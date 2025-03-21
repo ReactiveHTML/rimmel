@@ -3,30 +3,24 @@
 
 [![npm](https://img.shields.io/npm/v/rimmel.svg)](https://www.npmjs.com/package/rimmel)
 
-Rimmel is a small, lightweight and fast UI library entirely built around the **Observable** and **Observer** patterns, where:
+Rimmel is a small, lightweight and fast JavaScript UI library designed for the streams oriented programming paradigm, implementing [Reactive Markup](https://github.com/ReactiveHTML/reactive-markup) and the [WICG Observable](https://wicg.github.io/observable/) specifications.
 
-- Input Events (sources) are Observables
-- Output (sinks) are Observers
-- Everything in between is your streams
+Writing reactive streams is easier than you think: take an input, transform it, forward it. Combine with other streams if needed.
 
-Writing reactive streams is easier than you think: take an input, transform it, return it. If you need a crash-course on reactive streams, tailored for UI development, check [this one](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) out.
+If you need a mini-crash-course on reactive streams tailored for UI development, check [this one](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) out.
 
 ## 👋 Hello World 👋
-The "Hello World" for reactive interfaces is the click counter: one button, you click it, he counts it.<br>
-This is how it works:
+The "Hello World" for reactive interfaces is the click counter: one button, you click it, he counts it.
 
 <img src="docs/assets/how-rimmel-works.png" alt="How RimmelJS Works">
 
-The `click` event is "sourced" into `counter`, which is an Observable Subject that takes `Event` objects and emits numbers.<br>
+The `click` event is "sourced" into `counter`, which is a behavior that takes `Event` objects and emits numbers.<br>
 
 The result is then "sinked" into the `<span>` element at the end.
 
+In code? Equally simple:
+
 <img src="docs/assets/how-rimmel-works-6.png" alt="How RimmelJS Works">
-
-<div class="playground-link">
-
-
-<br>
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-click-counter)
 
@@ -556,18 +550,18 @@ A simple use case for mixins is drag'n'drop, in the form of an isolated, reusabl
 
 <img src="docs/assets/how-rimmel-works-7.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
 
-The code above is a simple function that performs its business and returns a DOM object.
-Whatever it contains is merged into the host element.
-Static key-values (e.g.: `class`) are merged on the spot, before mounting.
-Promises and Observables get merged whenever they resolve/emit.
+The code above is a simple function that performs its business and returns an object of attribuends (prospective attributes): whatever it contains will be merged into the host element on mount.
+Promises and Observables will be merged whenever they resolve/emit.
+
 
 <br><br>
 <div class="playground-link">
 <a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://codepen.io/fourtyeighthours/pen/YzMgXoL?editors=0010">Draggable Mixin</a> on Codepen
 </div>
 
+&nbsp;
+
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-draggable)
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-draggable-deferred)
 
 <br>
 
@@ -663,17 +657,17 @@ We have created a few experimental AI assistants like [RimmelGPT.js](https://cha
 
 <br>
 
-## TodoMVC - the Rimmel way
+## TodoMVC
 Want to delve deeper into more advanced scenarios? Have a look at the following todo app all based on RxJS streams, [ObservableTypes](https://github.com/reactivehtml/observable-types) and Rimmel.
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-todomvc)
 
-## Tic-Tac-Toe - with Streams
+## Tic-Tac-Toe
 Here's a version of Tic Tac Toe made with Observable Streams
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/tic-tac-toe-rimmeljs)
 
-## A Colour Picker component
+## A Colour Picker
 In a component like a colour picker there's a lot of derived state to manage, from various inputs and controls, mouse and touch actions, copy-paste, drag'n'drop.
 RxJS can handle these without blinking an eye whilst Rimmel just glues them together.
 

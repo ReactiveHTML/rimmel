@@ -1,8 +1,7 @@
-import type { Observable } from '../types/futures';
+import type { BehaviorSubject, Observable } from '../types/futures';
 
-// TODO: add support for sync promises w/ cancellation?
 export function takeFirstSync<T>(stream: Observable<T>): T | undefined {
-	let result: T | undefined = stream.value;
+	let result: T | undefined = (stream as BehaviorSubject<T>).value;
 	result ?? (stream?.subscribe?.(value => result = value)?.unsubscribe?.());
 	return result;
 }

@@ -10,9 +10,9 @@
 
 import type { HTMLString, SinkBindingConfiguration, Stream, Coords } from '../../src/index';
 
-import { BehaviorSubject, Subject, catchError, combineLatest, filter, interval, map, merge, mergeWith, Observable, of, scan, share, startWith, take, tap, } from 'rxjs';
+import { BehaviorSubject, Subject, ReplaySubject, catchError, combineLatest, filter, interval, map, merge, mergeWith, Observable, of, pipe, scan, share, startWith, take, tap, timer } from 'rxjs';
 
-import { rml, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Removed, Sanitize, sink, source, Swap, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, } from '../../src/index';
+import { rml, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Removed, Sanitize, sink, source, Suspend, Suspender, Swap, SwitchToLatest, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, } from '../../src/index';
 import { subscribe } from '../../src/lib/drain';
 import { set_USE_DOM_OBSERVABLES } from '../../src/index';
 import { char } from '../../src/types/basic';
@@ -24,9 +24,6 @@ const step = tap(x => {
 	debugger;
 });
 const upperCase = map((s: string)=>s.toUpperCase());
-
-const timer = interval(1000);
-
 
 const defer = <T>(x: T, timeout: number = 500): Promise<T> =>
 	new Promise<T>(resolve => setTimeout(resolve, timeout, x));
@@ -85,7 +82,7 @@ const sources = {
 		);
 
 		const strHTML = rml`
-			<button onclick="${() => stream.next('next value')}">next value</button>
+			<button rml:debugger onclick="${Value(stream)}">next value</button>
 			<div>${stream}</div>
 		`;
 
@@ -222,6 +219,19 @@ const sources = {
 		`;
 	},
 
+	SwitchToLatest: () => {
+		const otherStream = new ReplaySubject(123);
+		const stream = new Subject<any>();
+
+		setTimeout(() =>
+			otherStream.next(234)
+		, 1000);
+
+		return rml`
+			<button onclick="${SwitchToLatest(otherStream, stream)}">click me</button>
+			[ <span>${stream}</span> ]
+		`;
+	},
 
 	ValueSource: () => {
 		const stream = new Subject<string>();
@@ -525,15 +535,35 @@ const sinks = {
 		return rml`<div>${123}</div>`;
 	},
 
+	StaticZero: () => {
+		return rml`<div>${0}</div>`;
+	},
+
 	StaticString: () => {
 		return rml`<div>${'hello'}</div>`;
+	},
+
+	StaticNull: () => {
+		return rml`<div>${null}</div>`;
+	},
+
+	StaticNullString: () => {
+		return rml`<div>${'null'}</div>`;
+	},
+
+	StaticUndefined: () => {
+		return rml`<div>${undefined}</div>`;
+	},
+
+	StaticUndefinedString: () => {
+		return rml`<div>${'undefined'}</div>`;
 	},
 
 	AlertButton: () => {
 		return rml`<button onclick="${()=>alert('clicked')}">click me</button>`
 	},
 
-	EmptyInitial: () => {
+	BehaviorSubject: () => {
 		const bs = new BehaviorSubject('').pipe(
 			mergeWith(interval(1000)),
 		);
@@ -665,14 +695,6 @@ const sinks = {
 			<div style="background: #f0c0b0; color: ${bg}; text-decoration: ${textDeco}; padding: 1rem; font-size: ${size}; ${rest}; font-family: monospace;">
 				Should turn maroon, underlined, large, rotated, translucent
 			</div>
-		`;
-	},
-
-	UndefinedSink: () => {
-		const empty = undefined;
-
-		return rml`
-			<button style="min-width: 5rem; min-height: 2rem;">${empty}</button>
 		`;
 	},
 
@@ -1156,6 +1178,34 @@ const sinks = {
 		`;
 	},
 
+	Suspend: () => {
+		const i = interval(1000);
+		return rml`
+			<div>
+				${Suspend('Waiting...', i)}
+			</div>
+		`;
+	},
+
+	Suspender_Streams: () => {
+		const stream = interval(1000);
+		const loader = Suspender('Waiting...');
+		return rml`
+			<div>
+				${loader(stream)}
+			</div>
+		`;
+	},
+
+	Suspender_Promises: () => {
+		const stream = new Promise(r => setTimeout(()=>r('Done'), 1000));
+		const loader = Suspender('Waiting...');
+		return rml`
+			<div>
+				${loader(stream)}
+			</div>
+		`;
+	},
 
 	Array: () => {
 		const children = [
@@ -1189,6 +1239,22 @@ const sinks = {
 		`;
 	},
 
+	PromisesArray: () => {
+		const children = [...Array(10)]
+			.map((_, i)=>defer(i +1, (i+1)*100))
+		;
+
+		return rml`
+			<ol>
+			${
+				children.map(str =>
+					rml`<li>${str}</li>`
+				)
+			}
+			</ol>
+		`;
+	},
+
 //	Sanitize: () => {
 //		const Sanitize = (input: Observable<string>) => ({
 //			type: 'sink',
@@ -1205,11 +1271,27 @@ const sinks = {
 //		`;
 //	},
 
-	Sanitize: () => {
+	Sanitize1: () => {
 		const stream = of(<HTMLString>`<div>
 			Dirty code
 			<script>alert("evil")</script>
-			<img onload="alert('hack')" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHBhdGggZmlsbD0icmVkIiBkPSJNNTAgMTAwYTUwIDUwIDAgMSAwIDAtMTAwIDUwIDUwIDAgMCAwIDAgMTAwWiIvPjwvc3ZnPg==" width="100" height="100" />
+			<img onload="alert('hack')" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHBhdGggZmlsbD0icmVkIiBkPSJNNTAgMTAwYTUwIDUwIDAgMSAwIDAtMTAwIDUwIDUwIDAgMCAwIDAgMTAwWiIvPjwvc3ZnPg==" width="10" height="10" />
+			</div>
+		`);
+
+		return rml`
+			<div>${Sanitize(stream)}</div>
+		`;
+	},
+
+	Sanitize2: () => {
+		const fn = () => alert('hack');
+		const stream = of(<HTMLString>rml`
+			<div>
+				Dirty code
+				<script>alert("evil")</script>
+				<img onload="alert('hack')" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHBhdGggZmlsbD0icmVkIiBkPSJNNTAgMTAwYTUwIDUwIDAgMSAwIDAtMTAwIDUwIDUwIDAgMCAwIDAgMTAwWiIvPjwvc3ZnPg==" width="10" height="10" />
+				<button onload="alert('hack')" onclick="${fn}">click</button>
 			</div>
 		`);
 
@@ -1315,12 +1397,6 @@ const sinks = {
 				scan((a, _b) => a-1, limit),
 			);
 
-		// "Suspense" Sink
-		const Suspend = (stream: Observable<any>, initial: any) =>
-			new BehaviorSubject(initial).pipe(
-				mergeWith(stream)
-			);
-
 		// Main State stream
 		const stream = new Subject().pipe(
 			map(count => {
@@ -1334,7 +1410,7 @@ const sinks = {
 		return rml`
 			<button onclick="${CountDown(stream, 5)}">Next</button><br>
 			Output:<br>
-			<div>${Catch(Suspend(stream, 5), e => `Caught: ${e.message}`)}</div>
+			<div>${Catch(Suspend(5, stream), e => `Caught: ${e.message}`)}</div>
 		`;
 	},
 
@@ -1540,6 +1616,8 @@ const component = () => {
 					}
 					</ul>
 				</fieldset>
+
+				<br>
 
 				<fieldset>
 					<legend>Sinks</legend>

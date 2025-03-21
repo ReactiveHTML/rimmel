@@ -1,6 +1,5 @@
-//import type { CSSSelector } from '../types/dom';
+import type { CSSSelector } from '../types/dom';
 import type { RMLTemplateExpressions } from '../types/internal';
-type CSSSelector = string;
 import { map } from 'rxjs';
 import { pipeIn } from '../utils/input-pipe';
 
@@ -10,18 +9,18 @@ import { pipeIn } from '../utils/input-pipe';
  * @param target A handler function or observer to send events to
  */
 export const All =
-	<T>(qs: CSSSelector | CSSSelector[], target: RMLTemplateExpressions.TargetEventHandler<Element[]>) =>
+	<T>
+	(querySelector: CSSSelector | CSSSelector[], target: RMLTemplateExpressions.TargetEventHandler<Element[]>) =>
 		pipeIn<Event, Element[]>(target,
-			map((e: Event) => {
-				const t = <Element>e.currentTarget;
-				return (<CSSSelector[]>[]).concat(qs).flatMap(qs=>[...t.querySelectorAll(qs)])
-			}),
-		);
+			map((e: Event) => (<CSSSelector[]>[]).concat(querySelector)
+					.flatMap(querySelector=>[...(e.currentTarget as Element).querySelectorAll(querySelector)])
+			),
+		)
+;
 
-export const qs =
-	(qs: CSSSelector | CSSSelector[]) =>
-		map((e: Event) => {
-			const t = <Element>e.currentTarget;
-			return (<CSSSelector[]>[]).concat(qs).flatMap(qs=>[...t.querySelectorAll(qs)])
-		})
+export const qsa = (qs: CSSSelector | CSSSelector[]) =>
+	map((e: Event) => {
+		const t = <Element>e.currentTarget;
+		return (<CSSSelector[]>[]).concat(qs).flatMap(qs=>[...t.querySelectorAll(qs)])
+	})
 ;

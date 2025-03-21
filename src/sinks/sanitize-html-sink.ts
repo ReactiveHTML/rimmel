@@ -7,48 +7,51 @@ import { SINK_TAG } from "../constants";
 const isElement = (node: Element | DocumentFragment): node is Element => node.nodeType == Node.ELEMENT_NODE;
 
 const sanitizeNode = (node: Element | DocumentFragment) => {
-  if(isElement(node)) {
-    const forbiddenTags = ['script', 'style', 'iframe', 'object', 'embed'];
-    if (forbiddenTags.includes(node.tagName.toLowerCase())) {
-      node.remove();
-      return;
-    }
+	if(isElement(node)) {
+		const forbiddenTags = ['script', 'style', 'iframe', 'object', 'embed'];
+		if (forbiddenTags.includes(node.tagName.toLowerCase())) {
+			node.remove();
+			return;
+		}
 
-    const forbiddenAttributes = ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onkeydown', 'onkeypress', 'onkeyup'];
-    Array.from(node.attributes).forEach(attr => {
-      if (forbiddenAttributes.includes(attr.name.toLowerCase()) || attr.name.toLowerCase().startsWith('on')) {
-        node.removeAttribute(attr.name);
-      }
-    });
-  }
+		const forbiddenAttributes = ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur', 'onkeydown', 'onkeypress', 'onkeyup'];
+		Array.from(node.attributes).forEach(attr => {
+			if (forbiddenAttributes.includes(attr.name.toLowerCase()) || attr.name.toLowerCase().startsWith('on')) {
+				node.removeAttribute(attr.name);
+			}
+		});
+	}
 
-  Array.from(node.children).forEach(child => sanitizeNode(child));
+	Array.from(node.children).forEach(child => sanitizeNode(child));
 };
 
+function sanitizeInput(target: Element, input: HTMLString) {
+	const tempElement = document.createElement('div');
+	// tempElement.textContent = input;
+	tempElement.innerHTML = input;
 
-function sanitizeInput(input: HTMLString, target: Element) {
-  const tempElement = document.createElement('div');
-  tempElement.textContent = input;
+	const fragment = document.createDocumentFragment();
+	fragment.append(...tempElement.childNodes);
 
-  const fragment = document.createDocumentFragment();
-  fragment.append(...tempElement.childNodes);
+	sanitizeNode(fragment);
 
-  sanitizeNode(fragment);
-
-  target.innerHTML = '';
-  target.appendChild(fragment);
+	target.innerHTML = '';
+	target.appendChild(fragment);
 }
 
-export const SanitizeSink: Sink<HTMLElement> = node =>
-  (html: HTMLString) => sanitizeInput(html, node)
+export const SanitizeSink: Sink<HTMLElement> =
+	(e: Element) =>
+		sanitizeInput.bind(null, e)
 ;
 
-export const Sanitize: ExplicitSink<'textcontent'> = (source: RMLTemplateExpressions.HTMLText) =>
-  <SinkBindingConfiguration<HTMLElement>>({
-    type: SINK_TAG,
-    t: 'Sanitize',
-    source,
-    sink: SanitizeSink,
-  })
-;
+	//(html: HTMLString) => sanitizeInput(html, node)
 
+export const Sanitize: ExplicitSink<'textcontent'> =
+	(source: RMLTemplateExpressions.HTMLText) =>
+		<SinkBindingConfiguration<HTMLElement>>({
+			type: SINK_TAG,
+			t: 'Sanitize',
+			source,
+			sink: SanitizeSink,
+		})
+;

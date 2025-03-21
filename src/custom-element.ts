@@ -1,12 +1,15 @@
-import { isSinkBindingConfiguration, isSourceBindingConfiguration, type Inputs, type RimmelComponent } from './types/internal';
-import type { SourceBindingConfiguration, SinkBindingConfiguration } from "./types/internal";
+import type { Inputs, RimmelComponent, SourceBindingConfiguration, SinkBindingConfiguration } from './types/internal';
+import type { Future } from './types/futures';
+import type { Sink } from './types/sink';
 
 import { RESOLVE_SELECTOR } from "./constants";
+import { isSinkBindingConfiguration, isSourceBindingConfiguration } from './types/internal';
 import { Rimmel_Bind_Subtree, Rimmel_Mount } from "./lifecycle/data-binding";
 import { subscribe } from "./lib/drain";
 import { waitingElementHanlders } from "./internal-state";
 
 import { BehaviorSubject, Subject } from "rxjs";
+import { camelCase } from './utils/camelCase';
 
 export type CustomElementDefinition = {
 	observedAttributes?: string[]
@@ -15,8 +18,6 @@ export type CustomElementDefinition = {
 	disconnectedCallback?: (this: HTMLElement) => void;
 	attributeChangedCallback?: (this: HTMLElement, name: string, oldValue: string, newValue: string) => void;
 }
-
-const camelCase = (s: string) => s.split('-').map((s,i)=>i?s[0].toLocaleUpperCase()+s.slice(1):s).join('');
 
 interface RMLNamedNodeMap extends NamedNodeMap {
 	resolve: Attr;
@@ -31,9 +32,9 @@ const SubjectProxy = (defaults: Record<string | symbol, any> = {}) => {
 	});
 };
 
-const SubjectProxy2 = (initials = {}, sources: Record<string | symbol, Observable<any>> = {}) => {
+const SubjectProxy2 = (initials: Record<string | symbol, any> = {}, sources: Record<string | symbol, Future<any>> = {}) => {
 	//const subjects = <Record<string | symbol, BehaviorSubject<unknown> | Subject<unknown>>>;
-	const subjects = new Map();
+	const subjects = new Map<string | symbol, Subject<any>>();
 
 	return new Proxy(sources, {
 		get(_target, prop) {
@@ -47,9 +48,12 @@ class RimmelElement extends HTMLElement {
 	attrs: Inputs;
 	#externalMutationObserver?: MutationObserver;
 	#internalMutationObserver?: MutationObserver;
-	extSinks: {};
-	extSources: {};
-	bindings: {};
+	extSinks?: Record<string | symbol, Future<any>>;
+	/**
+	 * Attributes on the external HTML element
+	 */
+	externalSourceAttributes?: Record<string, Sink<any>>;
+	bindings?: {};
 
 	constructor(component?: RimmelComponent, initFn?: Function) {
 		super();
@@ -88,7 +92,7 @@ class RimmelElement extends HTMLElement {
 				.map((s: SinkBindingConfiguration<any>) => [camelCase(s.t), s.source])
 			);
 
-			this.extSources = Object.fromEntries(
+			this.externalSourceAttributes = Object.fromEntries(
 				sinkBindingConfigurations
 				// .map(s => {[s.t]: s.sink = hijack?...
 				.map((s: SinkBindingConfiguration<any>) => [s.t, s.sink])
@@ -101,20 +105,19 @@ class RimmelElement extends HTMLElement {
 						: [(s as SourceBindingConfiguration<any>).eventName, (s as SourceBindingConfiguration<any>).listener ]
 				)
 			);
-		}
 
-		if(initFn) {
-			debugger;
-			//initFn?.(this, this.attrs, extSinks);
-			// FIXME: maybe too much stuff merged in?
-			const attributeProxy = SubjectProxy2(attrs, this.extSinks);
-			initFn?.(this, attributeProxy);
-			// initFn?.(this, { ...attrs, ...this.attrs, ...this.extSinks });
+			if(initFn) {
+				//initFn?.(this, this.attrs, extSinks);
+				// FIXME: maybe too much stuff merged in?
+				const attributeProxy = SubjectProxy2(attrs, this.extSinks);
+				initFn?.(this, attributeProxy);
+				// initFn?.(this, { ...attrs, ...this.attrs, ...this.extSinks });
+			}
 		}
 	}
 
 	render() {
-		this.shadowRoot!.innerHTML = this.component(this.attrs);
+		this.shadowRoot!.innerHTML = this.component!(this.attrs);
 	}
 
 	connectedCallback() {
@@ -125,7 +128,17 @@ class RimmelElement extends HTMLElement {
 				const v = this.getAttribute(k);
 				this.attrs[k].next(v);
 				//this.bindings[k]?.next?.(v);
-				this.extSources[k]?.next?.(v);
+				// debugger;
+				// this.externalSourceAttributes?.[k]?.next?.(v);
+
+				// ---
+				// Set the attribute on the custom element
+				// Actually, don't, as it would cause an infinite loop
+				// with this same mutationObserver...
+				// Shall we just make it ignore self-originated changes
+				// or should we just not set the attribute?
+				// const sink = this.externalSourceAttributes?.[k];
+				// sink?.(this)(v);
 			});
 		});
 		this.#externalMutationObserver.observe(this, { attributes: true, childList: false, subtree: false });
@@ -144,11 +157,6 @@ class RimmelElement extends HTMLElement {
 		}
 	}
 
-//	attributeChangedCallback() {
-//		// FIXME: what's this?
-//		this.render();
-//	}
-
 	disconnectedCallback() {
 		// AKA: unmount
 		this.#externalMutationObserver?.disconnect();
@@ -162,7 +170,6 @@ class RimmelElement extends HTMLElement {
  * ## Examples
  *
  * ### Create a simple "Hello, World" web component
- *
  * ```ts
  * import { rml, RegisterElement } from 'rimmel';
  *
@@ -172,7 +179,6 @@ class RimmelElement extends HTMLElement {
  *   `;
  * }
  * ```
- *
  **/
 export const RegisterElement = (tagName: string, component?: RimmelComponent, initFn?: Function) => {
 	// FIXME: prevent redefinition...
@@ -183,4 +189,3 @@ export const RegisterElement = (tagName: string, component?: RimmelComponent, in
 		}
 	});
 };
-

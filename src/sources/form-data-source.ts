@@ -6,7 +6,14 @@ import { map, tap } from 'rxjs';
  * @returns OperatorFunction<Event, FormData>
  * @example <form onsubmit="${source(isValid, form, stream)}"> ... </form>
 **/
-export const form = map((e: Event) => Object.fromEntries(new FormData(<HTMLFormElement>e.currentTarget)));
+export const form =
+	map((e: Event) => Object.fromEntries(
+		new FormData(<HTMLFormElement>e.currentTarget)
+			// Checkboxes unintuitively emit "on" vs "null"
+			// FIXME: this should become a pipeline plugin, so people can choose their preferred behaviour?
+			// .map(([k, v]) => [k, v == 'on' ? true : v == 'null' ? false])
+	))
+;
 
 /**
  * An Event Adapter emitting a FormData object from the underlying form element instead of a regular DOM Event object

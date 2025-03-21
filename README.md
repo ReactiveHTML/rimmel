@@ -1,44 +1,52 @@
 <img src="docs/assets/github-hero.png" alt="Rimmel.js" style="text-align: start; max-width: 100%;">
-<br>
 
 [![npm](https://img.shields.io/npm/v/rimmel.svg)](https://www.npmjs.com/package/rimmel)
 
-Rimmel is a small, lightweight and fast JavaScript UI library designed for the streams oriented programming paradigm, implementing [Reactive Markup](https://github.com/ReactiveHTML/reactive-markup) and the [WICG Observable](https://wicg.github.io/observable/) specifications.
+Rimmel is a powerful, fast and lightweight JavaScript UI library for creating web applications using event streams.
 
-Writing reactive streams is easier than you think: take an input, transform it, forward it. Combine with other streams if needed.
+It implements the [RML/Reactive Markup](https://github.com/ReactiveHTML/reactive-markup) specification, which means everything in your code is a stream: it takes an input, you transform it and Rimmel takes care of the rest.
 
-If you need a mini-crash-course on reactive streams tailored for UI development, check [this one](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) out.
+## Getting started
+If you are new to all this, there is a [3m crash-course on event streams](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) tailored for UI development with Rimmel, arguably the simplest RxJS introduction around to get you started.
 
-## 👋 Hello World 👋
-The "Hello World" for reactive interfaces is the click counter: one button, you click it, he counts it.
+If you are new to the functional and reactive programming mindset, this [interactive tutorial](https://reactivex.io/learnrx/) may be an especially useful introduction to map/reduce in the reactive world.
+
+## Hello World 👋🌏🏖️😎
+Let's jump straight in. The "Hello World" for reactive user interfaces is the classic click counter: one button, you click it, ze counts it.
 
 <img src="docs/assets/how-rimmel-works.png" alt="How RimmelJS Works">
-
-The `click` event is "sourced" into `counter`, which is a behavior that takes `Event` objects and emits numbers.<br>
-
-The result is then "sinked" into the `<span>` element at the end.
-
-In code? Equally simple:
-
 <img src="docs/assets/how-rimmel-works-6.png" alt="How RimmelJS Works">
+
+
+<!--iframe src="https://stackblitz.com/edit/rimmel-click-counter?ctl=1&embed=1&file=main.ts" width="100%" height="500" frameborder="0"></iframe-->
+
+The click event from the `<button>` above is plugged into `counter` — a simple stream of events to numbers —
+and the output is plugged into the `<span>` element at the end.
+
+No need for anything else. No need to attach, connect, disconnect, clean up or anything. Rimmel does it all for you in pure JavaScript/TypeScript without any "dark magic".
+
+You've probably never seen anything like this before, so just go and try it:
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-click-counter)
 
 
-## Functional-Reactive
-Most JavaScript UI libraries and frameworks are designed for the Imperative Programming paradigm.
-Occasionally they may also support some aspects of Functional/Functional-Reactive Programming.
-Third-party adapters or utility libraries are often used to help with all this but the truth is that the functional-reactive paradigm was just an afterhthought and its use is severely limited, inconvenient or plain awkward to apply in practice.
+## Functional/Reactive
+Most JavaScript UI libraries and frameworks are designed for the imperative programming paradigm.
+Occasionally they may also support some aspects of functional, reactive, or functional-reactive programming.
+Third-party adapters or utility libraries can also be used but the reality is that the imperative paradigm is their main focus and others were just an afterhthought, so their use is severely limited, inconvenient or plain awkward to use in practice.
 
+Rimmel focuses primarily on functional/reactive streams, to make them "just work".
 
-Rimmel focuses primarily on the functional-reactive paradigm (FRP, for short), to make it "just work"!
+## Everything is a Stream ☄️
+For Rimmel to unleash the whole power of functional/reactive streams, all you do in practice is just treating everything (that's not genuinely static) as a stream: data in, data out.
 
-What that means in practice is you treat nearly everything as a stream — data in, data out.
-
-You don't write code to change the state of something else, as in:
+You no longer write code to change the state of something else, as in:
 
 ```typescript
-// The imperative way
+// Imperative programming
+target = newValue;
+
+// Object Oriented Programming
 target.property = value;
 target.setProperty('prop1', value);
 ```
@@ -46,29 +54,23 @@ target.setProperty('prop1', value);
 What you do instead, is you connect both ends of your stream to your component's HTML, within the template:
 
 ```javascript
-const ClickCounterComponent = () => {
-  // this takes click events in input
-  // and emits numbers in output
-  const count = new BehaviorSubject(0).pipe(
-    scan(x=>x+1)
-  );
-  
-  return rml`
-    <button onclick="${count}">click me</button>
-
-    Count: <span>${count}</span>
-  `;
-};
+// Streams Oriented Programming
+const template = rml`
+  <button onclick="${yourStream}">click me</button>
+  Total clicks: <b>${yourStream}</b>
+`;
 ```
 
-## No Virtual DOM
-The concept of Virtual DOM originates from the assumption that the DOM is slow, which might appear to be the case for some frameworks or UI libraries that make large numbers of redundant updates or "re-renders". For those, it may be less expensive to just run those computations outside of the DOM.
+## No Virtual DOM 🚀
+The concept of Virtual DOM originates from the assumption that the DOM is slow, which might appear to be the case if a framework makes a large number of unnecessary, uncontrolled updates, also known as "re-renders".
+In that case it may be computationally cheaper to just run those outside of the DOM.
 
-Since Rimmel never causes any unnecessary DOM update and the concept of a component "re-rendering" doesn't even exist, the whole idea of a Virtual DOM is disregarded.
+Rimmel does never ever cause any unnecessary DOM updates by design. The concept of a component "re-rendering" doesn't exist, so the whole idea of a Virtual DOM is unneeded. This helps keeping your apps very light and very fast.
 
-Rimmel uses Sinks, which are memory and/or performance-optimised direct DOM manipulation functions, attached to the Promises or Observable streams you provide. When there is new data, it gets sinked to the DOM. You are in control of when or how often you emit data, so you can also throttle/sample/debounce, use any schedulers as you see fit for your needs. RxJS provides all that, so if you know RxJS, you're ready to make the most of Rimmel.
+Updates to your page are performed using Sinks, which are memory and/or performance-optimised direct DOM manipulation functions, directly attached to the Promises or Observable streams you provide. When you emit new data, it gets sinked to the DOM straight away.
+You have complete control over when and how you emit data, so for simple apps you just don't care, and in the most extreme circumstances you can throttle, sample, debounce, use various schedulers at will. RxJS provides all that, so if you know RxJS, you're ready to make the most of Rimmel.
 
-## Conditional Rendering
+## Conditional Rendering ☂️
 If you need to render something based on a condition, plain-old standard JS can help you. No further abstractions or custom DSLs used:
 
 ```javascript
@@ -87,7 +89,7 @@ document.body.innerHTML = rml`
 You only want to use this method if your condition is static, and you don't need to reflect changes over time.
 
 
-### ... or streams
+### ... or conditional streams ☔
 If you need to render based on a live, ever-changing condition, you can just use a normal Observable stream:
 
 ```javascript
@@ -111,18 +113,19 @@ document.body.innerHTML = rml`
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-dynamic-conditional-rendering)
 
-## No Forward Refs
+## No Forward Refs 🪧
 Forward refs are a construct used in Imperative UI libraries to enable referencing and later modifying DOM elements that don't exist yet (you're writing components that will work on DOM nodes after they will be mounted).
 
 Rimmel enables you to declare future changes to a DOM element by means of a simple Promise or Observable.
 The mounting and data binding is completely managed by Rimmel. This means when they resolve or emit, the elements will already be there to receive them, effectively making the use of Forward Refs redundant.
 
-## Structured Data
+## Structured Data ⚙️
 When you're dealing with structured data, like lists or grids of repeated data, the best way to handle it depends on multiple factors, so it's left as an extension opportunity.
 
 You can create your custom, advanced Sinks to render data structures of any complexity and manage specific aspects of its interactions in the most optimal way for your needs.
 This is a perfect case for reactive grids, spreadsheets, SVG or Canvas drawings, 3D scenes, etc.
-### Dynamic Lists and Collections
+
+### Dynamic Lists and Collections 📝
 If you just want to display a dynamic list of repeated elements you may want to use a `Collection` from [ObservableTypes](https://github.com/reactivehtml/observable-types), which is an Array+Observable+Observer object to make lists trivial to manage with Rimmel.
 
 The following illustration shows how you can manage a simple list of items.
@@ -134,9 +137,11 @@ The following illustration shows how you can manage a simple list of items.
 
 <br>
 
-## Example: RGB Sliders
+## Example: RGB Colour Sliders
 Want a little more involved example of stream usage?<br>
-Let's make a component featuring a Red, Green and Blue slider that get transformed into an #RRGGBB colour string, displayed in a text box and used as the fill colour of an SVG circle:
+Let's make a component featuring a Red, a Green and a Blue slider that will get transformed into an #RRGGBB colour string, displayed in a text box and used as the fill colour of an SVG circle.
+
+Visually, this is what it's going to look like:
 
 <img src="docs/assets/how-rimmel-works-5.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
 
@@ -167,7 +172,7 @@ const ColorPicker = (initial = [0, 0, 0]) => {
       <circle fill="${RGB}" cx="20" cy="20" r="20" />
     </svg>
   `;
-}
+};
 
 document.getElementById('root-node').innerHTML = ColorPicker([255, 128, 64])
 ```
@@ -180,13 +185,13 @@ document.getElementById('root-node').innerHTML = ColorPicker([255, 128, 64])
 <br>
 
 As you can see, there are three main streams, one for each colour slider in the HTML.
-When they emit, their values are merged together through `combineLatest`, which passes them through as an array to `toRGBString` which will return the string as we need it.
+When they emit, their values are merged together through <a href="https://rxjs.dev/api/index/function/combineLatest" target="_blank">`combineLatest`</a>, which passes them through as an array to `toRGBString` which will return the string as we need it.
 
 Finally, we have two sinks where the data ends up; one as the innerHTML of the <span>, ther other as the fill colour of the SVG shape.
 
 <br>
 
-## State doesn't exist (it's a Stream)
+## State doesn't exist (it's a Stream) ✴️
 "State", as the word itself suggests, is something static, so it doesn't belong to the dynamic, interactive, reactive webapps we make every day.
 
 The rationale is that "state", as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow. You only need those when certain events happen, in order to respond.
@@ -205,7 +210,7 @@ Modelling your state as one or more observable streams will give you fine-graine
 
 All Rimmel does is binding your observable streams to the UI in a seamless integration that will result in improved code quality, scale, testability and performance.
 
-## No Lifecycle Events (you only need streams)
+## No Lifecycle Events (you only need streams) 🕢
 Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless, redudant and discouraged here.
 Streams and other listeners get connected and disconnected automatically for you when a component is mounted/unmounted. If you think about it, this is exactly what you would normally do in your init/onmount functions, so you no longer have to deal with these tiny details.
 
@@ -213,12 +218,12 @@ Since you only declare streams now and let Rimmel connect them to the DOM and ea
 
 Rimmel still has a `rml:onmount` event, but its use is only left as a last resort to integrate imperative, non-Rimmel components (some old jQuery plugins, etc?)
 
-## No Side Effects (that's what a framework is for)
+## No Side Effects (that's what a framework is for) 🌋
 You may have already realised that writing UI components with Rimmel means you no longer have to deal with UI side effects. That makes it easier to make your code purely functional by default.
 
 <img src="docs/assets/isolating-side-effects.png" alt="Isolating side effects" style="max-width: 80vw; max-height: 30vh;">
 
-# Sources vs. Sinks
+# Sources vs. Sinks ⚖️
 There are two key concepts used by Rimmel: sources and sinks.
 
 Sources are things that generate data which you can optionally process and transform along the way. What remains goes somewhere. That _somewhere_ is usually referred to as a sink.
@@ -229,7 +234,7 @@ Sinks are most often the place where you want to display any information in the 
 
 With RML/Rimmel you can treat most DOM elements as sources, sinks, or both.
 
-## Event Sources
+## Event Sources ↗️
 Rimmel supports event native and synthetic listeners from all DOM elements.
 All Observers such as event listener functions, Subjects and BehaviorSubjects will receive events as emitted by the DOM.
 
@@ -261,7 +266,7 @@ target.innerHTML = rml`
 
 <br>
 
-### Event Adapters
+### Event Adapters ➿
 In normal circumstances your event handlers receive a native DOM `Event` object, such as `MouseEvent`, `PointerEvent`, etc.
 
 To enable a better separation of concerns you can use Event Adapters to feed your event handlers or Observable streams the exact data they need, rather than the generic, raw Event objects coming from the DOM.
@@ -368,7 +373,7 @@ Please note how the last parameter of `source()` is `stream2` the actual target 
 
 <br>
 
-## Data Sinks
+## Data Sinks ↘️
 Rimmel supports two categories of sinks: standard (specialised) sinks and dynamic sinks.
 Standard sinks are the simplest and most intuitive ones: those you define in an everyday template from which the type of data binding required can be easily inferred. They are optimised for performance, updating a specific part of the DOM.<br />
 
@@ -566,7 +571,7 @@ Promises and Observables will be merged whenever they resolve/emit.
 <br>
 
 
-# Performance
+# Performance 🚀
 
 Performance is always key, isn't it?
 
@@ -657,17 +662,17 @@ We have created a few experimental AI assistants like [RimmelGPT.js](https://cha
 
 <br>
 
-## TodoMVC
+## TodoMVC 🗒️
 Want to delve deeper into more advanced scenarios? Have a look at the following todo app all based on RxJS streams, [ObservableTypes](https://github.com/reactivehtml/observable-types) and Rimmel.
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-todomvc)
 
-## Tic-Tac-Toe
+## Tic-Tac-Toe 🎮
 Here's a version of Tic Tac Toe made with Observable Streams
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/tic-tac-toe-rimmeljs)
 
-## A Colour Picker
+## A Colour Picker 🪅
 In a component like a colour picker there's a lot of derived state to manage, from various inputs and controls, mouse and touch actions, copy-paste, drag'n'drop.
 RxJS can handle these without blinking an eye whilst Rimmel just glues them together.
 
@@ -685,7 +690,7 @@ Rimmel is a young project built with meticulous attention to detail and a bold v
 Share the passion? Would like to help? That'd be hugely appreciated!<br>
 Come say Hi, there's a lot of work to do. The Roadmap is below.
 
-# Roadmap
+# Roadmap 👷
 - Completion handlers (what should happen when observables complete?)
 - Error sinks (what if streams throw? Anything better than just "error boundaries"?)
 - Performance benchmarks (we know it's fast, but, let's see the numbers!)
@@ -702,7 +707,7 @@ Come say Hi, there's a lot of work to do. The Roadmap is below.
 - RML Security (leverage sink pipelines to weed out XSS and other dirt)
 - i18n (leverage sink pipelines to make localisation trivial)
 
-# Building, testing and hacking
+# Building, testing and hacking ⛏️
 To work with Rimmel locally, check it out then either with bun or other runtimes:
 
 ```bash
@@ -714,12 +719,13 @@ npm run build
 There is a "kitchen sink" app you can use to play around locally, which should showcase most of what you can do with Rimmel:
 ```bash
 npm run kitchen-sink
-vite
 ```
 
 Or you can just run it with one click [on StackBlitz](https://stackblitz.com/~/github.com/ReactiveHTML/rimmel?file=examples/kitchen-sink/index.ts&startScript=kitchen-sink)
 
-# Web Standards
-There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544) and the more recent [Observable DOM](https://github.com/WICG/observable).
+# Web Standards 🏁
+There are discussions going on around making HTML and/or the DOM natively support Observables at [WHATWG DOM/544](https://github.com/whatwg/dom/issues/544).
 
-Rimmel is closely following these initiatives and aims to align with them as they develop,
+The Google-led [Observable DOM](https://github.com/WICG/observable) initiative is bringing Observables natively to the web platform. You can use native Observables in Chrome today. Visit [this page](https://stackblitz.com/edit/observables-rimmel-observatures) to see them in action.
+
+Rimmel is the first JavaScript UI library supporting native Observables. It is closely following the above standardisation initiatives and aims to align with them as they develop or new usage patterns emerge.

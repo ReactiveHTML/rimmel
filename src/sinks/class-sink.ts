@@ -105,4 +105,3 @@ export const ClassName: ExplicitSink<'class'> = (source: RMLTemplateExpressions.
 		sink: ClassNameSink,
 	})
 ;
-

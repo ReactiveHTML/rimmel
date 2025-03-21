@@ -5,7 +5,7 @@ import { pipeIn } from '../utils/input-pipe';
 
 /**
  * An Event Source emitting the "[event.clientX, event.clientY]" mouse coordinates
- * @param qs A query selector to select nodes from the underlying element's subtree
+ * @param querySelector A query selector to select nodes from the underlying element's subtree
  * @param target A handler function or observer to send events to
  */
 export const All =

@@ -7,7 +7,7 @@ import { isSinkBindingConfiguration, isSourceBindingConfiguration } from "../typ
 import { state, waitingElementHanlders } from "../internal-state";
 import { isFunction } from "../utils/is-function";
 import { takeFirstSync } from "../utils/take-first-sync";
-import { BehaviorSubject, isObservable, MaybeFuture, Observable } from "../types/futures";
+import { BehaviorSubject, MaybeFuture, Observable } from "../types/futures";
 import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUTE, RML_DEBUG } from "../constants";
 
@@ -17,8 +17,6 @@ import { DOMAttributePreSink, FixedAttributePreSink, WritableElementAttribute } 
 import { Mixin } from "../sinks/mixin-sink";
 import { ObjectSource, ObjectSourceExpression, isObjectSource } from "../sources/object-source";
 import { ObserverSource, isObserverSource, ObservatureSource, isObservatureSource } from "../sources/observer-source";
-
-import { isPromise } from '../types/futures';
 
 import { InnerHTML } from "../sinks/inner-html-sink";
 import { TextContent } from "../sinks/text-content-sink";

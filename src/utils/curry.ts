@@ -8,8 +8,8 @@ import { inputPipe, pipeIn } from '../utils/input-pipe';
  **/
 export const curry =
 	<I, O>
-	(op: OperatorFunction<I, O>, destination: RMLTemplateExpressions.Any) =>
+	(op: OperatorFunction<I, O>, destination?: RMLTemplateExpressions.Any) =>
 		destination
-			? pipeIn(destination, op)
-			: inputPipe(op)
+			? pipeIn<I, O>(destination, op)
+			: inputPipe<I, O>(op)
 ;

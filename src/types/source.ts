@@ -1,7 +1,7 @@
-import { EventListenerFunction } from "./dom";
-import { EventListenerOrEventListenerAdapter } from "./event-listener";
+import type { BindingConfiguration } from "./internal";
+import type { EventListenerFunction } from "./dom";
+import type { EventListenerOrEventListenerAdapter } from "./event-listener";
 import type { Observer } from "./futures";
-import { BindingConfiguration } from "./internal";
 
 /**
  * A module responsible to get data events (e.g.: DOM events, network calls, etc)
@@ -14,7 +14,7 @@ export interface SourceDescriptor<E extends Event, R> {
 }
 
 /**
- * An event "preprocessor" responsible to get raw events
+ * An event adapter, responsible to get raw events
  * (e.g.: DOM events, network calls, etc) and transform them into
  * something suitable for a UI-agnostic stream (typically a view-model)
  * @param target The Observer to send events to

@@ -39,13 +39,13 @@ import { inputPipe } from '../utils/input-pipe';
  * ```
  */
 export const cut =
-  map(<T extends (HTMLInputElement | HTMLElement), I extends Event, O extends string | number | Date | null>(e: I): O => {
-    const t = (<T>e.target);
-    const v = <O>autoValue(t);
-    (t as HTMLInputElement).value = '';
-    // TODO: t.innerText = '' for contenteditable items?
-    return v
-  })
+	map(<T extends (HTMLInputElement | HTMLElement), I extends Event, O extends string | number | Date | null>(e: I): O => {
+		const t = (<T>e.target);
+		const v = <O>autoValue(t);
+		(t as HTMLInputElement).value = '';
+		// TODO: t.innerText = '' for contenteditable items?
+		return v
+	})
 ;
 
 /**
@@ -80,7 +80,7 @@ export const cut =
  * ```
  */
 export const Cut =
-  inputPipe<Event, string | number | Date | null>(
-    cut
-  )
+	inputPipe<Event, string | number | Date | null>(
+		cut
+	)
 ;

@@ -24,8 +24,9 @@ export const DatasetObjectSink: Sink<HTMLElement | SVGElement | MathMLElement> =
 	const { dataset } = node;
 	return (data: Record<DatasetKey, string | null | undefined>) => {
 		for (const [key, str] of Object.entries(data ?? {})) {
-			(str === undefined || str == null) ? delete dataset[key] : asap(str => dataset[key] = str, str);
+			(str === undefined || str == null)
+				? delete dataset[key]
+				: asap((str: string) => dataset[key] = str, str);
 		}
 	};
 };
-

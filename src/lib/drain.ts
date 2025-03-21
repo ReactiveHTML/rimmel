@@ -1,6 +1,6 @@
 import type { SinkFunction } from "../types/sink";
 import type { EventListenerObject, EventListenerOrEventListenerObject } from "../types/dom";
-import type { MaybeFuture, Observable, Observer } from "../types/futures";
+import type { MaybeFuture, Observable, Observer, ObserverFunction } from "../types/futures";
 import type { RenderingScheduler } from "../types/schedulers";
 
 import { isObservable, isPromise } from "../types/futures";
@@ -14,19 +14,18 @@ import renderingScheduler from '../schedulers/ema-animation-frame';
  * - the function itself, if it's a function
  */
 export const callable = <T>(x: (Observer<T> | EventListenerObject<T> | ((t: T)=>any))) =>
-  (x as Observer<T>).next ?
-    (x as Observer<T>).next.bind(x) :
-  (x as EventListenerObject<T>).handleEvent ?
-    (x as EventListenerObject<T>).handleEvent.bind(x) :
-  (x as (t: T)=>any)
+	(x as Observer<T>).next ?
+		(x as Observer<T>).next.bind(x) :
+	(x as EventListenerObject<T>).handleEvent ?
+		(x as EventListenerObject<T>).handleEvent.bind(x) :
+	(x as (t: T)=>any)
 ;
 
-
 // FIXME: remove, use subscribe below instead
-export const asap = (fn: SinkFunction, arg: MaybeFuture<unknown>) => {
-	(<Observable<unknown>>arg)?.subscribe?.(fn) ??
-	(<Promise<unknown>>arg)?.then?.(fn) ??
-	fn(arg);
+export const asap = <T>(fn: ObserverFunction<T> | Observer<T>, arg: MaybeFuture<unknown>) => {
+	(<Observable<T>>arg)?.subscribe?.(fn) ??
+	(<Promise<T>>arg)?.then?.((fn as Observer<T>).next?.bind(fn) ?? fn) ??
+	(fn as ObserverFunction<T>)(arg as T);
 };
 
 /**

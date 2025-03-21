@@ -43,7 +43,7 @@ export { Active } from './sources/modifiers/active';
 export { Passive } from './sources/modifiers/passive';
 
 // Event Sources
-export { All, qs } from './sources/all-source';
+export { All, qsa } from './sources/all-source';
 export { AutoForm } from './sources/autoform-source';
 export { CheckedState } from './sources/checked-source';
 export { Cut, cut } from './sources/cut-source';
@@ -58,6 +58,7 @@ export { ClientXY } from './sources/client-xy-source';
 export { OffsetXY } from './sources/offset-xy-source';
 export { LastTouchXY } from './sources/last-touch-xy-source';
 export { Swap } from './sources/swap-source';
+export { SwitchToLatest } from './sources/switch-to-latest';
 export { Value, ValueAsDate, ValueAsNumber, value, valueAsString, valueAsDate, valueAsNumber } from './sources/value-source';
 
 // Data Sinks
@@ -80,7 +81,7 @@ export { PrependHTML } from './sinks/prepend-html-sink';
 //export { Readonly } from './sinks/readonly-sink';
 export { Removed } from './sinks/removed-sink';
 export { Sanitize } from './sinks/sanitize-html-sink';
-export { Suspend } from './sinks/suspense-sink';
+export { Suspend, Suspender } from './sinks/suspense-sink';
 export { TextContent } from './sinks/text-content-sink';
 
 // Plumbing

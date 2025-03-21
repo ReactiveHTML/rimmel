@@ -128,12 +128,7 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 					}
 				}
 			} else {
-				node.addEventListener(eventName, e=>{
-					if(node.getRootNode() instanceof ShadowRoot) {
-						e.stopPropagation();
-					}
-					sourceBindingConfiguration.listener(e);
-				}, sourceBindingConfiguration.options);
+				node.addEventListener(eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options);
 				// #REF49993849837451
 				// const listenerRef = [eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options];
 				// node.addEventListener(...listenerRef);

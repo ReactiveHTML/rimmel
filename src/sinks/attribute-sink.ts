@@ -153,7 +153,13 @@ export const FormElementSink: Sink<HTMLFormElement> =
 			const e = (node.elements.namedItem(elementName));
 			// TODO: add checkbox and radio...
 			if(e) {
-				e.value = value;
+				if((e as HTMLInputElement).type == 'checkbox') {
+					(e as HTMLInputElement).checked = value;
+				} else if((e as HTMLInputElement).type == 'radio') {
+					(e as HTMLInputElement).checked = (e as HTMLInputElement).value == value;
+				} else {
+					(e as HTMLInputElement | HTMLTextAreaElement).value = value;
+				}
 			}
 		}
 ;
@@ -179,7 +185,7 @@ export const AttributeObjectSink = <T extends HTMLElement | SVGElement | MathMLE
 				} else if(k.startsWith('on') && isFunction((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then ?? v)) {
 					node.addEventListener(k.substring(2), ((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then)?.bind(v) ?? v, {capture: true})
 				} else {
-					const sink = k == 'dataset'
+					const sink: Sink<any> = k == 'dataset'
 						? DatasetObjectSink
 						: k.startsWith('data-') ? <Sink<T>>DatasetItemPreSink(k.substring(5))
 						: node.tagName == 'FORM' ? FormElementSink

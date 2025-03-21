@@ -4,16 +4,16 @@
 import { SymbolObservature } from "../constants";
 
 export type Subject<T> = {
-    subscribe: (observer: ObserverFunction<T>) => Subscription;
-    pipe: (value: T) => void;
-    next: (value: T) => void;
-    error?: (error: unknown) => void;
-    complete?: () => void;
+	subscribe: (observer: ObserverFunction<T>) => Subscription;
+	pipe: (value: T) => void;
+	next: (value: T) => void;
+	error?: (error: unknown) => void;
+	complete?: () => void;
 };
 
 export type BehaviorSubject<T> = Subject<T> & {
-    getValue: () => T;
-    value: T;
+	getValue: () => T;
+	value: T;
 };
 
 
@@ -94,28 +94,27 @@ export type ObserverErrorFunction = (e: Error) => void;
 export type ObserverCompleteFunction = () => void;
 
 export interface Observer<I> {
-    next: ObserverFunction<I>;
-    error?: ObserverErrorFunction;
-    complete?: ObserverCompleteFunction;
+	next: ObserverFunction<I>;
+	error?: ObserverErrorFunction;
+	complete?: ObserverCompleteFunction;
 };
 
 export interface Observature<I, O=I> {
-    [SymbolObservature]: any,
+	[SymbolObservature]: any,
 	addSource: <I>(source: Observable<I>) => void,
 }
 
 export type Subscription = {
-    unsubscribe: () => void;
+	unsubscribe: () => void;
 };
 
 export type Observable<T> = {
-    subscribe: (observer: Observer<T> | ObserverFunction<T>, error?: ObserverErrorFunction, complete?: ObserverCompleteFunction) =>
-        Subscription;
+	subscribe: (observer: Observer<T> | ObserverFunction<T>, error?: ObserverErrorFunction, complete?: ObserverCompleteFunction) =>
+		Subscription;
 };
 
-
 export const isObserver = (x: any): x is Observer<any> =>
-    !!x?.next;
+	!!x?.next;
 
 // export type Subscription = {
 // 	destination: any; // FIXME HACK: an internal RxJS property, not to be relied upon
@@ -137,10 +136,10 @@ export type Transformer<I, O> = Observer<I> & {
 };
 
 export const isObservable = (x: any): x is Observable<any> =>
-    !!x?.subscribe;
+	!!x?.subscribe;
 
 export const isPromise = (x: any): x is Promise<any> =>
-    !!x?.then;
+	!!x?.then;
 
 export type MaybePromise<T> = Partial<Promise<T>>;
 export type MaybeObserver<I> = Partial<Observer<I>>;

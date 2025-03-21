@@ -13,6 +13,11 @@ export type RemovePrefix<TPrefix extends string, TString extends string> = TStri
 
 
 /**
+ * A CSS selector string
+ */
+export type CSSSelector = string;
+
+/**
  * An HTML event name prefixed by 'on'
  */
 export type HTMLEventAttributeName = keyof HTMLElement & `on${string}`;

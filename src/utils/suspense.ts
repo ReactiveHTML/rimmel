@@ -1,4 +1,5 @@
 import type { Observable } from 'rxjs';
+
 import { BehaviorSubject } from 'rxjs';
 
 /**
@@ -10,7 +11,7 @@ import { BehaviorSubject } from 'rxjs';
 export default function Suspense<T>(initial: T, subsequent: Observable<T>): Observable<T> {
 	const current = new BehaviorSubject(initial);
 	// TODO: store a reference for unsubscription?
-    subsequent.subscribe(current);
+	subsequent.subscribe(current);
 	return current;
 };
 

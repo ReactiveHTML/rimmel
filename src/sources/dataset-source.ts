@@ -22,9 +22,9 @@ export const dataset = <E extends Event>(key: string) =>
  * @example <button data-foo="bar" onclick="${Dataset('foo', handlerFn)}"> ... </button>
 **/
 export const Dataset =
-  <T extends HTMLElement, I extends Event, O extends string | undefined>
-  (key: string, source?: RMLTemplateExpressions.SourceExpression<I | O>) =>
-    curry<I, string | undefined>(dataset(key), source)
+	<T extends HTMLElement, I extends Event, O extends string | undefined>
+	(key: string, source?: RMLTemplateExpressions.SourceExpression<I | O>) =>
+		curry<I, string | undefined>(dataset(key), source)
 ;
 
 /**
@@ -32,7 +32,9 @@ export const Dataset =
  * @returns OperatorFunction<Event, DOMStringMap>
  * @example <button data-foo="bar" data-baz="bat" onclick="${source(datasetObject, stream)}"> ... </button>
 **/
-export const datasetObject = map((e: Event) => ((<HTMLElement>e.target).dataset));
+export const datasetObject =
+	map((e: Event) => ((<HTMLElement>e.target).dataset))
+;
 
 /**
  * An Event Source emitting the full dataset object from the underlying element instead of a regular DOM Event object
@@ -43,9 +45,9 @@ export const datasetObject = map((e: Event) => ((<HTMLElement>e.target).dataset)
  * @example <button data-foo="bar" data-baz="bat" onclick="${DatasetObject(handlerFn)}"> ... </button>
 **/
 export const DatasetObject =
-  <T extends HTMLElement, I extends Event, O extends string | undefined>
-  (source?: RMLTemplateExpressions.SourceExpression<I | O>) =>
-    curry<I, DOMStringMap>(datasetObject, source)
+	<T extends HTMLElement, I extends Event, O extends string | undefined>
+	(source?: RMLTemplateExpressions.SourceExpression<I | O>) =>
+		curry<I, DOMStringMap>(datasetObject, source)
 ;
 
 export const asDatasetOf = dataset;

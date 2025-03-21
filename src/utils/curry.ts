@@ -4,7 +4,7 @@ import type { OperatorFunction } from 'rxjs';
 import { inputPipe, pipeIn } from '../utils/input-pipe';
 
 /**
- * Curry for stream operators
+ * Curry for input stream operators
  **/
 export const curry =
 	<I, O>
@@ -13,4 +13,3 @@ export const curry =
 			? pipeIn(destination, op)
 			: inputPipe(op)
 ;
-

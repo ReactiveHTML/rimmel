@@ -35,7 +35,9 @@ import { inputPipe } from '../utils/input-pipe';
  * }
  * ```
  */
-export const key = map((e: KeyboardEvent) => e.key);
+export const key =
+	map((e: KeyboardEvent) => e.key)
+;
 
 /**
  * An Event Adapter emitting event.key instead of any KeyboardEvent object

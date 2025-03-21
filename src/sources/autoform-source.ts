@@ -16,28 +16,38 @@ const ElementMappers = {
 	checkbox: (e: HTMLInputElement) => e.checked,
 	radio: (e: HTMLInputElement) => e.checked && (DataMappers[e.dataset.type as keyof typeof DataMappers]?.(e.value)??e.value) || undefined,
 	'select-one': (e: HTMLSelectElement) => DataMappers[(e.options[e.selectedIndex].dataset.type ?? e.dataset.type) as keyof typeof DataMappers]?.(e.value) ?? e.value,
-    'select-multiple': (e: HTMLSelectElement) => [...e.options].filter(o => o.selected).map(o => (DataMappers[o.dataset.type as keyof typeof DataMappers ?? e.dataset.type as keyof typeof DataMappers] ?? DataMappers.text)(o.value)),
+	'select-multiple': (e: HTMLSelectElement) => [...e.options].filter(o => o.selected).map(o => (DataMappers[o.dataset.type as keyof typeof DataMappers ?? e.dataset.type as keyof typeof DataMappers] ?? DataMappers.text)(o.value)),
 } as const;
 
-const resolve = (e: HTMLFieldElement) => (ElementMappers[(e.type ?? (e as HTMLFieldElement).dataset.type) as keyof typeof ElementMappers] ?? ElementMappers.text)(e as HTMLInputElement & HTMLSelectElement);
+const resolve =
+	(e: HTMLFieldElement) =>
+		(ElementMappers[(e.type ?? (e as HTMLFieldElement).dataset.type) as keyof typeof ElementMappers] ?? ElementMappers.text)
+			(e as HTMLInputElement & HTMLSelectElement)
+;
 
 /**
- * An Event Operator emitting a FormData object from the underlying form element instead of a regular DOM Event object
+ * An Event Operator emitting a typed FormData object from the underlying &lt;form&gt; element instead of a regular DOM Event object
+ * Field types are taken from their respective data-type attribute or string if unset
  * @returns OperatorFunction<Event, FormData>
  * @example <form onsubmit="${source(isValid, form, stream)}"> ... </form>
 **/
-export const autoForm = map((e: Event) => Object.fromEntries(
-	[...(<HTMLFormElement>e.currentTarget).elements]
-		.map((e: Element) => [(e as HTMLFieldElement).name ?? e.id, resolve(e as HTMLFieldElement)])
-		.filter(([k, v]) => k!=='' && v!==undefined)
-));
+export const autoForm =
+	map((e: Event) => Object.fromEntries(
+		[...(<HTMLFormElement>e.currentTarget).elements]
+			.map((e: Element) => [(e as HTMLFieldElement).name ?? e.id, resolve(e as HTMLFieldElement)])
+			.filter(([k, v]) => k!=='' && v!==undefined)
+	))
+;
 
 /**
  * An Event Adapter emitting a FormData object from the underlying form element instead of a regular DOM Event object
  * @returns EventSource<string>
- * @example <form action="dialog" onsubmit="${Form(stream)}"> ... </form>
- * @example <form action="dialog" onsubmit="${Form(handlerFn)}"> ... </form>
+ * @example <form action="dialog" onsubmit="${AsTypedForm(stream)}"> ... </form>
+ * @example <form action="dialog" onsubmit="${AsTypedForm(handlerFn)}"> ... </form>
 **/
 export const AutoForm = inputPipe<SubmitEvent | Event>(
 	autoForm,
 );
+
+export const asTypedFormData = autoForm;
+export const AsTypedFormData = AutoForm;

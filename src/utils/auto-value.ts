@@ -1,7 +1,8 @@
 /**
- * Get the value of an <input> element matching its type: number, date or string,
- * or innerText if it's any other contenteditable element
-**/
+ * Get the value of an <input> element matching its type:
+ * number, date or string,
+ * or innerText if it's any other [contenteditable] element
+ **/
 export const autoValue = (input: HTMLInputElement | HTMLElement) =>
   (<HTMLInputElement>input).type=='checkbox'
     ? (<HTMLInputElement>input).checked :

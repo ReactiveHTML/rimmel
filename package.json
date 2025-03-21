@@ -22,7 +22,7 @@
   "files": [
     "dist/"
   ],
-  "sideEffects": false,
+  "sideEffects": ["./src/lifecycle/data-binding.ts"],
   "scripts": {
     "build": "rimraf dist && rollup --config rollup.config.js",
     "dev": "rimraf dist && rollup -w --config rollup.config.js",

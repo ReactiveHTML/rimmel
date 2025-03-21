@@ -78,6 +78,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 		//	/>\s*$/.test(string) && /^\s*<\s*/.test(nextString) ? 'child/subtree'
 		//	: /(?<attribute>[a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(resultPlusString) ? 'attribute'
 
+		// #IFDEF ENABLE_RML_DEBUGGER
 		if(string.includes(RML_DEBUG)) {
 			const nl = (str: string) => str.replace(/\t/g, '  ');
 			const reducer = (str: string[], next: string, j: number) => str.concat(
@@ -92,11 +93,16 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			/* Stopped parsing a RML template */
 			debugger;
 		}
+		// #ENDIF ENABLE_RML_DEBUGGER
 
-		if(expression == undefined || expression === '') {
-			// remove nullish values except 0, "0", false and "false"
-			// acc = accPlusString +(expression==0 || expression==false ? expression : '');
-			acc = accPlusString;
+		// We treat and render any null or undefined values as empty strings
+		// as a graceful handling of non-values (should this be configurable for a better QA?)
+		// const printableExpressionType = typeof expression ?? 'undefined';
+		const printableExpressionType = typeof (expression ?? '');
+
+		if(['string', 'number', 'boolean'].includes(printableExpressionType)) {
+			// Static expressions, no data binding. Just concatenate
+			acc = accPlusString +(expression ?? '');
 		} else if(eventName) {
 			// Event Source
 			// so feed it to an Rx Subject | Observer | Handler Function | POJO | Array
@@ -148,11 +154,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 			// // } else if(typeof ((<Observable<unknown>>expression).subscribe ?? (<Promise<unknown>>expression).then)  == 'function' && i<strings.length -1 || typeof expression == 'object') {
 			// } else if(
-			const expressionType = typeof expression;
-			if(['string', 'number', 'boolean'].includes(expressionType)) {
-				// Static expressions, no data binding. Just concatenate
-				acc = accPlusString +expression;
-			} else if(Array.isArray(expression)) {
+			if(Array.isArray(expression)) {
 				// If sinking an array, we're likely just mapping it
 				acc = accPlusString +expression.join('');
 			} else {

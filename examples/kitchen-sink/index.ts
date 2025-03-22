@@ -1,12 +1,15 @@
 /**
  * Rimmel.js Kitchen Sink Demo Application
  * 
- * You can get a running version of this code at: https://stackblitz.com/~/github.com/ReactiveHTML/rimmel?file=examples/kitchen-sink/index.ts&startScript=kitchen-sink
+ * You can get a running version of this code here:
+ * https://stackblitz.com/~/github.com/ReactiveHTML/rimmel?file=examples/kitchen-sink/index.ts&startScript=kitchen-sink
  *
  * This is a messy testbed of all you can do with Rimmel.
  * If you're just starting out, this will feel
  * overwhelming, so you might want to start with some
- * simpler examples around:
+ * simpler examples around.
+ * 
+ * Rimmel.js examples:
  * https://stackblitz.com/orgs/github/ReactiveHTML/collections/reactivity
  */
 

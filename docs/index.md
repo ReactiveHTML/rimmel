@@ -33,24 +33,24 @@ Third-party adapters or utility libraries can also be used but the reality is th
 
 Rimmel focuses primarily on functional/reactive streams, to make them "just work".
 
-## Everything is a Stream ☄️
+### Everything is a Stream ☄️
 For Rimmel to unleash the whole power of functional/reactive streams, all you do in practice is just treating everything (that's not genuinely static) as a stream: data in, data out.
 
 You no longer write code to change the state of something else, as in:
 
-```typescript
-// Imperative programming
+```javascript
+// Imperative Programming
 target = newValue;
 
-// Object Oriented Programming
+// Object Oriented (Imperative) Programming
 target.property = value;
 target.setProperty('prop1', value);
 ```
 
-What you do instead, is you connect both ends of your stream to your component's HTML, within the template:
+What you do instead, is you define all your application logic as streams, then you connect both ends of them to your HTML (Rimmel will know when to connect the input or the output from the context):
 
 ```javascript
-// Streams Oriented Programming
+// Streams Oriented
 const template = rml`
   <button onclick="${yourStream}">click me</button>
   Total clicks: <b>${yourStream}</b>
@@ -63,11 +63,13 @@ In that case it may be computationally cheaper to just run those outside of the 
 
 Rimmel does never ever cause any unnecessary DOM updates by design. The concept of a component "re-rendering" doesn't exist, so the whole idea of a Virtual DOM is unneeded. This helps keeping your apps very light and very fast.
 
-Updates to your page are performed using Sinks, which are memory and/or performance-optimised direct DOM manipulation functions, directly attached to the Promises or Observable streams you provide. When you emit new data, it gets sinked to the DOM straight away.
-You have complete control over when and how you emit data, so for simple apps you just don't care, and in the most extreme circumstances you can throttle, sample, debounce, use various schedulers at will. RxJS provides all that, so if you know RxJS, you're ready to make the most of Rimmel.
+All changes to your page are applied using _Sinks_, which are memory and/or performance-optimised direct DOM manipulation functions, directly attached to the Promises or Observable streams you provide. All data you emit gets sinked to the DOM immediately.
+You have complete control over when and how you emit data, so for simple apps you just don't care, and in the most extreme circumstances you can throttle, sample, debounce, use various schedulers at will.
+
+RxJS provides all that, so if you know some RxJS, you're ready to get the most out of Rimmel.
 
 ## Conditional Rendering ☂️
-If you need to render something based on a condition, plain-old standard JS can help you. No further abstractions or custom DSLs used:
+If you need to render something based on a condition, plain-old standard JS can help you. No further abstractions or custom DSLs are required:
 
 ```javascript
 document.body.innerHTML = rml`
@@ -115,25 +117,27 @@ Forward refs are a construct used in Imperative UI libraries to enable referenci
 Rimmel enables you to declare future changes to a DOM element by means of a simple Promise or Observable.
 The mounting and data binding is completely managed by Rimmel. This means when they resolve or emit, the elements will already be there to receive them, effectively making the use of Forward Refs redundant.
 
-## Structured Data ⚙️
+## Lists and Structured Data ⚙️
 When you're dealing with structured data, like lists or grids of repeated data, the best way to handle it depends on multiple factors, so it's left as an extension opportunity.
 
 You can create your custom, advanced Sinks to render data structures of any complexity and manage specific aspects of its interactions in the most optimal way for your needs.
 This is a perfect case for reactive grids, spreadsheets, SVG or Canvas drawings, 3D scenes, etc.
 
 ### Dynamic Lists and Collections 📝
-If you just want to display a dynamic list of repeated elements you may want to use a `Collection` from [ObservableTypes](https://github.com/reactivehtml/observable-types), which is an Array+Observable+Observer object to make lists trivial to manage with Rimmel.
+If you just want to display a dynamic list of repeated elements you may want to use a `Collection` from [ObservableTypes](https://github.com/reactivehtml/observable-types), which is a convenient Array+Observable+Observer hybrid to make lists absolutely trivial to manage with Rimmel.
 
-The following illustration shows how you can manage a simple list of items.
+The following illustration shows how you can display a simple list of items.
 
 <img src="docs/assets/observable-types.png" alt="Structured Data with Rimmel.js and Observable Types" style="max-width: 80vw; max-height: 30vh;">
 
+
+Conceptually simple, just as much as the code. you'll be amazed how simple and powerful it is to use:
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/observable-types-list)
 
 <br>
 
-## Example: RGB Colour Sliders
+## Example: RGB Colour Sliders 🌈
 Want a little more involved example of stream usage?<br>
 Let's make a component featuring a Red, a Green and a Blue slider that will get transformed into an #RRGGBB colour string, displayed in a text box and used as the fill colour of an SVG circle.
 
@@ -206,7 +210,7 @@ Modelling your state as one or more observable streams will give you fine-graine
 
 All Rimmel does is binding your observable streams to the UI in a seamless integration that will result in improved code quality, scale, testability and performance.
 
-## No Lifecycle Events (you only need streams) 🕢
+## No Lifecycle Events (streams can do it) 🕢
 Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless, redudant and discouraged here.
 Streams and other listeners get connected and disconnected automatically for you when a component is mounted/unmounted. If you think about it, this is exactly what you would normally do in your init/onmount functions, so you no longer have to deal with these tiny details.
 
@@ -522,7 +526,7 @@ When the above component is rendered on the page, the mixin will inject everythi
 
 Whenever the `classes` stream emits, you will be able to set/unset class names in the component.
 
-#### No reference to the host element
+#### No reference to the host element 🧙🏽‍♂️
 You may have noticed that mixins doesn't get any reference to the elements you merge them into.
 
 In the imperative paradigm you would indeed have one, so you can imperatively set `hostElement.classList.add('big')`.
@@ -546,7 +550,7 @@ In order to stick with good functional principles, mixins only return this `DOM 
 
 <br>
 
-### A simple drag'n'drop mixin
+### A simple drag'n'drop mixin 🐭
 A simple use case for mixins is drag'n'drop, in the form of an isolated, reusable piece of functionality.
 
 <img src="docs/assets/how-rimmel-works-7.png" alt="Rimmel Sources and Sinks" style="max-height: 100vh;">
@@ -589,7 +593,7 @@ We call this the **Vanilla+ Speed**.
 
 <br>
 
-### Special cases of "fast"
+### Special cases of "fast" 🐌
 Do you have a Combobox with 1M rows?<br>
 A large spreadsheet with 1k x 10k reactive cells?<br>
 An HFT stock ticker with 10000 subscriptions?<br>
@@ -600,14 +604,14 @@ These are perfect cases to create Custom Sinks implementing relevant design patt
 
 <br>
 
-## Memory management
+## Memory management 🧠
 If you come from some other libraries or frameworks, including "vanilla RxJS", you know you're somewhat responsible of cleaning up memory. The indiscriminate use of Observable subscriptions without proper cleanup can cause memory leaks in certain scenarios.
 
 Using Observables with Rimmel is trivial. All DOM subscriptions and event listeners are handled by the library behind the scenes, registered when a component is mounted and unregistered when it's removed.
 
 <br>
 
-## "Suspense" for free, out of the box
+## "Suspense" for free, out of the box ⚔️
 Do you have async data like an API call and a placeholder to display whilst waiting? We have good news: a `BehaviorSubject` is all you need.
 
 A `BehaviorSubject` receives a special treatment from Rimmel in that its initial value will be rendered immediately, synchronously, whilst subsequent emissions will replace it as normal. This helps avoid unnecessary reflows and jank on the page.
@@ -633,7 +637,7 @@ const WaitingComponent = () => {
 <a href="https://stackblitz.com/edit/rimmel-suspense"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://stackblitz.com/edit/rimmel-suspense">Suspense</a> on Stackblitz.
 
 
-## The little gotcha!
+## The little GOTCHA! 🚸
 Never forget to tag your templates with `rml`, otherwise they won't be reactive.
 This is a standard piece of HTML string: 
 ```ts
@@ -645,13 +649,13 @@ And this is a reactive template managed by Rimmel:
 const str = rml`<div>hello</div>`
 ```
 
-## Migrating from/to other frameworks
+## Migrating from/to other frameworks 🚶🏽‍♀️
 It might sound unusual, but Rimmel can actually coexist with other frameworks.
 Your Rimmel component can be embedded in a React component and have children made in Vue, or even jQuery plugins or sit inside a larger jQuery application, or any other way around.
 
 If you are planning a progressive framework migration, you can do it one component at a time.
 
-## Use with AI assistants/LLMs
+## Use with AI assistants/LLMs 🗿
 We have created a few experimental AI assistants like [RimmelGPT.js](https://chat.openai.com/g/g-L01pb60It-rimmelgpt-js), to help you convert existing components, create new ones or just get started and have fun. 
 
 (Please note these are still highly experimental and various forms of severe hallucination can happen under different circumstances — YMMV)
@@ -680,7 +684,7 @@ Remember, this is complex by nature and without RxJS it would be much worse!
 
 [![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
 
-# Get in touch!
+# Get in touch! ☝🏽
 Rimmel is a young project built with meticulous attention to detail and a bold vision: building a web ecosystem that "just works", using the functional-reactive paradigm.
 
 Share the passion? Would like to help? That'd be hugely appreciated!<br>

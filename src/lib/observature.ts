@@ -73,7 +73,7 @@ export const CreateObservature = <I, O>(initial?: O) => {
 					return (_observer: Observer<O>) => {
 						observer = _observer;
 						/* @ts-ignore */
-						const starter = Observable.merge(...(<Observable<I>[]>[]).concat(sources, initial ? Observable.of(initial) : <Observable<I>[]>[]));
+						const starter = Observable.merge(...(<Observable<I>[]>[]).concat(sources, initial ? Observable.from([].concat(initial ?? [])]) : <Observable<I>[]>[]));
 						const pipeline = operators
 							.reduce((obs, [prop, args]: OperatorPreload) => obs[prop](...args), starter)
 						/* @ts-ignore */

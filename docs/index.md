@@ -1,9 +1,9 @@
-Rimmel is a powerful, fast and lightweight JavaScript UI library for creating web applications using event streams.
+Rimmel is a powerful, fast and lightweight JavaScript UI library for creating web applications using declarative, functional, reactive event streams.
 
 It implements the [RML/Reactive Markup](https://github.com/ReactiveHTML/reactive-markup) specification, which means everything in your code is a stream: it takes an input, you transform it and Rimmel takes care of the rest.
 
 ## Getting started
-If you are new to all this, there is a [3m crash-course on event streams](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) tailored for UI development with Rimmel, arguably the simplest RxJS introduction around to get you started.
+If you are new to all this, there is a [3m crash-course on functional/reactive streams](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) tailored for UI development with Rimmel, arguably the simplest RxJS introduction around to get you started.
 
 If you are new to the functional and reactive programming mindset, this [interactive tutorial](https://reactivex.io/learnrx/) may be an especially useful introduction to map/reduce in the reactive world.
 
@@ -29,7 +29,7 @@ You've probably never seen anything like this before, so just go and try it:
 ## Functional/Reactive
 Most JavaScript UI libraries and frameworks are designed for the imperative programming paradigm.
 Occasionally they may also support some aspects of functional, reactive, or functional-reactive programming.
-Third-party adapters or utility libraries can also be used but the reality is that the imperative paradigm is their main focus and others were just an afterhthought, so their use is severely limited, inconvenient or plain awkward to use in practice.
+Third-party adapters or utility libraries can also be used to help but the reality is that the imperative paradigm is their main focus and others were just an afterhthought, so their use is severely limited, inconvenient or plain awkward to use in practice.
 
 Rimmel focuses primarily on functional/reactive streams, to make them "just work".
 

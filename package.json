@@ -1,6 +1,6 @@
 {
   "name": "rimmel",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "A Functional-Reactive UI library for the Rx.Observable Universe",
   "type": "module",
   "_main": "dist/cjs/index.cjs",

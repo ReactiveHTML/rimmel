@@ -38,7 +38,7 @@ Third-party adapters or utility libraries can also be used to help but the reali
 Rimmel focuses primarily on functional/reactive streams, to make them "just work".
 
 ### Everything is a Stream ☄️
-For Rimmel to unleash the whole power of functional/reactive streams, all you do in practice is just treating everything (that's not genuinely static) as a stream: data in, data out.
+For Rimmel to unleash the whole power of functional/reactive/streams-oriented programming, all you do is just treat everything (that's not genuinely static) as a stream: data in, data out.
 
 You no longer write code to change the state of something else, as in:
 
@@ -61,7 +61,7 @@ const template = rml`
 `;
 ```
 
-## No Virtual DOM 🚀
+## No need for a Virtual DOM 🚀
 The concept of Virtual DOM originates from the assumption that the DOM is slow, which might appear to be the case if a framework makes a large number of unnecessary, uncontrolled updates, also known as "re-renders".
 In that case it may be computationally cheaper to just run those outside of the DOM.
 
@@ -72,7 +72,7 @@ You have complete control over when and how you emit data, so for simple apps yo
 
 RxJS provides all that, so if you know some RxJS, you're ready to get the most out of Rimmel.
 
-## Conditional Rendering ☂️
+## Conditional Rendering done simple ☂️
 If you need to render something based on a condition, plain-old standard JS can help you. No further abstractions or custom DSLs are required:
 
 ```javascript
@@ -91,7 +91,7 @@ document.body.innerHTML = rml`
 You only want to use this method if your condition is static, and you don't need to reflect changes over time.
 
 
-### ... or conditional streams ☔
+### ... or with conditional streams ☔
 If you need to render based on a live, ever-changing condition, you can just use a normal Observable stream:
 
 ```javascript
@@ -115,7 +115,7 @@ document.body.innerHTML = rml`
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-dynamic-conditional-rendering)
 
-## No Forward Refs 🪧
+## No need for Forward Refs 🪧
 Forward refs are a construct used in Imperative UI libraries to enable referencing and later modifying DOM elements that don't exist yet (you're writing components that will work on DOM nodes after they will be mounted).
 
 Rimmel enables you to declare future changes to a DOM element by means of a simple Promise or Observable.
@@ -195,7 +195,7 @@ Finally, we have two sinks where the data ends up; one as the innerHTML of the <
 
 <br>
 
-## State doesn't exist (it's a Stream) ✴️
+## State doesn't exist. It's a Stream ✴️
 "State", as the word itself suggests, is something static, so it doesn't belong to the dynamic, interactive, reactive webapps we make every day.
 
 The rationale is that "state", as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow. You only need those when certain events happen, in order to respond.
@@ -214,7 +214,7 @@ Modelling your state as one or more observable streams will give you fine-graine
 
 All Rimmel does is binding your observable streams to the UI in a seamless integration that will result in improved code quality, scale, testability and performance.
 
-## No Lifecycle Events (streams can do it) 🕢
+## No need for Lifecycle Events 🕢
 Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless, redudant and discouraged here.
 Streams and other listeners get connected and disconnected automatically for you when a component is mounted/unmounted. If you think about it, this is exactly what you would normally do in your init/onmount functions, so you no longer have to deal with these tiny details.
 

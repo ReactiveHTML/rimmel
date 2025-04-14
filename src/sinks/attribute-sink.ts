@@ -1,11 +1,13 @@
 import type { Sink } from '../types/sink';
 import type { AttributeObject } from '../types/internal';
 import type { MaybeFuture, Observer } from '../types/futures';
-import type { RMLEventAttributeName } from '../types/dom';
+import type { RMLEventAttributeName, RMLEventName } from '../types/dom';
 
+import { addListener } from '../lib/addListener';
 import { asap } from '../lib/drain';
 import { DatasetItemPreSink, DatasetObjectSink } from './dataset-sink';
 import { isFunction } from '../utils/is-function';
+import { isRMLEventListener, RMLEventListener } from '../types/event-listener';
 import { sinkByAttributeName } from '../parser/sink-map';
 
 type EventListenerDeclarationWithOptions = [Function, EventListenerOptions];
@@ -182,14 +184,17 @@ export const AttributeObjectSink = <T extends HTMLElement | SVGElement | MathMLE
 				// which is no good, because 0 is no special value for non-boolean attributess. value="0"
 				if(v == null || v === false || v == 'false' || v == undefined) {
 					node.removeAttribute(k)
-				} else if(k.startsWith('on') && isFunction((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then ?? v)) {
-					node.addEventListener(k.substring(2), ((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then)?.bind(v) ?? v, {capture: true})
+				} else if(isRMLEventListener(k, v)) { //if(k.startsWith('on') /* && isFunction((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then ?? v) */) {
+					addListener(node, <RMLEventName>k.substring(2), v);
 				} else {
-					const sink: Sink<any> = k == 'dataset'
-						? DatasetObjectSink
-						: k.startsWith('data-') ? <Sink<T>>DatasetItemPreSink(k.substring(5))
-						: node.tagName == 'FORM' ? FormElementSink
-						: sinkByAttributeName.get(k)
+					const sink: Sink<any> =
+						k == 'dataset'
+							? DatasetObjectSink :
+						k.startsWith('data-')
+							? <Sink<T>>DatasetItemPreSink(k.substring(5)) :
+						node.tagName == 'FORM'
+							? FormElementSink :
+						sinkByAttributeName.get(k)
 						?? FixedAttributeSink;
 						//?? DOMAttributeSink;
 

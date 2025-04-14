@@ -5,7 +5,6 @@ import type { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/d
 import { isSinkBindingConfiguration, isSourceBindingConfiguration } from "../types/internal";
 
 import { state, waitingElementHanlders } from "../internal-state";
-import { isFunction } from "../utils/is-function";
 import { takeFirstSync } from "../utils/take-first-sync";
 import { BehaviorSubject, MaybeFuture, Observable } from "../types/futures";
 import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
@@ -15,13 +14,11 @@ import { PreSink } from "../sinks/index";
 import { sinkByAttributeName } from '../parser/sink-map';
 import { DOMAttributePreSink, FixedAttributePreSink, WritableElementAttribute } from "../sinks/attribute-sink";
 import { Mixin } from "../sinks/mixin-sink";
-import { ObjectSource, ObjectSourceExpression, isObjectSource } from "../sources/object-source";
-import { ObserverSource, isObserverSource, ObservatureSource, isObservatureSource } from "../sources/observer-source";
 
 import { InnerHTML } from "../sinks/inner-html-sink";
 import { TextContent } from "../sinks/text-content-sink";
-import { ClassRecord } from "../sinks/class-sink";
 import { StyleObjectSink, StylePreSink, STYLE_OBJECT_SINK_TAG } from "../sinks/style-sink";
+import { toListener } from "../utils/to-listener";
 
 export const addRef = (ref: string, data: BindingConfiguration) => {
 	waitingElementHanlders.get(ref)?.push(data) ?? waitingElementHanlders.set(ref, [data]);
@@ -121,14 +118,8 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 				listener = expression.listener;
 				addRef(ref, <SourceBindingConfiguration<typeof eventName>>{ ...expression, eventName });
 			} else {
-				listener =
-					isObservatureSource(expression) ? ObservatureSource(expression)
-					: isObserverSource(expression) ? ObserverSource(expression)
-					: isFunction(expression) ? expression
-					: isObjectSource(expression) ? ObjectSource(...(expression as ObjectSourceExpression<typeof expression[1]>))
-					: null // We allow it to be empty. If so, ignore, and don't connect any source. Perhaps add a warning in debug mode?
-				;
-
+				// listener = toListener(expression);
+				listener = expression;
 				if(listener) {
 					addRef(ref, <SourceBindingConfiguration<typeof eventName>>{ type: 'source', listener, eventName });
 				} // TODO: shall we add some notifications, otherwise, rather than silently ignore?

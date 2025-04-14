@@ -1,5 +1,3 @@
-import type { EventListenerFunction } from "../types/dom";
-import type { MonkeyPatchedObservable }	from '../types/monkey-patched-observable';
 import type { RMLEventName } from "../types/dom";
 import type { SourceBindingConfiguration } from "../types/internal";
 
@@ -10,19 +8,13 @@ import { isSinkBindingConfiguration } from "../types/internal";
 import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
 import { tracing } from "../debug";
-import { IObservature, isObservature } from "../lib/observature";
 import { SinkFunction } from "../types";
+import { addListener } from "../lib/addListener";
 
 const AUTOREMOVE_LISTENERS_DELAY = 100; // Cleanup event listeners after this much time
 const elementNodes = (n: Node): n is Element => n.nodeType == 1;
 
-// class LifecycleEvent extends CustomEvent{};
-
 const errorHandler = console.error;
-
-const isEventListenerObject = (l: any): l is EventListenerObject =>
-	typeof l == 'object' && 'handleEvent' in l
-;
 
 export const Rimmel_Bind_Subtree = (node: Element): void => {
 	// Data-to-be-bound text nodes in an element (<div>${thing1} ${thing2}</div>);
@@ -114,32 +106,7 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 			const sourceBindingConfiguration = <SourceBindingConfiguration<RMLEventName>>bindingConfiguration;
 			const { eventName } = sourceBindingConfiguration;
 
-			// We add an event listener for all those events who don't bubble by default (as we're delegating them to the top)
-			// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
-			if(USE_DOM_OBSERVABLES && node.when) {
-				const l = <EventListenerFunction | IObservature<Event>>sourceBindingConfiguration.listener;
-				if(!isEventListenerObject(l)) {
-					const source = node.when(eventName, <ObservableEventListenerOptions | undefined>sourceBindingConfiguration.options);
-					if(isObservature(l)) {
-						(<IObservature<Event>>l).addSource(source as MonkeyPatchedObservable<Event>);
-					} else {
-						// TODO: Add AbortController
-						source.subscribe(l);
-					}
-				}
-			} else {
-				node.addEventListener(eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options);
-				// #REF49993849837451
-				// const listenerRef = [eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options];
-				// node.addEventListener(...listenerRef);
-				// listeners.get(node)?.push?.(listenerRef) ?? listeners.set(node, [listenerRef]);
-			}
-
-			if (eventName == 'rml:mount') {
-				// Will need to bubble so that it can be captured by the delegated event handler
-				setTimeout(() => node.dispatchEvent(new CustomEvent('rml:mount', { bubbles: true, detail: {} })), 0);
-				//node.dispatchEvent(new CustomEvent('mount', {bubbles: true, detail: {}}))
-			}
+			addListener(node, eventName, sourceBindingConfiguration.listener, sourceBindingConfiguration.options);
 		}
 
 	});
@@ -151,28 +118,29 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 export const removeListeners = (node: Element) => {
 	if(document.contains(node)) {
 		// Don't remove listeners if the node has just been moved across (so it's back in the DOM)
-		return
+		return;
 	}
 
 	[...node.children as unknown as Element[]]
-		//.filter(n => document.contains(n))
 		.forEach(node => removeListeners(node))
 	;
 
-	// TODO: add AbortController support for cancelable promises?
+	// TODO: add AbortController support for cancellable promises?
 	subscriptions.get(node)?.forEach(l => {
 		// HACK: — destination is not a supported API for Subscription...
 		// l?.destination?.complete(); // do we need this, BTW?
 
 		// console.debug('Rimmel: Unsubscribing', node, l);
-		// FIXME: DOM Observables don't have unsubscribe => Use AbortControllers
-		l?.unsubscribe?.()
+		// FIXME: DOM Observables don't have unsubscribe => Use an AbortController in addListener.ts
+		// N.B.: unsubscribe is RxJS-specific, but the below still works.
+		l?.unsubscribe?.();
 	});
 	subscriptions.delete(node);
 
 	// #REF49993849837451 Just leaving this around, but there's no need to manually
-	// remove listeners. DevTools might suggest otherwise, but HE is holding on to
-	// EventListeners in memory, not Rimmel.
+	// remove listeners.
+	// DevTools might suggest otherwise, but if you see unreleased instances of
+	// EventListener, then HE is holding on to them (Heisenbug), not Rimmel.
 	// listeners.get(node)?.forEach(ref => node.removeEventListener(...ref));
 	// listeners.delete(node);
 };

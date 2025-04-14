@@ -1,5 +1,6 @@
 import type { BehaviorSubject, Subject } from 'rxjs';
-import type { EventListenerOrEventListenerObject, RMLEventMap } from './dom';
+import type { EventListener, EventListenerOrEventListenerObject, RMLEventMap } from './dom';
+import { Observer } from './futures';
 
 /**
  * A map of all HTML events
@@ -23,4 +24,13 @@ export type EventObject = {
     [K in keyof HTMLEventMap as `on${string & K}`]?: EventListenerOrEventListenerObject<HTMLEventMap[K]> | EventSubject<HTMLEventMap[K]>;
 } & {
     [K in keyof RMLEventMap]?: EventListenerOrEventListenerObject<RMLEventMap[K]> | EventSubject<RMLEventMap[K]>;
+};
+
+export type RMLEventListener<E extends Event = Event> =
+	| EventListener<E>
+	| Observer<E>
+;
+
+export const isRMLEventListener = (name: string, arg: unknown): arg is RMLEventListener => {
+    return name.startsWith('on');
 };

@@ -51,7 +51,7 @@ export { Dataset, DatasetObject, datasetObject } from './sources/dataset-source'
 export { Numberset } from './sources/numberset-source';
 export { EventData, eventData } from './sources/event-data';
 export { EventTarget } from './sources/event-target';
-export { Form, form } from './sources/form-data-source';
+export { Form, form, AsFormData, asFormData } from './sources/form-data-source';
 export { Key, key } from './sources/keyboard-source';
 export { Update } from './sources/object-source';
 export { ClientXY } from './sources/client-xy-source';

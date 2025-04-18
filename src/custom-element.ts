@@ -66,7 +66,8 @@ class RimmelElement extends HTMLElement {
 		}
 
 		const [attrs, events] = [...(<RMLNamedNodeMap>this.attributes)].reduce((acc, b) => {
-			const isEvent = <0 | 1>+b.nodeName.startsWith('on');
+			// FIXME: REF0000266279391633 this is an awful way to look up leftover event handlers from the parser.
+			const isEvent = <0 | 1>+/^_?on/.test(b.nodeName);
 			const t = acc[isEvent];
 			t[isEvent ? b.nodeName : camelCase(b.nodeName)] = b.nodeValue!;
 			return acc;
@@ -75,12 +76,15 @@ class RimmelElement extends HTMLElement {
 		const refs = waitingElementHanlders.get((this.attributes as RMLNamedNodeMap).resolve?.nodeValue ?? '') ?? [];
 		this.attrs = SubjectProxy(attrs);
 
-		if(refs) {
+		// This condition holds for non-virtual custom elements. Won't be needed anymore if we split web components from virtual web components
+		if(refs.length) {
+			// Connect/Bind Outbound Events
 			Object.keys(events)
 				.map(name => (<SourceBindingConfiguration<any>[]>refs).find(x => isSourceBindingConfiguration(x)))
 				.filter(f=>!!f)
 				.forEach(f => {
-					subscribe(this, this.attrs[f.eventName], f.listener)
+					// TODO: store subscription for later removal
+					const subscription = subscribe(this, this.attrs[`on${f.eventName}`], f.listener)
 				})
 			;
 
@@ -92,12 +96,14 @@ class RimmelElement extends HTMLElement {
 				.map((s: SinkBindingConfiguration<any>) => [camelCase(s.t), s.source])
 			);
 
+			// Inbound Attributes
 			this.externalSourceAttributes = Object.fromEntries(
 				sinkBindingConfigurations
 				// .map(s => {[s.t]: s.sink = hijack?...
 				.map((s: SinkBindingConfiguration<any>) => [s.t, s.sink])
 			);
 
+			// Outbound Events
 			this.bindings = Object.fromEntries(
 				refs.map(s =>
 					isSinkBindingConfiguration(s)

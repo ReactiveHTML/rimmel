@@ -155,7 +155,6 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 				;
 
 				const isAttribute = /(?<attribute>[:a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(accPlusString);
-				// const isAttribute = /<[a-z][a-z0-9\-_]+\s+.*\s+(?<attribute>[:a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(accPlusString);
 				if(isAttribute) {
 
 					const quotationMarks = isAttribute.groups!.quote;
@@ -187,9 +186,8 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						// TODO: remove boolean attributes if they are bound to streams: disabled="${stream}"
 						// should not be disabled by its mere presence, but depending on the value emitted by the stream.
 
-						// isBooleanAttribute && console.log('>>>>>>>', initialValue, expression);
-
 						const prefix = isBooleanAttribute && (!initialValue || !expression)
+							// REF0000266279391633
 							? accPlusString.replace(new RegExp(`${attributeName}=['"]+$`), `_${attributeName}="`) // TODO: or maybe clean it up completely?
 							: accPlusString
 						;

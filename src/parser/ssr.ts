@@ -49,6 +49,7 @@ export const rml = (strings: TemplateStringsArray, ...args: RMLTemplateExpressio
 		map(x => hydrationCall(JSON.stringify(x)))
 	);
 
+	// TODO: just return a string here and pass asynquences separately
 	return of(str).pipe(
 		mergeWith(asyncStuff()),
 		endWith(<HTMLString>'\n<!-- hydration end -->\n</body>\n</html>'),

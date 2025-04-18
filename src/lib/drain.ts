@@ -6,6 +6,7 @@ import type { RenderingScheduler } from "../types/schedulers";
 import { isObservable, isPromise } from "../types/futures";
 import { subscriptions } from "../internal-state";
 import renderingScheduler from '../schedulers/ema-animation-frame';
+import { toListener } from "../utils/to-listener";
 
 /**
  * Return the "callable" part of an entity:
@@ -41,7 +42,7 @@ export const subscribe =
 	(node: Node, source: MaybeFuture<T>, next: EventListenerOrEventListenerObject<T>, error?: (e: Error) => void, complete?: () => void, scheduler: RenderingScheduler | null = null) => {
 
 		// TODO: make this a plugin, in case people don't use anything with handleEvent...
-		const flattenedNext = (next as EventListenerObject<T>).handleEvent?.bind(next) ?? next;
+		const flattenedNext = toListener(next);
 		const task = scheduler?.(node, <SinkFunction>flattenedNext) ?? flattenedNext;
 
 		if (isObservable(source)) {

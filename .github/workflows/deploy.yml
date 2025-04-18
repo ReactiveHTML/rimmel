@@ -3,7 +3,7 @@ name: Build and Deploy Handbook and Website
 on:
   push:
     branches:
-      - main # Trigger on changes to the main branch
+      - master
 
 jobs:
   build-and-deploy:

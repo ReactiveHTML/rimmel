@@ -1,6 +1,6 @@
+import type { BindingConfiguration, SourceBindingConfiguration } from "./types/internal";
 import type { RMLEventName } from "./types/dom";
 import type { Subscription } from "./types/futures";
-import type { BindingConfiguration, SourceBindingConfiguration } from "./types/internal";
 
 import { REF_TAG } from './constants';
 

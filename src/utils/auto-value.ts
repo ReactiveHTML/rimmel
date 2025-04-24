@@ -1,6 +1,6 @@
 /**
  * Get the value of an <input> element matching its type:
- * number, date or string,
+ * boolean, number, date or string,
  * or innerText if it's any other [contenteditable] element
  **/
 export const autoValue = (input: HTMLInputElement | HTMLElement) =>

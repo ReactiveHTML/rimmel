@@ -1,4 +1,5 @@
 import type { AttributeObject, BindingConfiguration, RMLTemplateExpression, RMLTemplateExpressions, SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
+import type { BehaviorSubject, MaybeFuture, Observable } from "../types/futures";
 import type { Sink } from "../types/sink";
 import type { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
 
@@ -6,7 +7,6 @@ import { isSinkBindingConfiguration, isSourceBindingConfiguration } from "../typ
 
 import { state, waitingElementHanlders } from "../internal-state";
 import { takeFirstSync } from "../utils/take-first-sync";
-import { BehaviorSubject, MaybeFuture, Observable } from "../types/futures";
 import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUTE, RML_DEBUG } from "../constants";
 

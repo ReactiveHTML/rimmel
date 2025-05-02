@@ -9,6 +9,7 @@ import { ClosedSink } from "../sinks/closed-sink";
 import { DatasetSink, DatasetObjectSink } from "../sinks/dataset-sink";
 import { DisabledSink } from "../sinks/disabled-sink";
 import { FocusSink } from "../sinks/focus-sink";
+import { HiddenSink } from "../sinks/hidden-sink";
 import { InnerHTMLSink } from "../sinks/inner-html-sink";
 import { InnerTextSink } from "../sinks/inner-text-sink";
 import { ReadonlySink } from "../sinks/readonly-sink";
@@ -27,6 +28,7 @@ export const sinkByAttributeName = new Map(<Iterable<readonly [string, Sink<any>
 	['data-',           DatasetSink],
 	['dataset',         DatasetObjectSink], // Shall we include this, too?
 	['disabled',        DisabledSink],
+	['hidden',          HiddenSink],
 	['innerHTML',       InnerHTMLSink],
 	['innerText',       InnerTextSink],
 	['readonly',        ReadonlySink],

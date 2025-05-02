@@ -1050,9 +1050,21 @@ const sinks = {
 
 		return rml`
 			Async readonly sink
-			<input readonly="${toggle}" value="toggle readonly, not only">
+			<input readonly="${toggle}" value="toggle .readonly">
 		`
 	},
+
+	Hidden: (t = 2000) => {
+		const toggle = interval(1000).pipe(
+			scan(x=>!x, false)
+		);
+
+		return rml`
+			Async hidden sink
+			<input hidden="${toggle}" value="toggle hidden">
+		`
+	},
+
 
 	AsyncDialogToggle: (t = 1000) => {
 		const open$ = new Subject().pipe(

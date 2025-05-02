@@ -73,6 +73,7 @@ export { Closed } from './sinks/closed-sink';
 export { Disabled } from './sinks/disabled-sink';
 export { Catch } from './sinks/error-sink';
 export { Focus } from './sinks/focus-sink';
+export { Hidden } from './sinks/hidden-sink';
 export { InnerHTML } from './sinks/inner-html-sink';
 export { InnerText } from './sinks/inner-text-sink';
 export { Mixin } from './sinks/mixin-sink';

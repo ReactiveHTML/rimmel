@@ -2,14 +2,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
 import { join } from 'path';
 import typescript from '@rollup/plugin-typescript';
-import terser from '@rollup/plugin-terser';
 import { visualizer } from 'rollup-plugin-visualizer';
-
-const terserOptions = {
-	compress: {
-		drop_debugger: false,
-	},
-};
 
 const getTSConfig = async (path) => {
 	const tsConfig = (await import('./tsconfig.json', { assert: { type: 'json' } })).default;
@@ -37,7 +30,6 @@ export default [
 				declarationDir: undefined, // Explicitly unset
 				declarationMap: false,     // Explicitly disable
 			}),
-			terser(terserOptions),
 			visualizer({ filename: 'bundle-stats-globaljs.html' }),
 		],
 		output: [{
@@ -68,7 +60,6 @@ export default [
 			typescript({
 				...await getTSConfig('dist/esm'),
 			}),
-			terser(terserOptions),
 			visualizer({ filename: 'bundle-stats-esm.html' }),
 		],
 		output: [
@@ -101,7 +92,6 @@ export default [
 				outDir: 'dist/ssr',
 				declaration: true,
 			}),
-			terser(terserOptions),
 			visualizer({ filename: 'bundle-stats-ssr.html' }),
 		],
 		output: [

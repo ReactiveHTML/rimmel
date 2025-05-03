@@ -8,10 +8,14 @@ export type ObjectKey = string | number | symbol;
 export type TargetObject = object | Array<string | number | object | Function>; // Record<string, unknown>;
 export type ObjectSourceExpression<T extends TargetObject> = [key: keyof T, target: T];
 
+/**
+ * @deprecated don't use
+ **/
 export const isObjectSource =
-  <T extends TargetObject>
-  (expression: RMLTemplateExpression): expression is ObjectSourceExpression<T> =>
-    Array.isArray(expression) && expression.length == 2;
+	<T extends TargetObject>
+	(expression: RMLTemplateExpression): expression is ObjectSourceExpression<T> =>
+		Array.isArray(expression) && expression.length == 2
+;
 
 /**
  * A data source that updates an object's property from an &lt;input&gt; element when 
@@ -23,31 +27,31 @@ export const isObjectSource =
  * @example <input oninput="${ObjectSource(4, arr)}">
  */
 export const ObjectSource =
-  <E extends Event, T extends TargetObject>
-  (key: ObjectKey, targetObject?: T) => {
-    const handler = ((targetObject: T, e: E) => {
-      const t = e.target as HTMLInputElement;
-      (targetObject as any)[key] = autoValue(t);
-    });
+	<E extends Event, T extends TargetObject>
+	(key: ObjectKey, targetObject?: T) => {
+		const handler = ((targetObject: T, e: E) => {
+			const t = e.target as HTMLInputElement;
+			(targetObject as any)[key] = autoValue(t);
+		});
 
-    return (targetObject
-      ? handler.bind(null, targetObject as T) as EventListenerFunction<E>
-      : (t2: T)=>(handler.bind(null, t2) as EventListenerFunction<E>)
-    );
-  }
+		return (targetObject
+			? handler.bind(null, targetObject as T) as EventListenerFunction<E>
+			: (t2: T)=>(handler.bind(null, t2) as EventListenerFunction<E>)
+		);
+	}
 ;
 
 /**
- * A data source that updates an object's property from an &lt;input&gt; element when
- * a certain event occurs
- * @param property A property to update in the given object
- * @param object The object to update
+ * An Event Adapter that uses an event's underlying &lt;input&gt; element
+ * to updates an object's property or an array item.
+ * @param property A property to update in the given object or an index to update in the given array
+ * @param object The object or array to update
  * @returns An event handler
  */
 export const Update =
-  <E extends Element, T extends TargetObject, I extends Event, O extends never>
-  (property: ObjectKey, object?: T): ((t2: T) => EventListenerFunction<I>) | EventListenerFunction<I> | Source<I, O> =>
-    ObjectSource<I, T>(property, object)
+	<E extends Element, T extends TargetObject, I extends Event, O extends never>
+	(property: ObjectKey, object?: T): ((t2: T) => EventListenerFunction<I>) | EventListenerFunction<I> | Source<I, O> =>
+		ObjectSource<I, T>(property, object)
 ;
 
 export const asObjectSource = ObjectSource;

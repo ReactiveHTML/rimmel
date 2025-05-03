@@ -67,6 +67,10 @@ export type SinkElementTypes = {
     elements: HTMLContainerElement;
     types: HTMLString;
   };
+  'hidden': {
+    elements: HTMLElement;
+    types: boolean | 'true' | 'false' | 'until-found';
+  };
   'textcontent': {
     elements: HTMLElement;
     types: HTMLString;

@@ -59,6 +59,7 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 
 		// #IFDEF ENABLE_RML_DEBUGGER
 		if(tracing && debugThisNode) {
+
 			/* Stopped at data binding */
 			debugger;
 		}
@@ -99,7 +100,7 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 
 			const sourceStream = bindingConfiguration.source;
 
-			subscribe(targetNode, sourceStream, sinkFn2, bindingConfiguration.error ?? errorHandler, bindingConfiguration.termination ?? terminationHandler);
+			subscribe(targetNode, sourceStream, sinkFn2, bindingConfiguration.error ?? errorHandler, bindingConfiguration.termination ?? terminationHandler, bindingConfiguration.scheduler);
 		} else {
 			// EVENT SOURCES
 

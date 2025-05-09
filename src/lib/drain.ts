@@ -30,7 +30,7 @@ export const asap = <T>(fn: ObserverFunction<T> | Observer<T>, arg: MaybeFuture<
 };
 
 /**
- * Connect a source to a sink through a compatible interface
+ * Connect a source to a sink through any compatible interface
  * @param node The node on which the binding is set
  * @param source A Promise, Observable or EventEmitter
  * @param next A "next" or "then" handler on the sink side

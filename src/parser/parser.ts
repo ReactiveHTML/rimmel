@@ -83,6 +83,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			);
 			const currentTemplate = strings.reduce(reducer, <string[]>[]);
 			console.log(...currentTemplate);
+
 			/* Stopped parsing a RML template */
 			debugger;
 		}

@@ -1150,8 +1150,16 @@ const sinks = {
 		`;
 	},
 
+	OnMount: () => {
+		const onmount = () => alert('onmount callback');
+
+		return rml`
+			<div onmount="${onmount}">do on mount</div>
+		`;
+	},
+
 	RMLOnMount: () => {
-		const onmount = () => alert('mounted');
+		const onmount = () => alert('rml:onmount callback');
 
 		return rml`
 			<div rml:onmount="${onmount}">do on mount</div>
@@ -1159,10 +1167,10 @@ const sinks = {
 	},
 
 	OnPlay: () => {
-		const onmount = () => alert('play');
+		const handler = () => alert('play');
 
 		return rml`
-			<video controls onplay="${onmount}" style="max-width: 50%;">
+			<video controls onplay="${handler}" style="max-width: 50%;">
 				<source src="./flower.webm" type="video/webm" />
 			</video>
 		`;

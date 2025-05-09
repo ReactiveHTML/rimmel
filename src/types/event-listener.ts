@@ -6,8 +6,8 @@ import { Observer } from './futures';
  * A map of all HTML events
  */
 export type HTMLEventMap = HTMLElementEventMap & {
-    'onmount': Event; // deprecated, don't use
-    'onunmount': Event; // deprecated, don't use
+	'onmount': Event; // deprecated, don't use
+	'onunmount': Event; // deprecated, don't use
 };
 
 /**
@@ -21,9 +21,9 @@ export type EventSubject<T> = Subject<T> | BehaviorSubject<T>;
  * @example onmousemove: <Handler<MouseEvent>>
  */
 export type EventObject = {
-    [K in keyof HTMLEventMap as `on${string & K}`]?: EventListenerOrEventListenerObject<HTMLEventMap[K]> | EventSubject<HTMLEventMap[K]>;
+	[K in keyof HTMLEventMap as `on${string & K}`]?: EventListenerOrEventListenerObject<HTMLEventMap[K]> | EventSubject<HTMLEventMap[K]>;
 } & {
-    [K in keyof RMLEventMap]?: EventListenerOrEventListenerObject<RMLEventMap[K]> | EventSubject<RMLEventMap[K]>;
+	[K in keyof RMLEventMap]?: EventListenerOrEventListenerObject<RMLEventMap[K]> | EventSubject<RMLEventMap[K]>;
 };
 
 export type RMLEventListener<E extends Event = Event> =
@@ -31,6 +31,6 @@ export type RMLEventListener<E extends Event = Event> =
 	| Observer<E>
 ;
 
-export const isRMLEventListener = (name: string, arg: unknown): arg is RMLEventListener => {
-    return name.startsWith('on');
-};
+export const isRMLEventListener = (name: string, arg: unknown): arg is RMLEventListener =>
+	/^(?:rml:)?on/.test(name);
+;

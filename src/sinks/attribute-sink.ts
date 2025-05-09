@@ -185,7 +185,9 @@ export const AttributeObjectSink = <T extends HTMLElement | SVGElement | MathMLE
 				if(v == null || v === false || v == 'false' || v == undefined) {
 					node.removeAttribute(k)
 				} else if(isRMLEventListener(k, v)) { //if(k.startsWith('on') /* && isFunction((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then ?? v) */) {
-					addListener(node, <RMLEventName>k.substring(2), v);
+					// addListener(node, <RMLEventName>k.substring(2), v);
+					const e = k.replace(/^(rml:)?on/, '$1') as RMLEventName;
+					addListener(node, e, v);
 				} else {
 					const sink: Sink<any> =
 						k == 'dataset'

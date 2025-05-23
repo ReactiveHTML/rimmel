@@ -55,10 +55,9 @@
     "streams-oriented",
     "streams-oriented programming",
     "fp",
-    "frp",
     "functional programming",
-    "functional-reactive",
-    "functional-reactive programming"
+    "functional/reactive",
+    "functional/reactive programming"
   ],
   "author": "Dario Mannu",
   "license": "MIT",

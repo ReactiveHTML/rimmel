@@ -26,6 +26,8 @@ jobs:
 
       - name: Build the site
         run: npm run website
+
+      - name: Build the handbook
         run: npm run handbook
 
       - name: Deploy to GitHub Pages

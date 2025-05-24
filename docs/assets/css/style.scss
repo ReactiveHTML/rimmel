@@ -30,7 +30,7 @@ section img {
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
-	width: 100%;
+	max-width: 100%;
 }
 
 
@@ -85,10 +85,6 @@ footer {
 h1, h2, h3 {
 	margin-block-start: 4rem;
 	color: #aa0033ff;
-}
-
-img {
-	width: 100%;
 }
 
 .playground-link img {

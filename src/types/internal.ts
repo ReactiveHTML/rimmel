@@ -1,13 +1,14 @@
 import type { BooleanAttribute } from "../definitions/boolean-attributes";
+import type { CSSClassName, CSSObject, CSSValue } from "./style";
+import type { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString } from "./dom";
+import type { Future, MaybeFuture, Observable, Observer, Subject } from "./futures";
+import type { RenderingScheduler } from "./schedulers";
+import type { RMLEventName, RMLEventAttributeName } from "./dom";
+import type { Sink } from "./sink";
 
 import { ObjectSourceExpression, TargetObject } from "../sources/object-source";
-import { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString } from "./dom";
-import { RMLEventName, RMLEventAttributeName } from "./dom";
-import { Future, MaybeFuture, Observable, Observer, Subject } from "./futures";
 import { isFunction } from "../utils/is-function";
 import { isObserverSource } from "../sources/observer-source";
-import { Sink } from "./sink";
-import type { CSSClassName, CSSObject, CSSValue } from "./style";
 
 export type ErrorHandler = (e: Error) => void;
 
@@ -103,6 +104,8 @@ export namespace RMLTemplateExpressions {
 	// export type BooleanAttributeValue<T extends keyof typeof BOOLEAN_ATTRIBUTES> = MaybeFuture<boolean | T | 'true'>;
 	// export type BooleanAttributeValue = BooleanAttribute;
 	export type BooleanAttributeValue<T extends BooleanAttribute> = MaybeFuture<boolean | T | 'true'>;
+
+	export type EnumAttributeValue<T extends 'hidden'> = MaybeFuture<T | boolean | 'true' | 'false' | 'until-found'>;
 
 
 	/**

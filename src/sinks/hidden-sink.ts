@@ -19,7 +19,7 @@ export const HiddenSink: Sink<HTMLElement> = (node: HTMLElement) =>
  * @example <div hidden="${booleanObservable}">
  * @example <div hidden="${Hidden(booleanPromise)}">
  */
-export const Hidden: ExplicitSink<'hidden'> = (source: RMLTemplateExpressions.BooleanAttributeValue<'hidden'>) =>
+export const Hidden: ExplicitSink<'hidden'> = (source: RMLTemplateExpressions.EnumAttributeValue<'hidden'>) =>
   <SinkBindingConfiguration<HTMLElement>>({
     type: SINK_TAG,
     t: HIDDEN_SINK_TAG,

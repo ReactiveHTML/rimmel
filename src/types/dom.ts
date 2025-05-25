@@ -28,6 +28,11 @@ export type HTMLEventAttributeName = keyof HTMLElement & `on${string}`;
 export type HTMLEventName = RemovePrefix<'on', HTMLEventAttributeName>;
 
 /**
+ * The Name of an HTML element
+ */
+export type HTMLElementName = string;
+
+/**
  * A RML event name prefixed by 'on', which includes all HTML events and RML events (currently only 'onmount').
  */
 export type RMLEventAttributeName =

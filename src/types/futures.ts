@@ -90,7 +90,7 @@ export type BehaviorSubject<T> = Subject<T> & {
 ////////////////////////////////////////////////////////
 
 export type ObserverFunction<T> = (value: T) => void;
-export type ObserverErrorFunction = (e: Error) => void;
+export type ObserverErrorFunction = (e: unknown) => void;
 export type ObserverCompleteFunction = () => void;
 
 export interface Observer<I> {

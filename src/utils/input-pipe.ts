@@ -1,11 +1,11 @@
-import type { OperatorFunction } from 'rxjs';
+import type { MonoTypeOperatorFunction, OperatorFunction } from 'rxjs';
 import type { MaybeFuture, Observable, Observer } from '../types/futures';
 import type { RMLTemplateExpressions } from '../types/internal';
 
 import { Subject } from 'rxjs';
 
 // export type OperatorPipeline<I, O, M = O> = [OperatorFunction<I, M>, ...(OperatorPipeline<M, O>[])];
-export type OperatorPipeline<I, O> = [...OperatorFunction<any, any>[]];
+export type OperatorPipeline<I, O> = [...(MonoTypeOperatorFunction<I> | OperatorFunction<any, any>)[]];
 
 export type Pipeline<I, O> = (i: Observable<I>) => Observable<O>;
 export type rxPipe<I, O> = (...pipeline: OperatorPipeline<I, O>) => Pipeline<I, O>;
@@ -42,7 +42,7 @@ export const pipeIn =
  *   <input onkeypress="${MyUsefulEventAdapter(targetObserver)}">
  * `;
 **/
-export const inputPipe = <I, O=unknown>(...pipeline: OperatorPipeline<I, O>) =>
+export const inputPipe = <I extends any, O extends any>(...pipeline: OperatorPipeline<I, O>) =>
 	(target: RMLTemplateExpressions.TargetEventHandler<O>) =>
 		pipeIn<I, O>(target, ...pipeline)
 ;
@@ -53,7 +53,7 @@ export const feedIn = pipeIn;
 export const reversePipe = inputPipe;
 
 // TBC
-export const source = (...reversePipeline: [...OperatorPipeline<any, any>, Observer<any>]) =>
+export const source = (...reversePipeline: [...OperatorPipeline<any, any>, (Observer<any> | Function)]) =>
 	pipeIn(<Observer<any>>reversePipeline.pop(), ...<OperatorPipeline<any, any>>reversePipeline);
 
 export const sink = (source: MaybeFuture<any>, ...pipeline: OperatorPipeline<any, any>) =>

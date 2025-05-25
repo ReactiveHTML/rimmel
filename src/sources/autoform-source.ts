@@ -1,4 +1,4 @@
-import type { HTMLFieldElement } from '../types/dom';
+import type { HTMLElementName, HTMLFieldElement } from '../types/dom';
 
 import { inputPipe } from '../utils/input-pipe';
 import { map } from 'rxjs';
@@ -45,7 +45,7 @@ export const autoForm =
  * @example <form action="dialog" onsubmit="${AsTypedForm(stream)}"> ... </form>
  * @example <form action="dialog" onsubmit="${AsTypedForm(handlerFn)}"> ... </form>
 **/
-export const AutoForm = inputPipe<SubmitEvent | Event>(
+export const AutoForm = inputPipe<SubmitEvent | Event, Record<HTMLElementName, any>>(
 	autoForm,
 );
 

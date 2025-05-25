@@ -57,6 +57,7 @@ export interface SinkBindingConfiguration<E extends Element> extends BindingConf
 	t: string;
 	source: Future<unknown>;
 	sink: Sink<E>;
+	scheduler?: RenderingScheduler;
 	params?: any;
 	error?: ErrorHandler;
 	termination?: () => void;

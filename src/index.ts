@@ -102,6 +102,8 @@ export { Rimmel_Bind_Subtree, Rimmel_Mount } from './lifecycle/data-binding';
 export { RESOLVE_SELECTOR, RML_DEBUG, SINK_TAG } from './constants';
 export { set_USE_DOM_OBSERVABLES } from './constants';
 
+export { callable } from './lib/drain';
+
 // Main entries
 export { rml } from './parser/parser';
 export { rml as html } from './parser/parser'; // Shall we?

@@ -190,8 +190,18 @@ export type RMLTemplateExpression =
 /**
  * A RML template expression
  *
- * This includes anything that can be passed in RML templates
+ * This includes anything that can be passed in RML templates, such as
+ * - static values (strings, numbers, booleans)
+ * - event handlers (functions, Observers, Subjects, Behaviors)
+ * - CSS class names (strings, objects)
+ * - CSS style declarations (strings, objects)
+ * - HTML text (strings, arrays of strings, Promises, Observables)
+ * - Attribute Mixins (Objects, Promises, Observables)
+ * - Custom sources (e.g. ObjectSourceExpression)
+ * - Custom sinks (e.g. SinkBindingConfiguration)
+ * - and more
  */
+
 export type Handler<E extends Element, T extends RMLEventName = any> =
 	| undefined
 	| number

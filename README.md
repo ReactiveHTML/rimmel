@@ -174,7 +174,7 @@ Modelling your state as one or more observable streams will give you fine-graine
 
 All Rimmel does is binding your observable streams to the UI in a seamless integration that will result in improved code quality, scale, testability and performance.
 
-## Conditional Rendering done simple ☂️
+## Conditional Rendering made simple ☂️
 If you need to render something based on a condition, plain-old standard JS can help you. No further abstractions or custom DSLs are required:
 
 ```javascript
@@ -593,7 +593,7 @@ We call this the **Vanilla+ Speed**.
 
 <br>
 
-### Special cases of "fast" 🐌
+### Special cases of "fast" 🐰
 Do you have a Combobox with 1M rows?<br>
 A large spreadsheet with 1k x 10k reactive cells?<br>
 An HFT stock ticker with 10000 subscriptions?<br>
@@ -667,48 +667,50 @@ The Web Components incubator is creating a new proposal to bring [native tagged 
 Rimmel is closely following the above standardisation initiatives and aims to align with them as they develop or new usage patterns emerge.
 
 
-# Examples, examples, examples
+# Examples, examples, examples 🛟
 
 There are several collections on Stackblitz that can get you started, give you inspiration or show you advanced design patterns.
 
-[The Basics](https://stackblitz.com/@dariomannu/collections/rimmel-js-getting-started) - A good place to start off. Simple examples for simple tasks.
+There are several collections on Stackblitz that can get you started, give you inspiration or show you advanced design patterns.
 
-[The Collection](https://stackblitz.com/@dariomannu/collections/rimmel-js-experiments) - Streams-Oriented programming examples using Rimmel.
+[The Basics](https://stackblitz.com/@dariomannu/collections/rimmel-js-getting-started) 🧺 A good place to start off. Simple examples for simple tasks.
+
+[The Collection](https://stackblitz.com/@dariomannu/collections/rimmel-js-experiments) 🧞 Streams-Oriented programming examples using Rimmel.
 
 ### Experiments
 Cutting-edge things you can do with Rimmel. Still being refined here and there, but will show you where things are moving and bring some inspiration.
 
-[Web Components](https://stackblitz.com/@dariomannu/collections/web-components) - Experimental support for custom elements and web components in streams-oriented style.
+[Web Components](https://stackblitz.com/@dariomannu/collections/web-components) 🧩 Experimental support for custom elements and web components in streams-oriented style.
 
-[Web Workers](https://stackblitz.com/@dariomannu/collections/web-workers) - Experiments running your Rimmel components inside web workers
+[Web Workers](https://stackblitz.com/@dariomannu/collections/web-workers) 🛠️ Experiments running your Rimmel components inside web workers
 
-[Novel Design Patterns](https://stackblitz.com/@dariomannu/collections/novel-design-patterns) - What makes streams-oriented programming different
+[Novel Design Patterns](https://stackblitz.com/@dariomannu/collections/novel-design-patterns) 📖 What makes streams-oriented programming different
 
-[Observable Polyfill](https://stackblitz.com/@dariomannu/collections/observable-polyfill) - streams-oriented examples for the [observable-polyfill](https://github.com/keithamus/observable-polyfill/).
+[Observable Polyfill](https://stackblitz.com/@dariomannu/collections/observable-polyfill) 🧴 streams-oriented examples for the [observable-polyfill](https://github.com/keithamus/observable-polyfill/).
 
-[Native Observables](https://stackblitz.com/orgs/github/ReactiveHTML/collections/native-observables-in-rimmel-js) - Experiments using native Observables.
+[Native Observables](https://stackblitz.com/orgs/github/ReactiveHTML/collections/native-observables-in-rimmel-js) 👶 Experiments using native Observables.
 
 ### The classics
 
 #### TodoMVC 🗒️
 The reference implementation to compare apples with apples.
 
-[TodoMVC 1](https://stackblitz.com/edit/rimmel-todomvc) - A size-packed version in 100 lines of code, just for a quick glance and people who like concise code
+[TodoMVC 1](https://stackblitz.com/edit/rimmel-todomvc) 🥇 A size-packed version in 100 lines of code, just for a quick glance and people who like concise code
 
-[TodoMVC 2](https://stackblitz.com/edit/rimmel-todomvc-expanded) - A more human-readable, expanded version if you want to examine more in detail what's going on.
+[TodoMVC 2](https://stackblitz.com/edit/rimmel-todomvc-expanded) 🥈 A more human-readable, expanded version if you want to examine more in detail what's going on.
 
-This TodoMVC implementation uses [ObservableTypes](https://github.com/reactivehtml/observable-types), a reactive Collection with streams-oriented programming in mind.
+This TodoMVC implementation uses [ObservableTypes](https://github.com/reactivehtml/observable-types) 🪞, a reactive Collection with streams-oriented programming in mind.
 
 
 #### Tic-Tac-Toe 🎮
 Here's a version of Tic Tac Toe made with Observable Streams
 
-[TicTacToe](https://stackblitz.com/edit/tic-tac-toe-rimmeljs) - a fairly-compressed and minimalistic version of the game
+[TicTacToe](https://stackblitz.com/edit/tic-tac-toe-rimmeljs) 🎮 a fairly-compressed and minimalistic version of the game
 
-[TicTacToe (barebones)](https://stackblitz.com/edit/barebones-tic-tac-toe) - a barebones version of the game in 45 lines of code, an example for the bundlephobic to see how much we can squeeze our code
+[TicTacToe (barebones)](https://stackblitz.com/edit/barebones-tic-tac-toe) 🕹️ a barebones version of the game in 45 lines of code, an example for the bundlephobic to see how much we can squeeze our code
 
 
-#### A Colour Picker 🪅
+#### A Colour Picker 🌈
 In a component like a colour picker there's a lot of derived state to manage, from various inputs and controls, mouse and touch actions, copy-paste, drag'n'drop.
 RxJS can handle these without blinking an eye whilst Rimmel just glues them together.
 
@@ -721,7 +723,10 @@ Not the example you'd want to start with, but definitely one where the use of st
 
 [![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
 
-# Get in touch! ☝🏽
+# Get in touch! 💬
+
+[![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
+
 Rimmel is a young project built with meticulous attention to detail and a bold vision: building a new web ecosystem that "just works", using the streams oriented paradigm.
 
 Share the passion? Would like to help?<br>
@@ -745,7 +750,7 @@ Come say hi, there's a good amount of work to do and the roadmap is below.
 - i18n (leverage sink pipelines to make localisation trivial)
 - Native Observables — exciting challenges for the upcoming standard
 
-# Building, testing and hacking ⛏️
+# Building, testing, hacking 🪓
 To work with Rimmel locally, check it out then either with bun or other runtimes:
 
 ```bash

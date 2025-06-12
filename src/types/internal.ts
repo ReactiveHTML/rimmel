@@ -1,7 +1,7 @@
 import type { BooleanAttribute } from "../definitions/boolean-attributes";
 import type { CSSClassName, CSSObject, CSSValue } from "./style";
 import type { CSSString, EventListenerOrEventListenerObject, EventType, HTMLString } from "./dom";
-import type { Future, MaybeFuture, Observable, Observer, Subject } from "./futures";
+import { isFuture, type Future, type MaybeFuture, type Observable, type Observer, type Subject } from "./futures";
 import type { RenderingScheduler } from "./schedulers";
 import type { RMLEventName, RMLEventAttributeName } from "./dom";
 import type { Sink } from "./sink";
@@ -78,7 +78,11 @@ export type SourceAttributeName = RMLEventAttributeName;
 export type SinkAttributeName<T = string> = T extends RMLEventAttributeName ? never : string;
 export type AttributeName = SourceAttributeName | SinkAttributeName;
 
-export type SinkAttributeValue = boolean | string | number | Promise<any> | Observable<any> | null | undefined;
+export type PresentSinkAttributeValue = boolean | string | number | null | undefined | Function;
+export const isPresentSinkAttributeValue = (value: any): value is PresentSinkAttributeValue => !isFuture(value)
+export type FutureSinkAttributeValue = Future<PresentSinkAttributeValue>;
+export const isFutureSinkAttributeValue = (value: any): value is FutureSinkAttributeValue => isFuture(value)
+export type SinkAttributeValue = PresentSinkAttributeValue & FutureSinkAttributeValue;
 export type SourceAttributeValue = Observer<any> | Function;
 export type AttributeValue = SinkAttributeValue | SourceAttributeValue;
 export type AttributeObject = {

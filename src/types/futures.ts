@@ -1,5 +1,6 @@
 // import type { BehaviorSubject, Observable, Observer, Subject, Subscription } from 'rxjs';
 // export type { BehaviorSubject, Observable, Observer, OperatorFunction, Subject, Subscription } from 'rxjs';
+import { map, type OperatorFunction } from 'rxjs';
 
 import { SymbolObservature } from "../constants";
 
@@ -9,6 +10,9 @@ export type Subject<T> = {
 	next: (value: T) => void;
 	error?: (error: unknown) => void;
 	complete?: () => void;
+	// impl. detaiils
+	source: Observable<T>;
+	destination: Observable<T>;
 };
 
 export type BehaviorSubject<T> = Subject<T> & {
@@ -114,6 +118,8 @@ export type Observable<T> = {
 };
 
 export const isObserver = (x: any): x is Observer<any> =>
+	// FIXME: it should actually be x?.next || x?.error || x?.complete
+	// or a function
 	!!x?.next;
 
 // export type Subscription = {
@@ -136,10 +142,16 @@ export type Transformer<I, O> = Observer<I> & {
 };
 
 export const isObservable = (x: any): x is Observable<any> =>
-	!!x?.subscribe;
+	!!x?.subscribe
+;
 
 export const isPromise = (x: any): x is Promise<any> =>
-	!!x?.then;
+	!!x?.then
+;
+
+export const isFuture = (x: any): x is Future<any> =>
+	isPromise(x) || isObservable(x)
+;
 
 export type MaybePromise<T> = Partial<Promise<T>>;
 export type MaybeObserver<I> = Partial<Observer<I>>;

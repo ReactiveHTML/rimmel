@@ -17,11 +17,9 @@ export const PrependHTMLSink: Sink<Element> =
  * @example <div>${PrependHTML(stream)}</div>
  */
 export const PrependHTML: ExplicitSink<'content'> = (source: RMLTemplateExpressions.HTMLText, pos: InsertPosition = 'afterbegin') => <SinkBindingConfiguration<Element>>({
-		type: SINK_TAG,
-		t: PREPEND_HTML_SINK_TAG,
-		source,
-		sink: PrependHTMLSink,
-		params: pos,
-	})
-;
-
+	type: SINK_TAG,
+	t: PREPEND_HTML_SINK_TAG,
+	source,
+	sink: PrependHTMLSink,
+	params: pos,
+});

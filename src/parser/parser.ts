@@ -1,10 +1,11 @@
-import type { AttributeObject, BindingConfiguration, RMLTemplateExpression, RMLTemplateExpressions, SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
-import type { BehaviorSubject, MaybeFuture, Observable } from "../types/futures";
+import type { AttributeObject, BindingConfiguration, FutureSinkAttributeValue, PresentSinkAttributeValue, RMLTemplateExpression, RMLTemplateExpressions, SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
+import type { Future, MaybeFuture } from "../types/futures";
 import type { Sink } from "../types/sink";
-import type { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
+import type { AttributeName, HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
 
-import { isSinkBindingConfiguration, isSourceBindingConfiguration } from "../types/internal";
+import { isFutureSinkAttributeValue, isPresentSinkAttributeValue, isSinkBindingConfiguration, isSourceBindingConfiguration } from "../types/internal";
 
+import { currentValue } from "../lib/current-value";
 import { state, waitingElementHanlders } from "../internal-state";
 import { takeFirstSync } from "../utils/take-first-sync";
 import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
@@ -12,6 +13,7 @@ import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUT
 
 import { PreSink } from "../sinks/index";
 import { sinkByAttributeName } from '../parser/sink-map';
+import { DatasetItemPreSink } from './dataset-sink';
 import { DOMAttributePreSink, FixedAttributePreSink, WritableElementAttribute } from "../sinks/attribute-sink";
 import { Mixin } from "../sinks/mixin-sink";
 
@@ -19,6 +21,7 @@ import { InnerHTML } from "../sinks/inner-html-sink";
 import { TextContent } from "../sinks/text-content-sink";
 import { StyleObjectSink, StylePreSink, STYLE_OBJECT_SINK_TAG } from "../sinks/style-sink";
 import { toListener } from "../utils/to-listener";
+import { isObservable, isPromise } from "../types/futures"
 
 export const addRef = (ref: string, data: BindingConfiguration) => {
 	waitingElementHanlders.get(ref)?.push(data) ?? waitingElementHanlders.set(ref, [data]);
@@ -34,8 +37,10 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
  *
  * rml is a tag function. You call it by tagging it with an ES6 template literal
  * of HTML text interleaved with references to any JavaScript entity that's in scope.
- *
- * By using components that use rml to return HTML strings, you have a monad you can use to compse a whole web application
+ * 
+ * Any JavaScript expression inside the template literal will be evaluated and the
+ * resulting value will be inserted into the HTML template literal. Async expressions
+ * such as Promises and Observables will be rendered as they resolve/emit.
  *
  * ## Example
  *
@@ -43,14 +48,41 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
  * import { rml } from 'rimmel';
  *
  * const Component = () => {
- *   const num = 5;
+ *   const content = 'hello world';
  *
  *   return rml`
- *     <div>${number}</div>
+ *     <div>${content}</div>
  *   `;
  * };
  * ```
+ * 
+ * ## Example
  *
+ * ```ts
+ * import { rml } from 'rimmel';
+ *
+ * const Component = () => {
+ *   const num = 123;
+ *
+ *   return rml`
+ *     <input type="number" value="${number}">
+ *   `;
+ * };
+ * ```
+ * 
+ * ## Example
+ *
+ * ```ts
+ * import { rml } from 'rimmel';
+ *
+ * const Component = () => {
+ *   const data = fetch('/api').then(res => res.text());
+ *
+ *   return rml`
+ *     <div>${data}</div>
+ *   `;
+ * };
+ * ```
  **/
 export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateExpression[]): HTMLString {
 	let acc = '';
@@ -150,10 +182,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 				const nextString = strings[i+1];
 				// if it's a BehaviorSubject or any other sync stream (e.g.: startWith operator), pick its initial/current value to render it synchronously
-				const initialValue = (expression as BehaviorSubject<unknown>)?.value
-					// ?? ((<RMLTemplateExpressions.SourceExpression<any>>expression).source && takeFirstSync((<Observable<any>>expression).source))
-					// ?? takeFirstSync(expression)
-				;
+				const initialValue = currentValue(expression);
 
 				const isAttribute = /(?<attribute>[:a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(accPlusString);
 				if(isAttribute) {
@@ -177,7 +206,9 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 							handler = PreSink<HTMLElement | SVGElement>(STYLE_OBJECT_SINK_TAG, sink, expression, CSSAttribute);
 						} else {
 							isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attributeName);
-							sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName))) || FixedAttributePreSink(attributeName);
+							const isDatasetAttribute = attributeName.startsWith('data-');
+
+							sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName)) ?? (isDatasetAttribute && DatasetItemPresink(attributeName))) || FixedAttributePreSink(attributeName);
 							// TODO: hard-match attributeName with a corresponding SINK_TAG...
 							handler = PreSink(attributeName, sink, expression, attributeName);
 						}
@@ -206,9 +237,9 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 						acc = (prefix +(initialValue ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}
-				//} else if(/<\S+(?:\s+[a-z0-9_][a-z0-9_-]*(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+))?)*(?:\s+\.\.\.)?$/.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
-				} else if(/<[a-z0-9_][a-z0-9_-]*[^>]*(?:\s+\.\.\.)?$/ig.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
-                    // FIXME:                                                                                                                                  ^    ^^^^^^^^^  why are we doing this?
+		        // } else if(/<\S+(?:\s+[a-z0-9_][a-z0-9_-]*(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+))?)*(?:\s+\.\.\.)?$/.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
+				} else if(/<[a-z_][a-z0-9_-]*[^>]*(?:\s+\.\.\.)?$/ig.test(accPlusString.substring(lastTag))) {
+
 					// Mixin Sink
 					// Use Cases:
 					// <some-tag some-attribute="some-value" ${mixin}></some-tag>
@@ -216,24 +247,26 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 					// <some-tag some-attributes ...${mixin} other-stuff>...</some-tag>
 					// will bind multiple attributes and values
 					let sink: SinkBindingConfiguration<HTMLElement | SVGElement | MathMLElement>;
+					acc += string.replace(/\.\.\.$/, '');
 					if(isSinkBindingConfiguration(expression)) {
-						acc = accPlusString;
+						// acc = accPlusString;
 						sink = expression;
+					} else if(isObservable(expression) || isPromise(expression)) {
+						// If we have a Promise, we wait for it to resolve and then render the mixin}
+						sink = Mixin(expression as Future<AttributeObject>);
 					} else {
-						const attrs = <AttributeObject>expression;
-
-						acc += string.replace(/\.\.\.$/, '');
-						// Map static (string, number) properties of the mixin to attributes
-						acc += Object.entries(attrs || {})
-							.filter(([, v]) => typeof v == 'string' || typeof v == 'number')
-							.map(([k, v])=>`${k}="${v}"`)
-							.join(' ')
+						// Merge static (string, number) properties of the mixin inline in the rendered HTML
+						// and pass the rest as a future sink
+						const [staticAttributes, deferredAttributes] = Object.entries(expression as AttributeObject || {})
+							.reduce((acc, [k, v]) => (acc[+isFutureSinkAttributeValue(v)].push([k, v]), acc), [[] as [AttributeName, PresentSinkAttributeValue][], [] as [AttributeName, FutureSinkAttributeValue][]])
 						;
 
-						sink = Mixin(attrs);
+						acc += staticAttributes.map(([k, v])=>`${k}="${v}"`).join(' ');
+						// if(split[0].length)
+						debugger;
+						sink = Mixin(Object.fromEntries(deferredAttributes));
 					}
 
-					// TODO: should we care about cleaning up the sink object from static attributes?
 					addRef(ref, sink);
 					acc = acc.replace(/<(\w[\w-]*)\s+([^<]*)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 

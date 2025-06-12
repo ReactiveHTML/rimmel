@@ -27,7 +27,7 @@ export const NodeValue: ExplicitSink<'text'> = (source: RMLTemplateExpressions.S
     <SinkBindingConfiguration<Element>>({
         type: SINK_TAG,
         t: 'NodeValue',
-        source: source,
+        source,
         sink: NodeValueSink,
     })
 ;

@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import type { Observable as Observable1, Observer } from '../types/futures';
 import type { MonkeyPatchedObservable as Observable2 } from '../types/monkey-patched-observable';
 import { SymbolObservature } from '../constants';

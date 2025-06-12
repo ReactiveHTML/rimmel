@@ -142,8 +142,8 @@ const sources = {
 		const shadowColor = new BehaviorSubject('#0000ff');
 
 		const strHTML = rml`
-			<input type="color" onchange="${Value(color)}"> <br>
-			<input type="color" onchange="${Value(color)}"> <br>
+			<input type="color" oninput="${Value(color)}"> <br>
+			<input type="color" oninput="${Value(color)}"> <br>
 
 			<canvas style="width: 100%; height: 100px">
 				<canvas-line color="${color}" shadow-color="${shadowColor}" path="${stream}" onxxx="${s2}" />

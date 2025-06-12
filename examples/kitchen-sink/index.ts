@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Rimmel.js Kitchen Sink Demo Application
  * 

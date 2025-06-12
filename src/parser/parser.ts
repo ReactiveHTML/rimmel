@@ -1,7 +1,7 @@
 import type { AttributeObject, BindingConfiguration, FutureSinkAttributeValue, PresentSinkAttributeValue, RMLTemplateExpression, RMLTemplateExpressions, SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
 import type { Future, MaybeFuture } from "../types/futures";
 import type { Sink } from "../types/sink";
-import type { AttributeName, HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
+import type { HTMLAttributeName, HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
 
 import { isFutureSinkAttributeValue, isPresentSinkAttributeValue, isSinkBindingConfiguration, isSourceBindingConfiguration } from "../types/internal";
 
@@ -258,7 +258,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						// Merge static (string, number) properties of the mixin inline in the rendered HTML
 						// and pass the rest as a future sink
 						const [staticAttributes, deferredAttributes] = Object.entries(expression as AttributeObject || {})
-							.reduce((acc, [k, v]) => (acc[+isFutureSinkAttributeValue(v)].push([k, v]), acc), [[] as [AttributeName, PresentSinkAttributeValue][], [] as [AttributeName, FutureSinkAttributeValue][]])
+							.reduce((acc, [k, v]) => (acc[+isFutureSinkAttributeValue(v)].push([k, v]), acc), [[] as [HTMLAttributeName, PresentSinkAttributeValue][], [] as [HTMLAttributeName, FutureSinkAttributeValue][]])
 						;
 
 						acc += staticAttributes.map(([k, v])=>`${k}="${v}"`).join(' ');

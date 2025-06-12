@@ -20,7 +20,7 @@ export type CSSSelector = string;
 /**
  * An HTML attribute name
  */
-export type AttributeName = string; 
+export type HTMLAttributeName = string; 
 
 /**
  * An HTML event name prefixed by 'on'

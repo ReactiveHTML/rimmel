@@ -1,14 +1,7 @@
-import type { MonoTypeOperatorFunction, OperatorFunction } from 'rxjs';
-import type { MaybeFuture, Observable, Observer } from '../types/futures';
+import type { MaybeFuture, Observer, OperatorPipeline } from '../types/futures';
 import type { RMLTemplateExpressions } from '../types/internal';
 
 import { Subject } from 'rxjs';
-
-// export type OperatorPipeline<I, O, M = O> = [OperatorFunction<I, M>, ...(OperatorPipeline<M, O>[])];
-export type OperatorPipeline<I, O> = [...(MonoTypeOperatorFunction<I> | OperatorFunction<any, any>)[]];
-
-export type Pipeline<I, O> = (i: Observable<I>) => Observable<O>;
-export type rxPipe<I, O> = (...pipeline: OperatorPipeline<I, O>) => Pipeline<I, O>;
 
 /**
  * Create an "input pipe" by prepending operators to the input of an Observer, Subject, BehaviorSubject, or plain subscriber function.
@@ -18,12 +11,13 @@ export const pipeIn =
 	<I, O=I>(target: RMLTemplateExpressions.TargetEventHandler<O>, ...pipeline: OperatorPipeline<I, O>): Observer<I> => {
 		const source = new Subject<I>();
 		source
-			.pipe(...(<[OperatorFunction<I, O>]>pipeline))
-			.subscribe(<Observer<O>>target)
+			.pipe(...pipeline)
+			.subscribe(target)
 		;
 
 		// FIXME: will we need to unsubscribe? Then store a reference for unsubscription
 		// TODO: can we/should we delay subscription until mounted? Could miss the first events otherwise
+		// TODO: check if a Subject is needed, or if we can connect directly to the target (e.g. w/ Observature.addSource)
 
 		return source;
 	}
@@ -34,7 +28,9 @@ export const pipeIn =
  *
  * @remarks This works the opposite way to the pipe() function in RxJS, which
  * transforms the output of an observable whilst this transforms the input.
+ *
  * You normally use an input pipe to create Event Adapters.
+ * 
  * @template I the input type of the returned stream (the event adapter)
  * @template O the output type of the returned stream (= the input type of the actual target stream)
  * @example const MyUsefulEventAdapter = inputPipe(...pipeline);

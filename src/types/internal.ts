@@ -82,7 +82,7 @@ export type PresentSinkAttributeValue = boolean | string | number | null | undef
 export const isPresentSinkAttributeValue = (value: any): value is PresentSinkAttributeValue => !isFuture(value)
 export type FutureSinkAttributeValue = Future<PresentSinkAttributeValue>;
 export const isFutureSinkAttributeValue = (value: any): value is FutureSinkAttributeValue => isFuture(value)
-export type SinkAttributeValue = PresentSinkAttributeValue & FutureSinkAttributeValue;
+export type SinkAttributeValue = PresentSinkAttributeValue | FutureSinkAttributeValue;
 export type SourceAttributeValue = Observer<any> | Function;
 export type AttributeValue = SinkAttributeValue | SourceAttributeValue;
 export type AttributeObject = {

@@ -13,7 +13,7 @@ import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUT
 
 import { PreSink } from "../sinks/index";
 import { sinkByAttributeName } from '../parser/sink-map';
-import { DatasetItemPreSink } from './dataset-sink';
+import { DatasetItemPreSink } from '../sinks/dataset-sink';
 import { DOMAttributePreSink, FixedAttributePreSink, WritableElementAttribute } from "../sinks/attribute-sink";
 import { Mixin } from "../sinks/mixin-sink";
 

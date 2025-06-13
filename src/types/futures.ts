@@ -20,6 +20,17 @@ export type BehaviorSubject<T> = Subject<T> & {
 	value: T;
 };
 
+export type OperatorPipeline<I, O, Ops extends OperatorFunction<any, any>[] = []> =
+	Ops extends []
+		? []                                                    // 0 operators
+		: Ops extends [OperatorFunction<I, infer Next>]         // 1 operator
+			? [OperatorFunction<I, Next>] & (Next extends O ? unknown : never)
+			: Ops extends [OperatorFunction<I, infer Next>, ...infer Rest] // 2+ operators
+				? Rest extends OperatorFunction<any, any>[]
+					? [OperatorFunction<I, Next>, ...OperatorPipeline<Next, O, Rest>]
+					: never
+				: never
+;
 
 // export type OperatorPipeline<I, O> = 
 //   [] |
@@ -84,12 +95,12 @@ export type BehaviorSubject<T> = Subject<T> & {
 // 
 // 
 // 
-// const p: OperatorPipeline<Event, number> = [
+
+// const p = [
 //     map((e: Event)=>(<HTMLInputElement>e.target).value),
 //     map((s: string)=>s.toUpperCase()),
 //     map((s: string)=>s.length),
-// ];
-// 
+// ] as OperatorPipeline<Event, number>;
 // const x = new Subject().pipe(...p).subscribe(console.log);
 ////////////////////////////////////////////////////////
 

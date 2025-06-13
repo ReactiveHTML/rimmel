@@ -13,6 +13,12 @@ const terserOptions = {
 
 export default defineConfig({
   build: {
+    minify: 'terser',
+    terserOptions: {
+      format: {
+        comments: 'all'
+      }
+    },
     lib: {
       entry: 'src/index.ts',
       name: 'rml',

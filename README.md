@@ -765,3 +765,7 @@ npm run kitchen-sink
 ```
 
 Or you can just run it with one click [on StackBlitz](https://stackblitz.com/~/github.com/ReactiveHTML/rimmel?file=examples/kitchen-sink/index.ts&startScript=kitchen-sink)
+
+## The Handbook 📚
+
+A newly available, work-in-progress typedoc [handbook](/handbook) is available to explore interfaces, types, sources, sinks and other entities in more detail.

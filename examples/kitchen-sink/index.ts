@@ -926,6 +926,71 @@ const sinks = {
 		`
 	},
 
+	'Mixin (multiple)': () => {
+		const counter = timer(0, 1000);
+
+		const mix = (source: Observable<any>) => {
+			return {
+				innerHTML: source,
+			};
+		};
+
+		const colors = (source: Observable<any>) => {
+			return {
+				style: {
+					color: interval(200).pipe(map(i => `#80${Math.round((255*Math.random())).toString(16).padStart(2, '0')}80`)),
+				}
+			};
+		};
+
+		return rml`
+			<div ...${mix(counter)} ...${colors()}>
+			</div>
+		`
+	},
+
+	'Mixin (multiple2)': () => {
+		const counter = timer(0, 1000);
+
+		const mix = (source: Observable<any>) => {
+			return {
+				innerHTML: source,
+			};
+		};
+
+		const colors = (source: Observable<any>) => {
+			return {
+				style: {
+					color: interval(200).pipe(map(i => `#80${Math.round((255*Math.random())).toString(16).padStart(2, '0')}80`)),
+				}
+			};
+		};
+
+		return rml`
+			<div foo="bar" ...${mix(counter)} baz="bat" ...${colors()}>
+			</div>
+		`
+	},
+
+	'Mixin (aaa)': () => {
+		const a = { 'data-foo': 'bar' };
+		const b = defer({ 'data-bar': 'baz' });
+		return rml`<div ...${a} rml:debugger ...${b}>Hello</div>`;
+	},
+
+
+	'Mixin (mixed)': () => {
+		const quz = defer('quz');
+		const obj = { 'data-foo': 'bar', 'data-baz': quz };
+
+		return rml`<div rml:debugger ...${obj}>Hello</div>`;
+	},
+
+	'Mixin (mixed2)': () => {
+		const a = defer({ 'data-foo': 'bar' });
+		return rml`<div rml:debugger ...${a}>Hello</div>`;
+	},
+
 	'Removed (Implicit)': () => {
 		const removed = new Subject<Event>();
 
@@ -1011,6 +1076,56 @@ const sinks = {
 			<span class="pqpqpq" ...${stream}>foo...</span>
 		`;
 	},
+
+	'Dataset (static)': () => {
+		const stream = {'data-foo': 'bar'};
+
+		return rml`
+			Static Dataset attributes<br>
+			<style>
+				.display::after {
+					content: attr(data-foo);
+					margin: 0 1rem;
+					color: green;
+				}
+			</style>
+			<span class="display" ...${stream}>data-foo:</span>
+		`;
+	},
+
+	'Dataset (deferred)': () => {
+		const stream = defer({'data-foo': 'bar'});
+
+		return rml`
+			Static Dataset attributes<br>
+			<style>
+				.display::after {
+					content: attr(data-foo);
+					margin: 0 1rem;
+					color: green;
+				}
+			</style>
+			<span class="display" ...${stream}>data-foo:</span>
+		`;
+	},
+
+	'Dataset (camelCase)': () => {
+		const stream = {'data-foo-bar': 'baz'};
+		const check = (e: Event) => alert(e.target.dataset.fooBar);
+
+		return rml`
+			Static Dataset attributes<br>
+			<style>
+				.display::after {
+					content: attr(data-foo);
+					margin: 0 1rem;
+					color: green;
+				}
+			</style>
+			<span class="display" ...${stream} onmount="${check}">data-foo-bar:</span>
+		`;
+	},
+
 
 	Confusions: () => {
 		const disabled = false;

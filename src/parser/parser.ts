@@ -263,7 +263,6 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 						acc += staticAttributes.map(([k, v])=>`${k}="${v}"`).join(' ');
 						// if(split[0].length)
-						debugger;
 						sink = Mixin(Object.fromEntries(deferredAttributes));
 					}
 

@@ -14,7 +14,7 @@ If you are new to the functional/reactive programming mindset, this [interactive
 ## Hello World 👋🌏🏖️😎
 Let's jump straight in. The "Hello World" for reactive user interfaces is the classic click counter: one button, you click it, ze counts it.
 
-<img src="docs/assets/how-rimmel-works.png" alt="How RimmelJS Works">
+<img src="docs/assets/how-rimmel-works.gif" alt="How RimmelJS Works">
 <img src="docs/assets/how-rimmel-works-6.png" alt="How RimmelJS Works">
 
 

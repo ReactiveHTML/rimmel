@@ -721,8 +721,6 @@ Not the example you'd want to start with, but definitely one where the use of st
 
 <hr>
 
-[![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
-
 # Get in touch! 💬
 
 [![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)

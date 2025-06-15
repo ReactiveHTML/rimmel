@@ -92,7 +92,7 @@ If you just want to display a dynamic list of repeated elements you may want to 
 
 The following illustration shows how you can display a simple list of items.
 
-<img src="docs/assets/observable-types.png" alt="Structured Data with Rimmel.js and Observable Types" style="max-width: 80vw; max-height: 30vh;">
+<img src="docs/assets/how-observable-types-work.gif" alt="Structured Data with Rimmel.js and Observable Types" style="max-width: 80vw; max-height: 30vh;">
 
 
 Conceptually simple, just as much as the code. you'll be amazed how simple and powerful it is to use:

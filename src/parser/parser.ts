@@ -7,21 +7,21 @@ import { isFutureSinkAttributeValue, isPresentSinkAttributeValue, isSinkBindingC
 
 import { currentValue } from "../lib/current-value";
 import { state, waitingElementHanlders } from "../internal-state";
-import { takeFirstSync } from "../utils/take-first-sync";
 import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUTE, RML_DEBUG } from "../constants";
 
 import { PreSink } from "../sinks/index";
 import { sinkByAttributeName } from '../parser/sink-map';
-import { DatasetItemPreSink } from '../sinks/dataset-sink';
 import { DOMAttributePreSink, FixedAttributePreSink, WritableElementAttribute } from "../sinks/attribute-sink";
 import { Mixin } from "../sinks/mixin-sink";
 
 import { InnerHTML } from "../sinks/inner-html-sink";
 import { TextContent } from "../sinks/text-content-sink";
 import { StyleObjectSink, StylePreSink, STYLE_OBJECT_SINK_TAG } from "../sinks/style-sink";
-import { toListener } from "../utils/to-listener";
+import { isFunction } from "../utils/is-function";
 import { isObservable, isPromise } from "../types/futures"
+import { isRMLEventListener } from "../types/event-listener";
+import { toListener } from "../utils/to-listener";
 
 export const addRef = (ref: string, data: BindingConfiguration) => {
 	waitingElementHanlders.get(ref)?.push(data) ?? waitingElementHanlders.set(ref, [data]);
@@ -258,7 +258,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						// Merge static (string, number) properties of the mixin inline in the rendered HTML
 						// and pass the rest as a future sink
 						const [staticAttributes, deferredAttributes] = Object.entries(expression as AttributeObject || {})
-							.reduce((acc, [k, v]) => (acc[+isFutureSinkAttributeValue(v)].push([k, v]), acc), [[] as [HTMLAttributeName, PresentSinkAttributeValue][], [] as [HTMLAttributeName, FutureSinkAttributeValue][]])
+							.reduce((acc, [k, v]) => (acc[+(isFutureSinkAttributeValue(v) || isRMLEventListener(k, v) && isFunction(v))].push([k, v]), acc), [[] as [HTMLAttributeName, PresentSinkAttributeValue][], [] as [HTMLAttributeName, FutureSinkAttributeValue][]])
 						;
 
 						acc += staticAttributes.map(([k, v])=>`${k}="${v}"`).join(' ');

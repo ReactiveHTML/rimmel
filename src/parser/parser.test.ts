@@ -365,6 +365,28 @@ describe('Parser', () => {
                     );
                 });
 
+                describe('Event Handlers', () => {
+                    it('bakes string listeners inline', () => {
+                        const a = { 'onmouseover': 'alert(123)' };
+                        const template = rml`<div ...${a}>Hello</div>`;
+
+                        expect(template).toMatch(/<div.*resolve="RMLREF\+0".* onmouseover="alert\(123\)">Hello<\/div>/);
+                    });
+
+                    it('leaves referenced listeners to set on mount', () => {
+                        const fn = () => alert(123);
+                        const a = { 'onmouseover': fn };
+                        const template = rml`<div ...${a}>Hello</div>`;
+
+                        expect(template).toMatch(/<div.*resolve="RMLREF\+0".*>Hello<\/div>/);
+                        expect(waitingElementHanlders.get('RMLREF+0')![0]).toStrictEqual(
+                            { type: 'sink', t: 'mixin', source: { 'onmouseover': fn }, sink: AttributeObjectSink },
+                        );
+                    });
+
+                });
+
+
             });
 
             describe('When multiple mixins are passed together', () => {

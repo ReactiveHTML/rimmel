@@ -18,12 +18,14 @@ export interface MockElement extends HTMLElement {
     selectedIndex?: number;
     setAttribute(name: string, value: string): void;
     getAttribute(name: string): string | null;
+    hasAttribute: (name: string) => boolean;
     removeAttribute(name: string): void;
     className: string;
     insertAdjacentHTML(pos: InsertPosition, html: string): void;
     addEventListener(eventName: string, handler: EventListenerOrEventListenerObject): void;
     removeEventListener(eventName: string, handler: EventListenerOrEventListenerObject): void;
     dispatchEvent(event: Event): boolean;
+    childNodes: NodeListOf<ChildNode>;
 };
 
 export const MockElement = (props?: Record<string, any>): MockElement => {
@@ -43,6 +45,9 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
         },
         getAttribute(name: string) {
             return this[name];
+        },
+        hasAttribute(name: string) {
+            return this[name] !== undefined;
         },
         removeAttribute(name: string) {
             delete this[name];
@@ -74,6 +79,7 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
         dispatchEvent(event: Event) {
             (<HTMLEventSource>el)[`on${event.type}` as RMLEventAttributeName]?.(event);
         },
+        childNodes: [] as NodeListOf<ChildNode>,
         ...props,
     };
 

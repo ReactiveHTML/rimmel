@@ -258,7 +258,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						// Merge static (string, number) properties of the mixin inline in the rendered HTML
 						// and pass the rest as a future sink
 						const [staticAttributes, deferredAttributes] = Object.entries(expression as AttributeObject || {})
-							.reduce((acc, [k, v]) => (acc[+(isFutureSinkAttributeValue(v) || isRMLEventListener(k, v) && isFunction(v))].push([k, v]), acc), [[] as [HTMLAttributeName, PresentSinkAttributeValue][], [] as [HTMLAttributeName, FutureSinkAttributeValue][]])
+							.reduce((acc, [k, v]) => (acc[+(isFutureSinkAttributeValue(v) || isRMLEventListener(k, v) && isFunction(v) || /^(?:rml:)?onmount$/.test(k))].push([k, v]), acc), [[] as [HTMLAttributeName, PresentSinkAttributeValue][], [] as [HTMLAttributeName, FutureSinkAttributeValue][]])
 						;
 
 						acc += staticAttributes.map(([k, v])=>`${k}="${v}"`).join(' ');

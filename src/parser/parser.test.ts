@@ -237,6 +237,70 @@ describe('Parser', () => {
 
         });
 
+        describe('Booleans', () => {
+            describe('Attributes', () => {
+
+                it('handles true as a string', () => {
+                    const bool = true;
+                    const template = rml`<div something="${bool}">Hello</div>`;
+
+                    expect(template).toEqual(`<div something="true">Hello</div>`);
+                });
+
+                it('handles false as a string', () => {
+                    const bool = false;
+                    const template = rml`<div something="${bool}">Hello</div>`;
+
+                    expect(template).toEqual(`<div something="false">Hello</div>`);
+                });
+
+            });
+
+            describe('Content', () => {
+
+                it('handles true as a string', () => {
+                    const bool = true;
+                    const template = rml`<div>${bool}</div>`;
+
+                    expect(template).toEqual(`<div>${bool}</div>`);
+                });
+
+                it('handles false as a string', () => {
+                    const bool = false;
+                    const template = rml`<div>${bool}</div>`;
+
+                    expect(template).toEqual(`<div>${bool}</div>`);
+                });
+
+            });
+
+        });
+
+        describe.skip('Symbols', () => {
+            describe('Attributes', () => {
+
+                it('handles symbols as strings', () => {
+                    const sym = Symbol('test');
+                    const template = rml`<div something="${sym}">Hello</div>`;
+
+                    expect(template).toEqual(`<div something="${sym.toString()}">Hello</div>`);
+                });
+
+            });
+
+            describe('Content', () => {
+
+                it('handles symbols as strings', () => {
+                    const sym = Symbol('test');
+                    const template = rml`<div>${sym}</div>`;
+
+                    expect(template).toEqual(`<div>${sym.toString()}</div>`);
+                });
+
+            });
+
+        });
+
     });
 
     describe('Sources', () => {
@@ -381,6 +445,28 @@ describe('Parser', () => {
                         expect(template).toMatch(/<div.*resolve="RMLREF\+0".*>Hello<\/div>/);
                         expect(waitingElementHanlders.get('RMLREF+0')![0]).toStrictEqual(
                             { type: 'sink', t: 'mixin', source: { 'onmouseover': fn }, sink: AttributeObjectSink },
+                        );
+                    });
+
+                    it('always defers onmount', () => {
+                        const fn = () => alert(123);
+                        const a = { 'onmount': fn };
+                        const template = rml`<div ...${a}>Hello</div>`;
+
+                        expect(template).toMatch(/<div.*resolve="RMLREF\+0".*>Hello<\/div>/);
+                        expect(waitingElementHanlders.get('RMLREF+0')![0]).toStrictEqual(
+                            { type: 'sink', t: 'mixin', source: { 'onmount': fn }, sink: AttributeObjectSink },
+                        );
+                    });
+
+                    it('always defers rml:onmount', () => {
+                        const fn = () => alert(123);
+                        const a = { 'rml:onmount': fn };
+                        const template = rml`<div ...${a}>Hello</div>`;
+
+                        expect(template).toMatch(/<div.*resolve="RMLREF\+0".*>Hello<\/div>/);
+                        expect(waitingElementHanlders.get('RMLREF+0')![0]).toStrictEqual(
+                            { type: 'sink', t: 'mixin', source: { 'rml:onmount': fn }, sink: AttributeObjectSink },
                         );
                     });
 

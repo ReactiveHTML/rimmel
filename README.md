@@ -4,7 +4,7 @@
 
 Rimmel is a powerful, fast and lightweight JavaScript UI library for creating web applications with event streams.
 
-It implements the [RML/Reactive Markup](https://github.com/ReactiveHTML/reactive-markup) specification, which means everything in your code is a stream: it takes an input, you apply your business logic and it takes care of the rest.
+It implements [RML](https://github.com/ReactiveHTML/reactive-markup), the Reactive Markup which makes your HTML work with Streams in a seamless way.
 
 ## Getting started
 If you are new to reactive streams, there is a [3m crash-course](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) tailored for UI development with Rimmel, arguably the simplest RxJS introduction around to get you started.
@@ -31,15 +31,16 @@ You've probably never seen anything like this before, so just go and try it:
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-click-counter)
 
 
-## Streams Oriented
+## Stream Oriented
 Most JavaScript UI libraries and frameworks are designed for the imperative programming paradigm.
 Occasionally they may also support some aspects of reactive or functional programming, too.
 Third-party adapters or utility libraries can also be used to translate between each paradigm but the reality is that the imperative paradigm is their main focus and everything else was just an afterhthought, severely limited, inconvenient or plain awkward to use in practice.
 
 Rimmel was designed to make reactive streams just work.
+In the Stream Oriented paradigm you begin creating reactive streams for all your state and behaviour, then use declarative templates (e.g.: RML) to bind them to the real world. This helps writing an extremely high quality code that's also very easy to maintain.
 
 ### Everything is a Stream ☄️
-This is the key concept of the paradigm. Instead of creating variables, classes, object and methods that perform mutations, you create streams. A stream is data-in, data-out. Can be sync or async and combine other streams.
+This is the key concept of the paradigm. Instead of creating variables, classes, object and methods that perform mutations, you create streams. A stream is optional data-in, optional processing, optional data-out. Can be sync or async and combine other streams.
 
 You no longer write code to change the state of something else, as in:
 
@@ -55,7 +56,7 @@ target.setProperty('prop1', value);
 What you do instead, is you define all your application logic as streams, then you connect both ends of them to your HTML (Rimmel will know when to connect the input or the output from the context):
 
 ```javascript
-// Streams Oriented
+// Stream Oriented
 const stream = <your stream here>;
 
 const template = rml`
@@ -600,7 +601,7 @@ An HFT stock ticker with 10000 subscriptions?<br>
 
 These are obviously cases where "fast updates" or raw speed are irrelevant and what truly matters is adequate frontend architecture.<br>
 
-These are perfect cases to create Custom Sinks implementing relevant design patterns to make extreme scenarios still work optimally in an ergonomic, streams-oriented style that's easy to test and keep well organised.
+These are perfect cases to create Custom Sinks implementing relevant design patterns to make extreme scenarios still work optimally in an ergonomic, stream-oriented style that's easy to test and keep well organised.
 
 <br>
 
@@ -617,15 +618,18 @@ Do you have async data like an API call and a placeholder to display whilst wait
 A `BehaviorSubject` receives a special treatment from Rimmel in that its initial value will be rendered immediately, synchronously, whilst subsequent emissions will replace it as normal. This helps avoid unnecessary reflows and jank on the page.
 
 ```javascript
-import { ajax } from 'rxjs/ajax';
+import { BehaviorSubject, switchMap } from 'rxjs';
 
-const WaitingComponent = () => {
-  const stream = new BehaviorSubject('loading...');
-
-  ajax.getJSON('https://api.example.com/data')
-    .pipe(map(data => `<pre>${JSON.stringify(data, null, 2)}</pre>`))
-    .subscribe(stream)
+const WaitingComponent = () =>
+  const getData = () => fetch('https://api.example.com/data')
+    .then(data => data.json())
+    .then(data => `<pre>${JSON.stringify(data, null, 2)}</pre>`))
   ;
+
+
+  const stream = new BehaviorSubject('loading...').pipe(
+	  switchMap(getData)
+	);
 
   return rml`
     <div>${stream}</div>
@@ -637,7 +641,7 @@ const WaitingComponent = () => {
 <a href="https://stackblitz.com/edit/rimmel-suspense"><img src="docs/assets/try-it-button.png" valign="middle" height="40"></a>&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://stackblitz.com/edit/rimmel-suspense">Suspense</a> on Stackblitz.
 
 
-## Never forget this 🚸
+## Never forget the tag 🚸
 In standard JavaScript you can create simple template literals or tagged templates.
 
 In order to create a reactive template with Rimmel you need to tag your templates with `rml`. Easy to forget if you are new to tagged templates.
@@ -675,18 +679,18 @@ There are several collections on Stackblitz that can get you started, give you i
 
 [The Basics](https://stackblitz.com/@dariomannu/collections/rimmel-js-getting-started) 🧺 A good place to start off. Simple examples for simple tasks.
 
-[The Collection](https://stackblitz.com/@dariomannu/collections/rimmel-js-experiments) 🧞 Streams-Oriented programming examples using Rimmel.
+[The Collection](https://stackblitz.com/@dariomannu/collections/rimmel-js-experiments) 🧞 Stream-Oriented programming examples using Rimmel.
 
 ### Experiments
 Cutting-edge things you can do with Rimmel. Still being refined here and there, but will show you where things are moving and bring some inspiration.
 
-[Web Components](https://stackblitz.com/@dariomannu/collections/web-components) 🧩 Experimental support for custom elements and web components in streams-oriented style.
+[Web Components](https://stackblitz.com/@dariomannu/collections/web-components) 🧩 Experimental support for custom elements and web components in stream-oriented style.
 
 [Web Workers](https://stackblitz.com/@dariomannu/collections/web-workers) 🛠️ Experiments running your Rimmel components inside web workers
 
-[Novel Design Patterns](https://stackblitz.com/@dariomannu/collections/novel-design-patterns) 📖 What makes streams-oriented programming different
+[Novel Design Patterns](https://stackblitz.com/@dariomannu/collections/novel-design-patterns) 📖 What makes stream-oriented programming different
 
-[Observable Polyfill](https://stackblitz.com/@dariomannu/collections/observable-polyfill) 🧴 streams-oriented examples for the [observable-polyfill](https://github.com/keithamus/observable-polyfill/).
+[Observable Polyfill](https://stackblitz.com/@dariomannu/collections/observable-polyfill) 🧴 stream-oriented examples for the [observable-polyfill](https://github.com/keithamus/observable-polyfill/).
 
 [Native Observables](https://stackblitz.com/orgs/github/ReactiveHTML/collections/native-observables-in-rimmel-js) 👶 Experiments using native Observables.
 
@@ -699,7 +703,7 @@ The reference implementation to compare apples with apples.
 
 [TodoMVC 2](https://stackblitz.com/edit/rimmel-todomvc-expanded) 🥈 A more human-readable, expanded version if you want to examine more in detail what's going on.
 
-This TodoMVC implementation uses [ObservableTypes](https://github.com/reactivehtml/observable-types) 🪞, a reactive Collection with streams-oriented programming in mind.
+This TodoMVC implementation uses [ObservableTypes](https://github.com/reactivehtml/observable-types) 🪞, a reactive Collection with stream-oriented programming in mind.
 
 
 #### Tic-Tac-Toe 🎮
@@ -725,7 +729,7 @@ Not the example you'd want to start with, but definitely one where the use of st
 
 [![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
 
-Rimmel is a young project built with meticulous attention to detail and a bold vision: building a new web ecosystem that "just works", using the streams oriented paradigm.
+Rimmel is a young project built with meticulous attention to detail and a bold vision: building a new web ecosystem that "just works", using the stream oriented paradigm.
 
 Share the passion? Would like to help?<br>
 Come say hi, there's a good amount of work to do and the roadmap is below.

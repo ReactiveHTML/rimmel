@@ -139,6 +139,7 @@ const ColorPicker = (initial = [0, 0, 0]) => {
   `;
 };
 
+// Render to the DOM
 document.getElementById('root-node').innerHTML = ColorPicker([255, 128, 64])
 ```
 
@@ -179,6 +180,7 @@ All Rimmel does is binding your observable streams to the UI in a seamless integ
 If you need to render something based on a condition, plain-old standard JS can help you. No further abstractions or custom DSLs are required:
 
 ```javascript
+// Render to the DOM
 document.body.innerHTML = rml`
   <main>
     ${
@@ -210,6 +212,7 @@ const conditionalStream = new BehaviorSubject(0).pipe(
   })
 );
 
+// Render to the DOM
 document.body.innerHTML = rml`
   <div>Count: ${conditionalStream}</div>
   <button onclick="${conditionalStream}">click me</button>
@@ -217,6 +220,25 @@ document.body.innerHTML = rml`
 ```
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-dynamic-conditional-rendering)
+
+## No Build Tools 🔧
+Build tools can do a number of interesting things, but they're optional here, not a requirement.
+
+You can always import the pre-built `rml` tag and use it in any Vanilla JS or microfrontend context:
+
+```js
+import { rml } from "https://cdn.skypack.dev/rimmel";
+
+// Define your streams
+const apiData = fetch('/api/data').then(r=>r.text());
+
+// Render to the DOM
+document.body.innerHTML = rml`
+	<p>Your reactive content here: ${apiData}</p>
+`;
+
+```
+
 
 ## No Lifecycle Events 🕢
 Component lifecycle events such as `onmount`, `beforeunmount`, present in most other imperative frameworks quickly become useless, redudant and discouraged here.
@@ -249,8 +271,10 @@ All Observers such as event listener functions, Subjects and BehaviorSubjects wi
 ### Examples:
 
 ```ts
-// Observable Subjects
+// Define your Observable Subjects
 const stream = new Subject<MouseEvent>();
+
+// Bind/Render to the DOM
 target.innerHTML = rml`<button onclick="${stream}></button>`;
 
 
@@ -310,10 +334,12 @@ const datasetValue = map((e: Event) => Number(e.target.dataset.value));
 const buttonClick = filter((e: Event) => e.target.tagName == 'BUTTON');
 
 const Component = () => {
+  // Define your streams first
   const total = new Subject<number>().pipe(
     scan((a, b) => a+b, 0)
   );
 
+  // Then Bind/Render to the DOM
   return rml`
     <div onclick="${source(buttonClick, datasetValue, total)}">
 
@@ -347,8 +373,10 @@ import { rml, Cut } from 'rimmel';
 import { Subject } from 'rxjs';
 
 const Component = () => {
+  // Define your streams first
   const stream1 = new Subject<string>();
 
+  // Then Bind/Render to the DOM
   return rml`
     <input onchange="${Cut(stream1)}"> <br>
 
@@ -488,7 +516,7 @@ target.innerHTML = rml`<div>${UpperCase(stream)}</div>`;
 Dynamic sinks, on the other hand, are optimised for size and designed for convenience. They can take anyhing as input and figure out how to update the DOM at runtime.
 
 
-## Attribute Mixins
+## Attribute Mixins (Directives)
 Mixins are an exciting by-product of dynamic sinks, which allow you to inject pretty much anything at any time (event listeners, classes, attributes, etc) into an element by means of emitting an `Attribuend Object`­—a plain-old object whose properties and methods represent DOM attributes and event listeners to be merged in.
 
 <br>
@@ -682,7 +710,7 @@ There are several collections on Stackblitz that can get you started, give you i
 [The Collection](https://stackblitz.com/@dariomannu/collections/rimmel-js-experiments) 🧞 Stream-Oriented programming examples using Rimmel.
 
 ### Experiments
-Cutting-edge things you can do with Rimmel. Still being refined here and there, but will show you where things are moving and bring some inspiration.
+This is the cutting-edge of what you can do with Rimmel, still being refined here and there, but will show you where things are going and maybe give you some inspiration.
 
 [Web Components](https://stackblitz.com/@dariomannu/collections/web-components) 🧩 Experimental support for custom elements and web components in stream-oriented style.
 

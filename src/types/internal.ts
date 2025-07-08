@@ -23,13 +23,14 @@ export interface BindingConfiguration {
 };
 
 /**
- * This tells Rimmel how to bind an EventTarget to an event handler.
+ * An object that specifies how to bind an EventTarget to an event handler.
  *
- * Objects of this type are normally returned by Source functions
+ * Objects of this type are normally created by Source functions or
+ * by the Rimmel parser based on the context
  */
 export interface SourceBindingConfiguration<T extends RMLEventName> {
 	type: 'source';
-	listener: EventListenerOrEventListenerObject<EventType<T>>;
+	listener: EventListenerOrEventListenerObject<EventType<T>> | Observer<EventType<T>>;
 	options?: AddEventListenerOptions;
 	eventName: RMLEventName;
 	// error?: EventListener;

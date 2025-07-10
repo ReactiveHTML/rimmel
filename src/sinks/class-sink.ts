@@ -31,9 +31,7 @@ export const ClassObjectSink: Sink<Element> = (node: Element) => {
 
 	return (name: ClassName | ClassRecord | ((ClassName | ClassRecord)[])) => {
 		typeof name == 'string'
-			? name.includes(' ')
-				? set(name)
-				: add(name)
+			? set(name)
 			// FIXME: is it safe to assume it's an object, at this point?
 			: (<(ClassName | ClassRecord)[]>[]).concat(name).forEach(obj => Object.entries(obj)
 					// TODO: support 3-state with toggle

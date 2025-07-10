@@ -4,7 +4,7 @@ import type { Sink } from "../types/sink";
 import { AppendHTMLSink } from "../sinks/append-html-sink";
 import { BlurSink } from "../sinks/blur-sink";
 import { CheckedSink } from "../sinks/checked-sink";
-import { ClassName, ClassObjectSink, ToggleClass } from "../sinks/class-sink";
+import { ClassObjectSink } from "../sinks/class-sink";
 import { ClosedSink } from "../sinks/closed-sink";
 import { DatasetSink, DatasetObjectSink } from "../sinks/dataset-sink";
 import { DisabledSink } from "../sinks/disabled-sink";

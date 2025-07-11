@@ -182,7 +182,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 				const nextString = strings[i+1];
 				// if it's a BehaviorSubject or any other sync stream (e.g.: startWith operator), pick its initial/current value to render it synchronously
-				const initialValue = currentValue(expression);
+				const initialValue = currentValue(expression.source ?? expression);
 
 				const isAttribute = /(?<attribute>[:a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(accPlusString);
 				if(isAttribute) {

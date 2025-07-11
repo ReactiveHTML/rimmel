@@ -1,5 +1,5 @@
 import { of, Subject } from 'rxjs';
-import { state, waitingElementHanlders } from '../internal-state';
+import { state, waitingElementHandlers } from '../internal-state';
 import { AttributeObjectSink } from '../sinks/attribute-sink';
 import { RMLEventName } from '../types/dom';
 import { rml } from './parser';
@@ -8,7 +8,7 @@ const defer = <T>(value: T, timeout = 500) => new Promise<T>((resolve) => setTim
 
 describe('Parser', () => {
     beforeEach(() => {
-        waitingElementHanlders.clear();
+        waitingElementHandlers.clear();
         state.refCount = 0;
     });
 
@@ -16,7 +16,7 @@ describe('Parser', () => {
     global.document = globalThis.document || {};
     global.document = globalThis.document;
     global.document.addEventListener = (eventName: RMLEventName, handler: EventListenerOrEventListenerObject) => {};
-    waitingElementHanlders.clear();
+    waitingElementHandlers.clear();
 
     describe('Static values', () => {
 
@@ -311,7 +311,7 @@ describe('Parser', () => {
                 const template = rml`<div onclick="${handlerFn}">Hello</div>`;
 
                 expect(template).toEqual('<div _onclick="RMLREF+0" resolve="RMLREF+0">Hello</div>');
-                expect(waitingElementHanlders.get('RMLREF+0')).toEqual([{
+                expect(waitingElementHandlers.get('RMLREF+0')).toEqual([{
                     eventName: 'click',
                     listener: handlerFn,
                     type: 'source',
@@ -323,7 +323,7 @@ describe('Parser', () => {
                 const template = rml`<div onmouseover="${handlerStream}">Hello</div>`;
 
                 expect(template).toMatch(/<div .*>Hello<\/div>/);
-                expect(waitingElementHanlders.get('RMLREF+0')).toEqual([{
+                expect(waitingElementHandlers.get('RMLREF+0')).toEqual([{
                     eventName: 'mouseover',
                     listener: handlerStream,
                     type: 'source',
@@ -355,7 +355,7 @@ describe('Parser', () => {
                     const template = rml`<div data-foo="${foo}">Hello</div>`;
 
                     expect(template).toMatch(/<div .* data-foo="">Hello<\/div>/);
-                    expect(waitingElementHanlders.get('RMLREF+0')).toMatchObject([
+                    expect(waitingElementHandlers.get('RMLREF+0')).toMatchObject([
                         // TODO: match the sink, too
                         { source: foo, type: 'sink', t: 'data-foo' },
                     ]);
@@ -392,7 +392,7 @@ describe('Parser', () => {
                     const template = rml`<div ...${a}>Hello</div>`;
 
                     expect(template).toMatch(/<div.*resolve="RMLREF\+0".*>Hello<\/div>/);
-                    expect(waitingElementHanlders.get('RMLREF+0')).toEqual([
+                    expect(waitingElementHandlers.get('RMLREF+0')).toEqual([
                         { source: a, sink: AttributeObjectSink, type: 'sink', t: 'mixin' },
                     ]);
                 });
@@ -402,7 +402,7 @@ describe('Parser', () => {
                     const template = rml`<div ...${a}>Hello</div>`;
 
                     expect(template).toMatch(/<div.*resolve="RMLREF\+0".*>Hello<\/div>/);
-                    expect(waitingElementHanlders.get('RMLREF+0')).toEqual([
+                    expect(waitingElementHandlers.get('RMLREF+0')).toEqual([
                         { source: a, sink: AttributeObjectSink, type: 'sink', t: 'mixin' },
                     ]);
                 });
@@ -413,7 +413,7 @@ describe('Parser', () => {
                     const template = rml`<div ...${a} ...${b}>Hello</div>`;
 
                     expect(template).toMatch(/<div.*resolve="RMLREF\+0".* data-foo="bar".*>Hello<\/div>/);
-                    expect(waitingElementHanlders.get('RMLREF+0')![1]).toEqual(
+                    expect(waitingElementHandlers.get('RMLREF+0')![1]).toEqual(
                         { type: 'sink', t: 'mixin', source: b, sink: AttributeObjectSink },
                     );
                 });
@@ -424,7 +424,7 @@ describe('Parser', () => {
                     const template = rml`<div ...${a} ...${b}>Hello</div>`;
 
                     expect(template).toMatch(/<div.*resolve="RMLREF\+0".* data-foo="bar".*>Hello<\/div>/);
-                    expect(waitingElementHanlders.get('RMLREF+0')![0]).toEqual(
+                    expect(waitingElementHandlers.get('RMLREF+0')![0]).toEqual(
                         { type: 'sink', t: 'mixin', source: b, sink: AttributeObjectSink },
                     );
                 });
@@ -443,7 +443,7 @@ describe('Parser', () => {
                         const template = rml`<div ...${a}>Hello</div>`;
 
                         expect(template).toMatch(/<div.*resolve="RMLREF\+0".*>Hello<\/div>/);
-                        expect(waitingElementHanlders.get('RMLREF+0')![0]).toStrictEqual(
+                        expect(waitingElementHandlers.get('RMLREF+0')![0]).toStrictEqual(
                             { type: 'sink', t: 'mixin', source: { 'onmouseover': fn }, sink: AttributeObjectSink },
                         );
                     });
@@ -454,7 +454,7 @@ describe('Parser', () => {
                         const template = rml`<div ...${a}>Hello</div>`;
 
                         expect(template).toMatch(/<div.*resolve="RMLREF\+0".*>Hello<\/div>/);
-                        expect(waitingElementHanlders.get('RMLREF+0')![0]).toStrictEqual(
+                        expect(waitingElementHandlers.get('RMLREF+0')![0]).toStrictEqual(
                             { type: 'sink', t: 'mixin', source: { 'onmount': fn }, sink: AttributeObjectSink },
                         );
                     });
@@ -465,7 +465,7 @@ describe('Parser', () => {
                         const template = rml`<div ...${a}>Hello</div>`;
 
                         expect(template).toMatch(/<div.*resolve="RMLREF\+0".*>Hello<\/div>/);
-                        expect(waitingElementHanlders.get('RMLREF+0')![0]).toStrictEqual(
+                        expect(waitingElementHandlers.get('RMLREF+0')![0]).toStrictEqual(
                             { type: 'sink', t: 'mixin', source: { 'rml:onmount': fn }, sink: AttributeObjectSink },
                         );
                     });
@@ -545,7 +545,7 @@ describe('Parser', () => {
                     const template = rml`<div ...${obj}>Hello</div>`;
 
                     expect(template).toMatch(/^<div.*data-foo="bar">Hello<\/div>/);
-                    expect(waitingElementHanlders.get('RMLREF+0')).toEqual([
+                    expect(waitingElementHandlers.get('RMLREF+0')).toEqual([
                         { source: deferred, sink: AttributeObjectSink, type: 'sink', t: 'mixin' },
                     ]);
                 });

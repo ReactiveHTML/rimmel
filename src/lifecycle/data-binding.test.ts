@@ -4,7 +4,7 @@ import { RMLEventName, Sink } from "../types";
 import { SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
 import { Rimmel_Bind_Subtree } from "./data-binding";
 import * as addListenerModule from "../lib/addListener";
-import { waitingElementHanlders } from "../internal-state";
+import { waitingElementHandlers } from "../internal-state";
 import { beforeEach, expect, mock, describe, it } from "bun:test";
 import { REF_TAG, RESOLVE_ATTRIBUTE } from "../constants";
 import { Subject } from "rxjs";
@@ -23,7 +23,7 @@ describe("Data Binding Lifecycle", () => {
 
         beforeEach(() => {
             addListenerSpy.mockClear();
-            waitingElementHanlders.clear();
+            waitingElementHandlers.clear();
         });
 
         it("uses addSource to register event listener functions", () => {

@@ -4,7 +4,7 @@ import type { Subscription } from "./types/futures";
 
 import { REF_TAG } from './constants';
 
-export const waitingElementHanlders = <Map<string, BindingConfiguration[]>>new Map();
+export const waitingElementHandlers = <Map<string, BindingConfiguration[]>>new Map();
 // TODO: Test and verify with WeakRef/FinalizationRegistry
 export const delegatedEventHandlers: WeakMap<Element, SourceBindingConfiguration<RMLEventName>[]> = new WeakMap();
 export const subscriptions: Map<Node, Subscription[]> = new Map();

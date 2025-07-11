@@ -6,7 +6,7 @@ import { RESOLVE_SELECTOR } from "./constants";
 import { isSinkBindingConfiguration, isSourceBindingConfiguration } from './types/internal';
 import { Rimmel_Bind_Subtree, Rimmel_Mount } from "./lifecycle/data-binding";
 import { subscribe } from "./lib/drain";
-import { waitingElementHanlders } from "./internal-state";
+import { waitingElementHandlers } from "./internal-state";
 
 import { BehaviorSubject, Subject } from "rxjs";
 import { camelCase } from './utils/camelCase';
@@ -73,7 +73,7 @@ class RimmelElement extends HTMLElement {
 			return acc;
 		}, [{}, {}] as [Record<string, string>, Record<string, string>]);
 
-		const refs = waitingElementHanlders.get((this.attributes as RMLNamedNodeMap).resolve?.nodeValue ?? '') ?? [];
+		const refs = waitingElementHandlers.get((this.attributes as RMLNamedNodeMap).resolve?.nodeValue ?? '') ?? [];
 		this.attrs = SubjectProxy(attrs);
 
 		// This condition holds for non-virtual custom elements. Won't be needed anymore if we split web components from virtual web components

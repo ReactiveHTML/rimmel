@@ -3,7 +3,7 @@ import type { HTMLString } from '../types/dom';
 import type { SinkBindingConfiguration } from '../types/internal';
 
 import { rml as parser } from '../parser/parser';
-import { waitingElementHanlders } from '../internal-state';
+import { waitingElementHandlers } from '../internal-state';
 import { HydrationScript } from '../ssr/hydration';
 
 import { Observable, endWith, filter, map, mergeAll, mergeWith, tap, from, of, isObservable } from 'rxjs';
@@ -12,7 +12,7 @@ let count = 0;
 export const rml = (strings: TemplateStringsArray, ...args: RMLTemplateExpression[]): Observable<HTMLString> => {
 	const hydrationCall = (data: string) => <HTMLString>`\n<script>Rimmel_Hydrate(${data});</script>`;
 	const str: HTMLString = <HTMLString>(parser(strings, ...args) + HydrationScript);
-	const tasks = [...waitingElementHanlders.entries()]
+	const tasks = [...waitingElementHandlers.entries()]
 		.flatMap(([key, jobs]) =>
 			jobs.map(job => {
 				if(isSinkBindingConfiguration(job)) {
@@ -53,6 +53,6 @@ export const rml = (strings: TemplateStringsArray, ...args: RMLTemplateExpressio
 	return of(str).pipe(
 		mergeWith(asyncStuff()),
 		endWith(<HTMLString>'\n<!-- hydration end -->\n</body>\n</html>'),
-		tap(() => waitingElementHanlders.clear()),
+		tap(() => waitingElementHandlers.clear()),
 	);
 };

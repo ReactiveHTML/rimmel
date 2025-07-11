@@ -3,7 +3,7 @@ import type { SourceBindingConfiguration } from "../types/internal";
 
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, RESOLVE_ATTRIBUTE, RESOLVE_SELECTOR, RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
 
-import { subscriptions, waitingElementHanlders } from "../internal-state";
+import { subscriptions, waitingElementHandlers } from "../internal-state";
 import { isSinkBindingConfiguration } from "../types/internal";
 import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
@@ -54,7 +54,7 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 	}
 
 	const bindingRef = <string>node.getAttribute(RESOLVE_ATTRIBUTE);
-	(waitingElementHanlders.get(bindingRef) ?? []).forEach(function Rimmel_Bind_Element(bindingConfiguration) {
+	(waitingElementHandlers.get(bindingRef) ?? []).forEach(function Rimmel_Bind_Element(bindingConfiguration) {
 		const debugThisNode = node.hasAttribute(RML_DEBUG);
 
 		// #IFDEF ENABLE_RML_DEBUGGER
@@ -113,7 +113,7 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 	});
 
 	node.removeAttribute(RESOLVE_ATTRIBUTE);
-	waitingElementHanlders.delete(bindingRef);
+	waitingElementHandlers.delete(bindingRef);
 };
 
 export const removeListeners = (node: Element) => {

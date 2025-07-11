@@ -6,7 +6,7 @@ import type { HTMLAttributeName, HTMLString, RMLEventAttributeName, RMLEventName
 import { isFutureSinkAttributeValue, isPresentSinkAttributeValue, isSinkBindingConfiguration, isSourceBindingConfiguration } from "../types/internal";
 
 import { currentValue } from "../lib/current-value";
-import { state, waitingElementHanlders } from "../internal-state";
+import { state, waitingElementHandlers } from "../internal-state";
 import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, REF_TAG, RESOLVE_ATTRIBUTE, RML_DEBUG } from "../constants";
 
@@ -24,7 +24,7 @@ import { isRMLEventListener } from "../types/event-listener";
 import { toListener } from "../utils/to-listener";
 
 export const addRef = (ref: string, data: BindingConfiguration) => {
-	waitingElementHanlders.get(ref)?.push(data) ?? waitingElementHanlders.set(ref, [data]);
+	waitingElementHandlers.get(ref)?.push(data) ?? waitingElementHandlers.set(ref, [data]);
 };
 
 const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventName, RMLEventAttributeName] | [] => {

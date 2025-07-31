@@ -1,6 +1,10 @@
-<img src="docs/assets/github-hero-2.png" alt="Rimmel.js" style="text-align: start; max-width: 100%;">
+<img src="docs/assets/github-hero-3.png" alt="Rimmel.js" style="text-align: start; max-width: 100%;">
 
 [![npm](https://img.shields.io/npm/v/rimmel.svg)](https://www.npmjs.com/package/rimmel)
+![license](https://img.shields.io/npm/l/@reactivehtml/rimmel)
+![NPM Downloads](https://img.shields.io/npm/d18m/rimmel)
+![Discord](https://img.shields.io/discord/1392597664184537230)
+
 
 Rimmel is a powerful, fast and lightweight JavaScript UI library for creating web applications with event streams.
 
@@ -10,6 +14,10 @@ It implements [RML](https://github.com/ReactiveHTML/reactive-markup), the Reacti
 If you are new to reactive streams, there is a [3m crash-course](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) tailored for UI development with Rimmel, arguably the simplest RxJS introduction around to get you started.
 
 If you are new to the functional/reactive programming mindset, this [interactive tutorial](https://reactivex.io/learnrx/) may be an especially useful introduction to map/reduce in the reactive world.
+
+If you come from Angular, check out [this page](./docs/migrating/angular.md)<br>
+If you come from React, check out [this page](./docs/migrating/react.md)<br>
+
 
 ## Hello World 👋🌏🏖️😎
 Let's jump straight in. The "Hello World" for reactive user interfaces is the classic click counter: one button, you click it, ze counts it.
@@ -780,6 +788,10 @@ Come say hi, there's a good amount of work to do and the roadmap is below.
 - i18n (leverage sink pipelines to make localisation trivial)
 - Native Observables — exciting challenges for the upcoming standard
 
+# Chat?
+
+Find us [on Discord](https://discord.com/channels/1392597664184537230)
+
 # Building, testing, hacking 🪓
 To work with Rimmel locally, check it out then either with bun or other runtimes:
 
@@ -795,4 +807,6 @@ npm run kitchen-sink
 ```
 
 Or you can just run it with one click [on StackBlitz](https://stackblitz.com/~/github.com/ReactiveHTML/rimmel?file=examples/kitchen-sink/index.ts&startScript=kitchen-sink)
+
+Built on 🌎 with ✍️, 🧠 and a bit of 🤖
 

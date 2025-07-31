@@ -127,7 +127,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 		const printableExpressionType = typeof (expression ?? '');
 
 		if(['string', 'number', 'boolean'].includes(printableExpressionType)) {
-			// Static expressions, no data binding. Just concatenate
+			// Static expressions, no data binding. Just concatenate and move on
 			acc = accPlusString +(expression ?? '');
 		} else if(eventName) {
 			// Event Source
@@ -159,21 +159,11 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 			}
 
 			acc = accPlusString
-				//.replace(new RegExp(`\\s${eventAttributeName}=(['"]?)$`), ` _${eventAttributeName}=$1`)
 				.replace(/\s((?:rml:)?on\w+=['"]?)$/, ' _$1')
 				+(!listener || existingRef ? '' : `${ref}" ${RESOLVE_ATTRIBUTE}="${ref}`);
 		} else {
 			// Data Sink.
-			// Determine its type before connecting.
 
-			// 	// Custom/user-defined sink
-			// 	?????
-			// 	addRef(ref, <RMLTemplateExpressions.GenericHandler>{ type: 'sink', sink: expression.sink });
-			// 	// addRef(ref, expression);
-			// 	acc = accPlusString.replace(/<(\w[\w-]*)\s*([^>]*)(>?)\s*$/, `<$1 ${existingRef?'':`resolve="${ref}" `}$2$3`);
-
-			// // } else if(typeof ((<Observable<unknown>>expression).subscribe ?? (<Promise<unknown>>expression).then)  == 'function' && i<strings.length -1 || typeof expression == 'object') {
-			// } else if(
 			if(Array.isArray(expression)) {
 				// If sinking an array, we're likely just mapping it
 				acc = accPlusString +expression.join('');
@@ -213,7 +203,6 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 							handler = PreSink(attributeName, sink, expression, attributeName);
 						}
 
-						// addRef(ref, <RMLTemplateExpressions.GenericHandler>{ handler: expression, type: attributeType, attribute: attributeName });
 						addRef(ref, handler);
 						// TODO: remove boolean attributes if they are bound to streams: disabled="${stream}"
 						// should not be disabled by its mere presence, but depending on the value emitted by the stream.
@@ -224,20 +213,8 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 							: accPlusString
 						;
 
-						// acc += (<ClassRecord[]>[]).concat(<ClassRecord>expression)
-						// 	.flatMap(cls =>
-						// 		typeof cls == 'string'
-						// 			? cls
-						// 			: Object.entries(cls ?? {})
-						// 				.filter(([, v]) => typeof v != 'string')
-						// 				.map(([k]) => k)
-						// 	)
-						// 	.join(' ')
-						// ;
-
 						acc = (prefix +(initialValue ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}
-		        // } else if(/<\S+(?:\s+[a-z0-9_][a-z0-9_-]*(?:=(?:'[^']*'|"[^"]*"|\S+|[^>]+))?)*(?:\s+\.\.\.)?$/.test(accPlusString.substring(lastTag)) && /^(?:[^<]*>|\s+\.\.\.)/.test(nextString)) {
 				} else if(/<[a-z_][a-z0-9_-]*[^>]*(?:\s+\.\.\.)?$/ig.test(accPlusString.substring(lastTag))) {
 
 					// Mixin Sink
@@ -305,10 +282,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 					acc += (existingRef?string:string.replace(/\s*>(?=[^<]*$)/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`)) +INTERACTIVE_NODE_START +(initialValue ?? '') +INTERACTIVE_NODE_END;
 
 				} else {
-
 					acc = accPlusString;
-					// ???
-
 				}
 
 			}

@@ -1,55 +1,121 @@
-import babel from '@rollup/plugin-babel';
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import babelConfig from './babel.config.json';
-import sourceMaps from 'rollup-plugin-sourcemaps';
-import json from 'rollup-plugin-json';
-import { terser } from 'rollup-plugin-terser';
-import visualizer from 'rollup-plugin-visualizer';
-import cleanup from 'rollup-plugin-cleanup';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import json from '@rollup/plugin-json';
+import { join } from 'path';
+import typescript from '@rollup/plugin-typescript';
+import { visualizer } from 'rollup-plugin-visualizer';
+import fs from 'fs';
 
-const {
-  name,
-  main,
-  module,
-  peerDependencies,
-} = require('./package.json');
-
-const sourcemap = true;
-
-const external = [...Object.keys(peerDependencies || {})];
-
-const camelize = s => s.replace(/-./g, x=>x.toUpperCase()[1])
-
-export default {
-  input: 'src/index.js',
-  output: [
-    { file: main, name: camelize(name), format: 'umd', sourcemap },
-    { file: module, format: 'es', sourcemap },
-  ],
-  external,
-  watch: {
-    include: 'src/**',
-  },
-  plugins: [
-    babel({
-      babelrc: false,
-      babelHelpers: 'bundled',
-      exclude: 'node_modules/**',
-      ...babelConfig,
-    }),
-    // Allow json resolution
-    json(),
-    // Allow bundling cjs modules (unlike webpack, rollup doesn't understand cjs)
-    commonjs(),
-    // Allow node_modules resolution, so you can use 'external' to control
-    // which external modules to include in the bundle
-    // https://github.com/rollup/rollup-plugin-node-resolve#usage
-    resolve(),
-    // Resolve source maps to the original source
-    sourceMaps(),
-    terser(),
-    cleanup({ sourcemap }),
-    visualizer({ filename: './doc/bundle-stats.html', sourcemap }),
-  ],
+function getTSConfig(path) {
+	const tsConfigData = fs.readFileSync('./tsconfig.json', 'utf8');
+	const tsConfig = JSON.parse(tsConfigData);
+	
+	tsConfig.compilerOptions.outDir = path;
+	tsConfig.compilerOptions.declarationDir = join(path, 'types');
+	return tsConfig.compilerOptions;
 }
+
+export default [
+	{	// Global JS
+		external: ['rxjs'],
+		input: './src/index.ts',
+		treeshake: {
+			propertyReadSideEffects: false,    // Optimise property access side effects
+		},
+		plugins: [
+			nodeResolve({ preferBuiltins: true }),
+			// json(),
+			typescript({
+				...getTSConfig('dist/globaljs'),
+				sourceMap: true,
+				outDir: 'dist/globaljs',
+				declaration: false,
+				declarationDir: undefined, // Explicitly unset
+				declarationMap: false,     // Explicitly disable
+			}),
+			visualizer({ filename: 'bundle-stats-globaljs.html' }),
+		],
+		output: [{
+			exports: 'named',
+			externalLiveBindings: false,
+			dir: './dist/globaljs',
+			entryFileNames: '[name].mjs',
+			freeze: true,
+			generatedCode: 'es2015',
+			format: 'iife',
+			name: 'rml',
+			globals: {
+				'rxjs': 'rxjs',
+			},
+			sourcemap: true,
+		}],
+	},
+
+	{	// ESM
+		external: ['rxjs'],
+		input: './src/index.ts',
+		treeshake: {
+			propertyReadSideEffects: false,    // Optimise property access side effects
+		},
+		plugins: [
+			nodeResolve({ preferBuiltins: true }),
+			json(),
+			typescript({
+				...getTSConfig('dist/esm'),
+			}),
+			visualizer({ filename: 'bundle-stats-esm.html' }),
+		],
+		output: [
+			{
+				exports: 'named',
+				externalLiveBindings: false,
+				freeze: false,
+				sourcemap: true,
+				entryFileNames: '[name].js',
+				format: 'es',
+				dir: './dist/esm',
+				preserveModules: true,
+			}
+		],
+	},
+
+	{	// SSR
+		external: ['rxjs'],
+		input: './src/ssr/index.ts',
+		treeshake: {
+			moduleSideEffects: 'no-external',  // Only shake internal code
+			propertyReadSideEffects: false,    // Optimise property access side effects
+		},
+		plugins: [
+			nodeResolve({ preferBuiltins: true }),
+			json(),
+			typescript({
+				...getTSConfig('dist/ssr'),
+				sourceMap: true,
+				outDir: 'dist/ssr',
+				declaration: true,
+			}),
+			visualizer({ filename: 'bundle-stats-ssr.html' }),
+		],
+		output: [
+			{
+				exports: 'named',
+				externalLiveBindings: false,
+				dir: './dist/ssr',
+				entryFileNames: '[name].mjs',
+				format: 'es',
+				freeze: false,
+				sourcemap: true,
+			},
+			{
+				exports: 'named',
+				externalLiveBindings: false,
+				dir: './dist/ssr',
+				entryFileNames: '[name].cjs',
+				format: 'cjs',
+				freeze: false,
+				sourcemap: true,
+			}
+		],
+	},
+];
+

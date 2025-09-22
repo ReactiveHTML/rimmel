@@ -1,52 +1,94 @@
 {
-  "name": "rxhtml",
-  "version": "1.0.0",
-  "description": "Minimal framework for webapps",
-  "main": "dist/rxhtml.cjs.js",
-  "module": "dist/rxhtml.es.js",
+  "name": "rimmel",
+  "version": "1.5.2",
+  "description": "A Stream-Oriented UI library for the Rx.Observable Universe",
+  "type": "module",
+  "_main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "types": "./dist/esm/types/index.d.ts"
+    },
+    "./ssr": {
+      "import": "./dist/ssr/index.mjs",
+      "require": "./dist/ssr/index.cjs"
+    }
+  },
+  "files": [
+    "dist/"
+  ],
+  "sideEffects": [
+    "./src/lifecycle/data-binding.ts"
+  ],
   "scripts": {
-    "build": "rimraf dist && rimraf doc && rollup -c",
-    "dev": "rollup -c -w",
-    "examples": "http-server",
-    "test": "jest"
+    "build": "rimraf dist && rollup --config rollup.config.js",
+    "dev": "rimraf dist && rollup -w --config rollup.config.js",
+    "handbook:dev": "npx typedoc --watch",
+    "handbook": "npx typedoc",
+    "kitchen-sink": "cd examples/kitchen-sink && vite",
+    "modern-demo": "cd examples/modern-demo && vite",
+    "serve": "npx serve . -s -p 3000",
+    "website": "cd docs && bundle exec jekyll build",
+    "website:local": "cd docs && bundle exec jekyll serve",
+    "test": "bun test",
+    "test:types": "tsd --files src/**/*.test-d.ts"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hellomenu/rxhtml.git"
+    "url": "git+https://github.com/reactivehtml/rimmel.git"
   },
   "keywords": [
+    "rimmel",
+    "rimmel.js",
+    "rimmeljs",
+    "rxjs",
     "rx",
     "html",
-    "rxhtml",
-    "reacvive"
+    "observables",
+    "observable",
+    "reactive",
+    "reactive html",
+    "reactive dom",
+    "rml",
+    "reactive-markup",
+    "stream",
+    "stream-oriented",
+    "stream-oriented programming",
+    "fp",
+    "functional programming",
+    "functional/reactive",
+    "functional/reactive programming"
   ],
   "author": "Dario Mannu",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hellomenu/rxhtml/issues"
+    "url": "https://github.com/reactivehtml/rimmel/issues"
   },
-  "homepage": "https://github.com/hellomenu/rxhtml#readme",
+  "homepage": "https://rimmel.js.org",
   "devDependencies": {
-    "@babel/core": "^7.15.5",
-    "@babel/plugin-proposal-async-generator-functions": "^7.15.4",
-    "@babel/plugin-proposal-class-properties": "^7.14.5",
-    "@babel/plugin-proposal-decorators": "^7.15.4",
-    "@babel/plugin-proposal-export-default-from": "^7.14.5",
-    "@babel/plugin-syntax-dynamic-import": "^7.8.3",
-    "@babel/preset-env": "^7.15.6",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-commonjs": "^20.0.0",
-    "@rollup/plugin-node-resolve": "^13.0.4",
-    "babel-jest": "^27.2.0",
-    "babel-register": "^6.26.0",
-    "http-server": "^13.0.2",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^22.10.2",
+    "esbuild": "^0.25.10",
+    "esbuild-jest": "^0.4.0",
     "jest": "^27.2.0",
     "rimraf": "^3.0.2",
-    "rollup": "^2.56.3",
-    "rollup-plugin-cleanup": "^3.2.1",
-    "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-sourcemaps": "^0.6.3",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-visualizer": "^5.5.2"
+    "rollup": "^4.9.5",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "rxjs": "^7.8.1",
+    "ts-node": "^10.9.2",
+    "tsd": "^0.31.2",
+    "tslib": "^2.8.0",
+    "typedoc": "^0.27.5",
+    "typescript": "^5.7.2",
+    "vite": "^6.3.6"
+  },
+  "peerDependencies": {
+    "rxjs": ">=5.5.0 || >=6.0.0 || >=7.0.0 || >=8.0.0-0 <8.0.0"
   }
 }

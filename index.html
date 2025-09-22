@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rimmel.js - Reactive HTML with Streams</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Rimmel.js - A powerful, fast and lightweight JavaScript UI library for creating web applications with event streams. No Virtual DOM, just pure reactive programming.">
+    <meta name="keywords" content="rimmel, reactive programming, rxjs, streams, javascript, ui library, no virtual dom, typescript, reactive html">
+    <meta name="author" content="Rimmel.js Team">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://rimmel.js.org/">
+    <meta property="og:title" content="Rimmel.js - Reactive HTML with Streams">
+    <meta property="og:description" content="Build fast, reactive UIs without a Virtual DOM using RxJS observables and reactive templates">
+    <meta property="og:image" content="./docs/assets/github-hero-3.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://rimmel.js.org/">
+    <meta property="twitter:title" content="Rimmel.js - Reactive HTML with Streams">
+    <meta property="twitter:description" content="Build fast, reactive UIs without a Virtual DOM using RxJS observables and reactive templates">
+    <meta property="twitter:image" content="./docs/assets/github-hero-3.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    
+    <!-- TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .float { animation: float 6s ease-in-out infinite; }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up { animation: fadeInUp 0.8s ease-out; }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-primary-600">
+                        Rimmel.js
+                    </h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="https://github.com/ReactiveHTML/rimmel" 
+                       target="_blank"
+                       class="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors duration-200">
+                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        GitHub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="bg-gradient-to-br from-primary-50 to-blue-100 py-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="fade-in-up">
+                    <h1 class="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+                        Reactive HTML with 
+                        <span class="text-primary-600">Streams</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
+                        A powerful, fast and lightweight JavaScript UI library for creating web applications with event streams.
+                        <strong>No Virtual DOM</strong> — just pure reactive programming.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                        <a href="./examples/modern-demo/"
+                           class="inline-flex items-center px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                            🎨 Try Modern Demo
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                            </svg>
+                        </a>
+                        
+                        <a href="./examples/kitchen-sink/"
+                           class="inline-flex items-center px-8 py-4 bg-gray-100 hover:bg-gray-200 text-gray-900 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                            🛠️ Kitchen Sink Demo
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Installation -->
+                <div class="bg-white rounded-lg shadow-lg p-6 max-w-2xl mx-auto fade-in-up">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Start</h3>
+                    <div class="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-left">
+                        <div class="mb-2"># Install Rimmel.js</div>
+                        <div class="text-yellow-300">npm install rimmel</div>
+                        <div class="mt-4 mb-2"># Or use CDN</div>
+                        <div class="text-blue-300 text-sm">import { rml } from "https://cdn.skypack.dev/rimmel"</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-20 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                        Why Choose Rimmel?
+                    </h2>
+                    <p class="text-xl text-gray-600">
+                        Stream-oriented programming meets modern web development
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- No Virtual DOM -->
+                    <div class="text-center p-8 bg-gray-50 rounded-xl hover:shadow-lg transition-shadow duration-300">
+                        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 float">
+                            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4">No Virtual DOM</h3>
+                        <p class="text-gray-600">
+                            Direct DOM manipulation with optimized reactive sinks. 
+                            Faster than Virtual DOM with zero unnecessary re-renders.
+                        </p>
+                    </div>
+
+                    <!-- Stream-Oriented -->
+                    <div class="text-center p-8 bg-gray-50 rounded-xl hover:shadow-lg transition-shadow duration-300">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 float" style="animation-delay: 2s;">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4">Stream-Oriented</h3>
+                        <p class="text-gray-600">
+                            Everything is a stream. Use RxJS observables for all state and behavior. 
+                            Clean, testable, and maintainable code.
+                        </p>
+                    </div>
+
+                    <!-- Lightweight -->
+                    <div class="text-center p-8 bg-gray-50 rounded-xl hover:shadow-lg transition-shadow duration-300">
+                        <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 float" style="animation-delay: 4s;">
+                            <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-4">Lightweight</h3>
+                        <p class="text-gray-600">
+                            Minimal bundle size with tree-shakeable features. 
+                            Optional build tools — works great with plain JavaScript.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Code Example -->
+        <section class="py-20 bg-gray-900 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold mb-4">See It In Action</h2>
+                    <p class="text-xl text-gray-300">A simple reactive counter in just a few lines</p>
+                </div>
+                
+                <div class="grid lg:grid-cols-2 gap-8 items-center">
+                    <div class="bg-gray-800 rounded-lg p-6 overflow-x-auto">
+                        <div class="text-sm text-gray-400 mb-4">JavaScript + Rimmel</div>
+                        <pre class="text-green-400"><code>import { rml } from 'rimmel';
+import { BehaviorSubject, scan } from 'rxjs';
+
+// Create a reactive stream
+const clicks = new Subject();
+const counter = clicks.pipe(
+  scan(count => count + 1, 0)
+);
+
+// Bind to DOM with reactive template
+document.body.innerHTML = rml`
+  &lt;button onclick="${clicks}"&gt;
+    Clicked ${counter} times
+  &lt;/button&gt;
+`;</code></pre>
+                    </div>
+                    
+                    <div class="text-center">
+                        <h3 class="text-2xl font-bold mb-6">That's it! 🎉</h3>
+                        <div class="space-y-4 text-left">
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>No component lifecycle to manage</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>No manual DOM manipulation</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Automatic cleanup and memory management</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-6 h-6 text-green-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                <span>Pure reactive programming</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Demo Links -->
+        <section class="py-20 bg-gradient-to-r from-primary-600 to-blue-600 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-4xl font-bold mb-4">Ready to Explore?</h2>
+                <p class="text-xl mb-8 opacity-90">Choose your preferred demo experience</p>
+                
+                <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <!-- Modern Demo -->
+                    <div class="bg-white text-gray-900 rounded-xl p-8 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
+                        <div class="text-4xl mb-4">🎨</div>
+                        <h3 class="text-2xl font-bold mb-4">Modern Demo</h3>
+                        <p class="text-gray-600 mb-6">
+                            Beautiful TailwindCSS interface showcasing reactive features. 
+                            Perfect for newcomers and design-conscious developers.
+                        </p>
+                        <ul class="text-left text-sm text-gray-600 mb-6 space-y-2">
+                            <li>• Interactive counter with animations</li>
+                            <li>• Live todo list management</li>
+                            <li>• Real-time input binding</li>
+                            <li>• Dark mode toggle</li>
+                            <li>• Error handling examples</li>
+                        </ul>
+                        <a href="./examples/modern-demo/" 
+                           class="inline-flex items-center px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold transition-colors duration-200">
+                            Launch Modern Demo
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- Kitchen Sink Demo -->
+                    <div class="bg-white text-gray-900 rounded-xl p-8 shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300">
+                        <div class="text-4xl mb-4">🛠️</div>
+                        <h3 class="text-2xl font-bold mb-4">Kitchen Sink Demo</h3>
+                        <p class="text-gray-600 mb-6">
+                            Comprehensive showcase of all Rimmel features and advanced patterns. 
+                            Developer-focused with extensive examples.
+                        </p>
+                        <ul class="text-left text-sm text-gray-600 mb-6 space-y-2">
+                            <li>• All reactive sources and sinks</li>
+                            <li>• Advanced streaming patterns</li>
+                            <li>• Custom components</li>
+                            <li>• Performance examples</li>
+                            <li>• Integration patterns</li>
+                        </ul>
+                        <a href="./examples/kitchen-sink/" 
+                           class="inline-flex items-center px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-lg font-semibold transition-colors duration-200">
+                            Launch Kitchen Sink
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Rimmel.js</h3>
+                    <p class="text-gray-400">
+                        Stream-oriented UI library for building reactive web applications with RxJS observables.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://github.com/ReactiveHTML/rimmel" class="hover:text-white transition-colors">GitHub Repository</a></li>
+                        <li><a href="https://www.npmjs.com/package/rimmel" class="hover:text-white transition-colors">NPM Package</a></li>
+                        <li><a href="https://rimmel.js.org" class="hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="https://stackblitz.com/@dariomannu/collections/rimmel-js-getting-started" class="hover:text-white transition-colors">Examples</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Community</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="https://discord.com/channels/1392597664184537230" class="hover:text-white transition-colors">Discord</a></li>
+                        <li><a href="https://github.com/ReactiveHTML/rimmel/issues" class="hover:text-white transition-colors">Issues</a></li>
+                        <li><a href="https://github.com/ReactiveHTML/rimmel/discussions" class="hover:text-white transition-colors">Discussions</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center">
+                <p class="text-gray-400">
+                    Built with ❤️ by the 
+                    <a href="https://github.com/ReactiveHTML/rimmel" class="text-primary-400 hover:text-primary-300 transition-colors">
+                        Rimmel.js team
+                    </a>
+                    • MIT License
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

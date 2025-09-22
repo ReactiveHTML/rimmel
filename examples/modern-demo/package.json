@@ -1,0 +1,18 @@
+{
+  "name": "rimmel-modern-demo",
+  "version": "1.0.0",
+  "description": "Modern Rimmel.js demo with TailwindCSS",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "vite": "^6.3.6",
+    "typescript": "^5.7.2"
+  }
+}

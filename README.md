@@ -10,6 +10,30 @@ Rimmel is a powerful, fast and lightweight JavaScript UI library for creating we
 
 It implements [RML](https://github.com/ReactiveHTML/reactive-markup), the Reactive Markup which makes your HTML work with Streams in a seamless way.
 
+## 🚀 Live Demos
+
+Experience Rimmel.js in action with our interactive demos:
+
+### **🎨 Modern Demo** - *Recommended for newcomers*
+A beautiful, responsive showcase built with TailwindCSS featuring:
+- ⚡ Reactive counter with real-time updates
+- 📝 Live todo list management  
+- ⌨️ Instant input binding
+- 🌙 Dark mode toggle
+- 🚨 Error handling examples
+
+```bash
+npm run modern-demo
+# Opens at http://localhost:5174
+```
+
+### **🛠️ Kitchen Sink Demo** - *For developers*
+Comprehensive examples of all Rimmel features and advanced patterns:
+```bash
+npm run kitchen-sink  
+# Opens at http://localhost:5173
+```
+
 ## Getting started
 If you are new to reactive streams, there is a [3m crash-course](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) tailored for UI development with Rimmel, arguably the simplest RxJS introduction around to get you started.
 

@@ -759,16 +759,17 @@ RxJS can handle these without blinking an eye whilst Rimmel just glues them toge
 This is one of the most complex UI components by nature, with so many pieces of interdependent state all over the place.
 Not the example you'd want to start with, but definitely one where the use of streams makes a big mess much easier to manage.
 
-<hr>
 
-# Get in touch! 💬
-
-[![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
+# Stars and History 🤩
 
 Rimmel is a young project built with meticulous attention to detail and a bold vision: building a new web ecosystem that "just works", using the stream oriented paradigm.
 
 Share the passion? Would like to help?<br>
 Come say hi, there's a good amount of work to do and the roadmap is below.
+
+[![Star History Chart](https://api.star-history.com/svg?repos=reactivehtml/rimmel&type=Date)](https://www.star-history.com/#reactivehtml/rimmel&Date)
+
+[![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
 
 # Roadmap 👷
 - Completion handlers (what should happen when observables complete?)
@@ -788,9 +789,9 @@ Come say hi, there's a good amount of work to do and the roadmap is below.
 - i18n (leverage sink pipelines to make localisation trivial)
 - Native Observables — exciting challenges for the upcoming standard
 
-# Chat?
+# Get in Touch
 
-Find us [on Discord](https://discord.com/channels/1392597664184537230)
+Chat? Find us [on Discord](https://discord.com/channels/1392597664184537230)
 
 # Building, testing, hacking 🪓
 To work with Rimmel locally, check it out then either with bun or other runtimes:

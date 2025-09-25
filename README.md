@@ -22,12 +22,10 @@ If you come from React, check out [this page](./docs/migrating/react.md)<br>
 ## Hello World 👋🌏🏖️😎
 Let's jump straight in. The "Hello World" for reactive user interfaces is the classic click counter: one button, you click it, ze counts it.
 
+<img src="docs/assets/how-rimmel-works-6a.png" alt="How RimmelJS Works">
 <img src="docs/assets/how-rimmel-works.gif" alt="How RimmelJS Works">
-<img src="docs/assets/how-rimmel-works-6.png" alt="How RimmelJS Works">
-
 
 <!-- <iframe src="https://stackblitz.com/edit/rimmel-click-counter?ctl=1&embed=1&file=main.ts" width="100%" height="500" frameborder="0"></iframe> -->
-
 
 The click event from the `<button>` above is plugged into `counter` — a simple stream of events to numbers —
 and the output is plugged into the `<span>` element at the end.

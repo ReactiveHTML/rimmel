@@ -22,6 +22,7 @@ import { isFunction } from "../utils/is-function";
 import { isObservable, isPromise } from "../types/futures"
 import { isRMLEventListener } from "../types/event-listener";
 import { toListener } from "../utils/to-listener";
+import { DatasetItemPreSink } from "../sinks/dataset-sink";
 
 export const addRef = (ref: string, data: BindingConfiguration) => {
 	waitingElementHandlers.get(ref)?.push(data) ?? waitingElementHandlers.set(ref, [data]);
@@ -198,7 +199,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 							isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attributeName);
 							const isDatasetAttribute = attributeName.startsWith('data-');
 
-							sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName)) ?? (isDatasetAttribute && DatasetItemPresink(attributeName))) || FixedAttributePreSink(attributeName);
+							sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName)) ?? (isDatasetAttribute && DatasetItemPreSink(attributeName))) || FixedAttributePreSink(attributeName);
 							// TODO: hard-match attributeName with a corresponding SINK_TAG...
 							handler = PreSink(attributeName, sink, expression, attributeName);
 						}
@@ -215,7 +216,27 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 						acc = (prefix +(initialValue ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}
-				} else if(/<[a-z_][a-z0-9_-]*[^>]*(?:\s+\.\.\.)?$/ig.test(accPlusString.substring(lastTag))) {
+
+				/**
+				 * Fix: Resolve mixin position dependency issue
+				 * 
+				 * Problem: The regex pattern `(?:\s+\.\.\.)?$` made the spread operator detection optional and
+				 * required it to be at the end of the accumulated string. This caused mixins to be ignored when 
+				 * followed by other interpolated attributes, as the `...` was no longer at the string end
+				 * during parsing.
+				 * 
+				 * Example of broken case:
+				 * ```
+				 * <button ...${Red()} onclick="${count}"> // Red() mixin was ignored
+				 * ```
+				 * 
+				 * Solution: Changed regex to `\s+\.\.\.` (non-optional) to properly detect spread syntax
+				 * durng the specific parsing iteration when it appears, regardless of subsequent attributes.
+				 * 
+				 * Related: This ensures consistent mixin behavior regardless of attribute order, maintaining
+				 * the declarative nature of the template system.
+				 */
+				} else if(/<[a-z_][a-z0-9_-]*[^>]*\s+\.\.\.$/ig.test(accPlusString.substring(lastTag))) {
 
 					// Mixin Sink
 					// Use Cases:

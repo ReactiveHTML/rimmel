@@ -553,7 +553,7 @@ describe('Parser', () => {
 
 			});
 
-		});
+	});
 
 		describe('Any sink', () => {
 
@@ -588,5 +588,16 @@ describe('Parser', () => {
 	});
 
 	describe('Plain Objects', () => {
+		it('renders a primitive value property in content', () => {
+			const expr = { value: 0 };
+			const template = rml`<div>${expr}</div>`;
+			expect(template).toEqual(`<div>0</div>`);
+		});
+
+		it('renders a primitive value property in attribute', () => {
+			const expr = { value: 0 };
+			const template = rml`<input value="${expr}">`;
+			expect(template).toEqual(`<input value="0">`);
+		});
 	});
 });

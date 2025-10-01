@@ -123,12 +123,27 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 		// We treat and render any null or undefined values as empty strings
 		// as a graceful handling of non-values (should this be configurable for a better QA?)
-		// const printableExpressionType = typeof expression ?? 'undefined';
-		const printableExpressionType = typeof (expression ?? '');
+		// Additionally, treat plain objects with a primitive `value` property as printable
+		// so that expressions like `${{ value: 0 }}` render "0" rather than "[object Object]".
+		const printableExpression = (
+			(expression != null
+				&& typeof expression === 'object'
+				&& !isSinkBindingConfiguration(expression)
+				&& !isSourceBindingConfiguration(expression)
+				&& !isObservable((expression as any))
+				&& !isPromise((expression as any))
+				&& 'value' in (expression as any)
+				&& ['string','number','boolean'].includes(typeof (expression as any).value)
+			)
+				? (expression as any).value
+				: expression
+		);
+
+		const printableExpressionType = typeof (printableExpression ?? '');
 
 		if(['string', 'number', 'boolean'].includes(printableExpressionType)) {
 			// Static expressions, no data binding. Just concatenate and move on
-			acc = accPlusString +(expression ?? '');
+			acc = accPlusString +(printableExpression ?? '');
 		} else if(eventName) {
 			// Event Source
 			// so feed it to an Rx Subject | Observer | Handler Function | POJO | Array

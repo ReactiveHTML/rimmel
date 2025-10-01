@@ -107,7 +107,7 @@ describe('swap Event Operator', () => {
 		expect(el.value).toEqual('');
 	});
 
-    
+
 
 	it('Swaps a value using a function that generates new value from old', () => {
 		const oldValue = 'test';

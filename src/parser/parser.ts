@@ -68,14 +68,20 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
  *     <input type="number" value="${number}">
  *   `;
  * };
- * ```
- * 
- * ## Example
- *
- * ```ts
- * import { rml } from 'rimmel';
- *
- * const Component = () => {
+        if(['string', 'number', 'boolean'].includes(printableExpressionType)) {
+            acc = accPlusString +(expression ?? '');
+        } else if (
+            expression && typeof expression === 'object' &&
+            'value' in expression &&
+            (typeof expression.value === 'string' || typeof expression.value === 'number' || typeof expression.value === 'boolean')
+        ) {
+            // Render the value property of objects, including 0
+            acc = accPlusString + (expression.value ?? '');
+        } else {
+            //other existing logic for different expression types
+        }
+    }
+
  *   const data = fetch('/api').then(res => res.text());
  *
  *   return rml`
@@ -127,8 +133,13 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 		const printableExpressionType = typeof (expression ?? '');
 
 		if(['string', 'number', 'boolean'].includes(printableExpressionType)) {
-			// Static expressions, no data binding. Just concatenate and move on
 			acc = accPlusString +(expression ?? '');
+		} else if (
+			expression && typeof expression === 'object' &&
+			'value' in expression &&
+			(typeof expression.value === 'string' || typeof expression.value === 'number' || typeof expression.value === 'boolean')
+		) {
+			acc = accPlusString + (expression.value ?? '');
 		} else if(eventName) {
 			// Event Source
 			// so feed it to an Rx Subject | Observer | Handler Function | POJO | Array

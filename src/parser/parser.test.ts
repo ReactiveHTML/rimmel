@@ -205,6 +205,12 @@ describe('Parser', () => {
 					expect(template).toEqual(`<div>${num}</div>`);
 				});
 
+				it('renders 0 for { value: 0 } expressions', () => {
+					const expr = { value: 0 };
+					const template = rml`<div>${expr}</div>`;
+					expect(template).toEqual('<div>0</div>');
+				});
+
 				it('handles -0 as "0"', () => {
 					// Don't ask why, it's a JavaScript quirk
 					const num = -0;

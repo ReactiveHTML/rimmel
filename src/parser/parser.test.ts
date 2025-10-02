@@ -588,5 +588,20 @@ describe('Parser', () => {
 	});
 
 	describe('Plain Objects', () => {
-	});
+    describe('Content', () => {
+        it('renders 0 when an object has a .value of 0', () => {
+            const zeroValueObject = { value: 0 };
+            const template = rml`<div>${zeroValueObject}</div>`;
+            expect(template).toEqual('<div>0</div>');
+        });
+    });
+
+    describe('Attributes', () => { 
+        it('renders 0 in an attribute when an object has a .value of 0', () => {
+            const zeroValueObject = { value: 0 };
+            const template = rml`<input value="${zeroValueObject}">`;
+            expect(template).toEqual(`<input value="0">`);
+        });
+    });
+});
 });

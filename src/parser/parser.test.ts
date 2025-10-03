@@ -564,29 +564,36 @@ describe('Parser', () => {
 		describe('Any sink', () => {
 
 			describe('When a BehaviorSubject (.value) is passed', () => {
-
 				describe('When an implicit sink is used', () => {
-
 					it('sets the value inline', () => {
 						const bs = new BehaviorSubject(123)
 						const template = rml`<div>${bs}</div>`;
-
 						expect(template).toMatch(/<div.*>123<\/div>/);
 					});
-
 				});
-
 				describe('When an explicit sink is used', () => {
-
 					it('sets the value inline', () => {
 						const bs = new BehaviorSubject(123)
 						const template = rml`<div>${InnerText(bs)}</div>`;
-
 						expect(template).toMatch(/<div.*>123<\/div>/);
 					});
-
 				});
 
+				describe('Content', () => {
+					it('renders 0 when an object has a .value of 0', () => {
+						const zeroValueObject = { value: 0 };
+						const template = rml`<div>${zeroValueObject}</div>`;
+						expect(template).toEqual('<div>0</div>');
+					});
+				});
+
+				describe('Attributes', () => { 
+					it('renders 0 in an attribute when an object has a .value of 0', () => {
+						const zeroValueObject = { value: 0 };
+						const template = rml`<input value="${zeroValueObject}">`;
+						expect(template).toEqual(`<input value="0">`);
+					});
+				});
 			});
 
 		});

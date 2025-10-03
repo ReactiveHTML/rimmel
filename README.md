@@ -6,28 +6,25 @@
 ![Discord](https://img.shields.io/discord/1392597664184537230)
 
 
-Rimmel is a powerful, fast and lightweight JavaScript UI library for creating web applications with event streams.
+Rimmel is a powerful, fast and lightweight JavaScript UI library for creating web applications using reactive streams.
 
-It implements [RML](https://github.com/ReactiveHTML/reactive-markup), the Reactive Markup which makes your HTML work with Streams in a seamless way.
+It implements [RML](https://github.com/ReactiveHTML/reactive-markup), the Reactive Markup which makes your HTML work with streams in a seamless way.
 
 ## Getting started
 If you are new to reactive streams, there is a [3m crash-course](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) tailored for UI development with Rimmel, arguably the simplest RxJS introduction around to get you started.
 
-If you are new to the functional/reactive programming mindset, this [interactive tutorial](https://reactivex.io/learnrx/) may be an especially useful introduction to map/reduce in the reactive world.
+If you are new to the reactive and functional programming paradigms, this [interactive tutorial](https://reactivex.io/learnrx/) may be an especially useful introduction.
 
 If you come from Angular, check out [this page](./docs/migrating/angular.md)<br>
 If you come from React, check out [this page](./docs/migrating/react.md)<br>
 
-
 ## Hello World 👋🌏🏖️😎
 Let's jump straight in. The "Hello World" for reactive user interfaces is the classic click counter: one button, you click it, ze counts it.
 
+<img src="docs/assets/how-rimmel-works-6a.png" alt="How RimmelJS Works">
 <img src="docs/assets/how-rimmel-works.gif" alt="How RimmelJS Works">
-<img src="docs/assets/how-rimmel-works-6.png" alt="How RimmelJS Works">
-
 
 <!-- <iframe src="https://stackblitz.com/edit/rimmel-click-counter?ctl=1&embed=1&file=main.ts" width="100%" height="500" frameborder="0"></iframe> -->
-
 
 The click event from the `<button>` above is plugged into `counter` — a simple stream of events to numbers —
 and the output is plugged into the `<span>` element at the end.
@@ -759,16 +756,17 @@ RxJS can handle these without blinking an eye whilst Rimmel just glues them toge
 This is one of the most complex UI components by nature, with so many pieces of interdependent state all over the place.
 Not the example you'd want to start with, but definitely one where the use of streams makes a big mess much easier to manage.
 
-<hr>
 
-# Get in touch! 💬
-
-[![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
+# Stars and History 🤩
 
 Rimmel is a young project built with meticulous attention to detail and a bold vision: building a new web ecosystem that "just works", using the stream oriented paradigm.
 
 Share the passion? Would like to help?<br>
 Come say hi, there's a good amount of work to do and the roadmap is below.
+
+[![Star History Chart](https://api.star-history.com/svg?repos=reactivehtml/rimmel&type=Date)](https://www.star-history.com/#reactivehtml/rimmel&Date)
+
+[![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
 
 # Roadmap 👷
 - Completion handlers (what should happen when observables complete?)
@@ -788,9 +786,9 @@ Come say hi, there's a good amount of work to do and the roadmap is below.
 - i18n (leverage sink pipelines to make localisation trivial)
 - Native Observables — exciting challenges for the upcoming standard
 
-# Chat?
+# Get in Touch
 
-Find us [on Discord](https://discord.com/channels/1392597664184537230)
+Chat? Find us [on Discord](https://discord.com/channels/1392597664184537230)
 
 # Building, testing, hacking 🪓
 To work with Rimmel locally, check it out then either with bun or other runtimes:

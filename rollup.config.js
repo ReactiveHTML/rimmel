@@ -3,13 +3,14 @@ import json from '@rollup/plugin-json';
 import { join } from 'path';
 import typescript from '@rollup/plugin-typescript';
 import { visualizer } from 'rollup-plugin-visualizer';
+import tsConfig from './tsconfig.json' with { type: 'json' };
 
-const getTSConfig = async (path) => {
-	const tsConfig = (await import('./tsconfig.json', { with: { type: 'json' } })).default;
-
-	tsConfig.compilerOptions.outDir = path;
-	tsConfig.compilerOptions.declarationDir = join(path, 'types');
-	return tsConfig.compilerOptions;
+const getTSConfig = (path) => {
+	// Deep clone to avoid mutating the original config
+	const config = JSON.parse(JSON.stringify(tsConfig));
+	config.compilerOptions.outDir = path;
+	config.compilerOptions.declarationDir = join(path, 'types');
+	return config.compilerOptions;
 };
 
 export default [
@@ -23,7 +24,7 @@ export default [
 			nodeResolve({ preferBuiltins: true }),
 			// json(),
 			typescript({
-				...await getTSConfig('dist/globaljs'),
+				...getTSConfig('dist/globaljs'),
 				sourceMap: true,
 				outDir: 'dist/globaljs',
 				declaration: false,
@@ -58,7 +59,7 @@ export default [
 			nodeResolve({ preferBuiltins: true }),
 			json(),
 			typescript({
-				...await getTSConfig('dist/esm'),
+				...getTSConfig('dist/esm'),
 			}),
 			visualizer({ filename: 'bundle-stats-esm.html' }),
 		],
@@ -87,7 +88,7 @@ export default [
 			nodeResolve({ preferBuiltins: true }),
 			json(),
 			typescript({
-				...await getTSConfig('dist/ssr'),
+				...getTSConfig('dist/ssr'),
 				sourceMap: true,
 				outDir: 'dist/ssr',
 				declaration: true,

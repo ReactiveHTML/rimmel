@@ -7,10 +7,11 @@ import { curry } from '../utils/curry';
 import { EventListenerFunction } from '../types/dom';
 
 /**
- * An Event Source Operator that "cuts" the value of the underlying <input> element
- * and resets it to the provided value or empty otherwise
- * @param handler A handler function or observer to send events to
- * @returns EventSource<string>
+ * An Event Operator that swaps the value of the underlying <input> element
+ * with the provided replacement (or empty string by default) and emits the previous value.
+ * This operator mutates the element's value as a side effect.
+ * @param replacement A string or function used to compute the new value
+ * @returns OperatorFunction<Event, string>
  */
 export const swap =	<E extends Event>(replacement: string | Function) =>
 	map((e: E) => {
@@ -22,10 +23,10 @@ export const swap =	<E extends Event>(replacement: string | Function) =>
 ;
 
 /**
- * An Event Source that "cuts" the value of the underlying &lt;input&gt; element
- * and resets it to the provided value or empty otherwise
- * @param replacement A new value to swap the current element's value with
- * @param source A handler function or observer to send events to
+ * An Event Adapter that swaps the value of the underlying &lt;input&gt; element
+ * with the provided replacement (or empty string by default) and emits the previous value to the given target.
+ * @param replacement A new value or function to compute the element's next value
+ * @param source A handler function or observer to send emitted values to
  * @returns EventSource<string>
  */
 export const Swap =

@@ -6,20 +6,19 @@
 ![Discord](https://img.shields.io/discord/1392597664184537230)
 
 
-Rimmel is a powerful, fast and lightweight JavaScript UI library for creating web applications with event streams.
+Rimmel is a powerful, fast and lightweight JavaScript UI library for creating web applications using reactive streams.
 
-It implements [RML](https://github.com/ReactiveHTML/reactive-markup), the Reactive Markup which makes your HTML work with Streams in a seamless way.
+It implements [RML](https://github.com/ReactiveHTML/reactive-markup), the Reactive Markup which makes your HTML work with streams in a seamless way.
 
 ## To Busy to read?, Check [TL;DR 📜](./QUICKSTART.md)<br>
 
 ## Getting started
 If you are new to reactive streams, there is a [3m crash-course](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) tailored for UI development with Rimmel, arguably the simplest RxJS introduction around to get you started.
 
-If you are new to the functional/reactive programming mindset, this [interactive tutorial](https://reactivex.io/learnrx/) may be an especially useful introduction to map/reduce in the reactive world.
+If you are new to the reactive and functional programming paradigms, this [interactive tutorial](https://reactivex.io/learnrx/) may be an especially useful introduction.
 
 If you come from Angular, check out [this page](./docs/migrating/angular.md)<br>
 If you come from React, check out [this page](./docs/migrating/react.md)<br>
-
 
 ## Hello World 👋🌏🏖️😎
 Let's jump straight in. The "Hello World" for reactive user interfaces is the classic click counter: one button, you click it, ze counts it.

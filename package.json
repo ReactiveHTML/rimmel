@@ -70,6 +70,7 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
+    "@rollup/rollup-win32-x64-msvc": "^4.52.4",
     "@types/jest": "^29.5.11",
     "@types/node": "^22.10.2",
     "esbuild": "^0.19.11",

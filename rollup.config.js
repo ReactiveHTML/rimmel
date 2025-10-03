@@ -5,7 +5,7 @@ import typescript from '@rollup/plugin-typescript';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 const getTSConfig = async (path) => {
-	const tsConfig = (await import('./tsconfig.json', { assert: { type: 'json' } })).default;
+	const tsConfig = (await import('./tsconfig.json', { with: { type: 'json' } })).default;
 
 	tsConfig.compilerOptions.outDir = path;
 	tsConfig.compilerOptions.declarationDir = join(path, 'types');

@@ -37,113 +37,28 @@ describe('Closed Sink', () => {
             expect(typeof sink).toBe('function');
             expect(dialog.close).not.toHaveBeenCalled();
 
-            // Both true and false result in dialog.close() being called
-            sink(true);
+            // Each call to sink() results in dialog.close() being called
+            sink();
             expect(dialog.close).toHaveBeenCalledTimes(1);
 
-            sink(false);
+            sink();
             expect(dialog.close).toHaveBeenCalledTimes(2);
         });
 
-        describe('when truthy values are provided', () => {
-            it('calls dialog.close() when given true', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
+        it('calls dialog.close() when invoked', () => {
+            const dialog = MockDialogElement();
+            const sink = ClosedSink(dialog);
 
-                sink(true);
+            sink();
 
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('calls dialog.close() when given number 1', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink(1);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('calls dialog.close() when given non-empty string', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink('string');
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('calls dialog.close() when given object', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink({});
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('calls dialog.close() when given array', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink([]);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-        });
-
-        describe('when falsy values are provided', () => {
-            it('calls dialog.close() when given false', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink(false);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('calls dialog.close() when given number 0', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink(0);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('calls dialog.close() when given empty string', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink('');
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('calls dialog.close() when given null', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink(null);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('calls dialog.close() when given undefined', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink(undefined);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
+            expect(dialog.close).toHaveBeenCalledTimes(1);
         });
 
         it('binds the close method correctly to dialog element', () => {
             const dialog = MockDialogElement();
             const sink = ClosedSink(dialog);
 
-            sink(true);
+            sink();
 
             expect(dialog.close).toHaveBeenCalledWith();
             expect(dialog.close).toHaveBeenCalledTimes(1);
@@ -158,13 +73,6 @@ describe('Closed Sink', () => {
             const config = Closed(source);
 
             expectSinkBindingConfiguration(config, SINK_TAG, CLOSED_SINK_TAG, source, ClosedSink);
-        });
-
-        it('preserves source reference in configuration', () => {
-            const source = false;
-            const config = Closed(source);
-
-            expect(config.source).toBe(source);
         });
 
         it('handles boolean attribute values', () => {
@@ -194,144 +102,36 @@ describe('Closed Sink', () => {
 
     describe('Given dialog closing functionality', () => {
 
-        it('closes dialog when sink receives truthy value', () => {
+        it('closes dialog when sink is invoked', () => {
             const dialog = MockDialogElement();
             const config = Closed(true);
             const sink = config.sink(dialog);
 
-            sink(config.source);
-
-            expect(dialog.close).toHaveBeenCalledTimes(1);
-        });
-
-        it('closes dialog when sink receives falsy value', () => {
-            const dialog = MockDialogElement();
-            const config = Closed(false);
-            const sink = config.sink(dialog);
-
-            sink(config.source);
+            sink();
 
             expect(dialog.close).toHaveBeenCalledTimes(1);
         });
 
         describe('when called multiple times', () => {
-            it('calls dialog.close() on each invocation regardless of input value', () => {
+            it('calls dialog.close() on each invocation', () => {
                 const dialog = MockDialogElement();
                 const sink = ClosedSink(dialog);
 
                 // Each call to sink() results in dialog.close() being called
-                sink(true);
+                sink();
                 expect(dialog.close).toHaveBeenCalledTimes(1);
 
-                sink(false);
+                sink();
                 expect(dialog.close).toHaveBeenCalledTimes(2);
 
-                sink(1);
+                sink();
                 expect(dialog.close).toHaveBeenCalledTimes(3);
 
-                sink(0);
+                sink();
                 expect(dialog.close).toHaveBeenCalledTimes(4);
 
                 // Note: dialog.close() doesn't take parameters and always closes the dialog
                 // There's no "unclose" functionality - each call just triggers close()
-            });
-        });
-
-    });
-
-    describe('Given boolean attribute value handling', () => {
-
-        it('processes true boolean values', () => {
-            const dialog = MockDialogElement();
-            const sink = ClosedSink(dialog);
-
-            sink(true);
-
-            expect(dialog.close).toHaveBeenCalledWith();
-        });
-
-        it('processes false boolean values', () => {
-            const dialog = MockDialogElement();
-            const sink = ClosedSink(dialog);
-
-            sink(false);
-
-            expect(dialog.close).toHaveBeenCalledWith();
-        });
-
-        describe('when truthy non-boolean values are provided', () => {
-            it('processes number 1', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink(1);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('processes non-empty string', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink('string');
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('processes object', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink({});
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('processes array', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink([]);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-        });
-
-        describe('when falsy non-boolean values are provided', () => {
-            it('processes number 0', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink(0);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('processes empty string', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink('');
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('processes null', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink(null);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-            });
-
-            it('processes undefined', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                sink(undefined);
-
-                expect(dialog.close).toHaveBeenCalledTimes(1);
             });
         });
 
@@ -345,7 +145,7 @@ describe('Closed Sink', () => {
             const config = Closed(promiseSource);
             const sink = config.sink(dialog);
 
-            sink(config.source);
+            sink();
 
             // Wait for promise to resolve
             await new Promise(resolve => setTimeout(resolve, 10));
@@ -359,7 +159,7 @@ describe('Closed Sink', () => {
             const config = Closed(promiseSource);
             const sink = config.sink(dialog);
 
-            sink(config.source);
+            sink();
 
             // Wait for promise to reject
             await new Promise(resolve => setTimeout(resolve, 10));
@@ -392,15 +192,6 @@ describe('Closed Sink', () => {
     });
 
     describe('Given edge cases', () => {
-
-        it('handles empty function calls', () => {
-            const dialog = MockDialogElement();
-            const sink = ClosedSink(dialog);
-
-            sink();
-
-            expect(dialog.close).toHaveBeenCalledTimes(1);
-        });
 
         it('handles complex object sources', () => {
             const dialog = MockDialogElement();
@@ -450,8 +241,8 @@ describe('Closed Sink', () => {
             const sink1 = ClosedSink(dialog1);
             const sink2 = ClosedSink(dialog2);
 
-            sink1(true);
-            sink2(false);
+            sink1();
+            sink2();
 
             expect(dialog1.close).toHaveBeenCalledTimes(1);
             expect(dialog2.close).toHaveBeenCalledTimes(1);
@@ -464,9 +255,9 @@ describe('Closed Sink', () => {
             const sink1 = ClosedSink(dialog1);
             const sink2 = ClosedSink(dialog2);
 
-            sink1(true);
-            sink1(false);
-            sink2(true);
+            sink1();
+            sink1();
+            sink2();
 
             expect(dialog1.close).toHaveBeenCalledTimes(2);
             expect(dialog2.close).toHaveBeenCalledTimes(1);

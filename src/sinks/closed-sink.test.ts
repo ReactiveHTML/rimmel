@@ -45,15 +45,6 @@ describe('Closed Sink', () => {
             expect(dialog.close).toHaveBeenCalledTimes(2);
         });
 
-        it('calls dialog.close() when invoked', () => {
-            const dialog = MockDialogElement();
-            const sink = ClosedSink(dialog);
-
-            sink();
-
-            expect(dialog.close).toHaveBeenCalledTimes(1);
-        });
-
         it('binds the close method correctly to dialog element', () => {
             const dialog = MockDialogElement();
             const sink = ClosedSink(dialog);
@@ -110,29 +101,6 @@ describe('Closed Sink', () => {
             sink();
 
             expect(dialog.close).toHaveBeenCalledTimes(1);
-        });
-
-        describe('when called multiple times', () => {
-            it('calls dialog.close() on each invocation', () => {
-                const dialog = MockDialogElement();
-                const sink = ClosedSink(dialog);
-
-                // Each call to sink() results in dialog.close() being called
-                sink();
-                expect(dialog.close).toHaveBeenCalledTimes(1);
-
-                sink();
-                expect(dialog.close).toHaveBeenCalledTimes(2);
-
-                sink();
-                expect(dialog.close).toHaveBeenCalledTimes(3);
-
-                sink();
-                expect(dialog.close).toHaveBeenCalledTimes(4);
-
-                // Note: dialog.close() doesn't take parameters and always closes the dialog
-                // There's no "unclose" functionality - each call just triggers close()
-            });
         });
 
     });
@@ -245,21 +213,6 @@ describe('Closed Sink', () => {
             sink2();
 
             expect(dialog1.close).toHaveBeenCalledTimes(1);
-            expect(dialog2.close).toHaveBeenCalledTimes(1);
-        });
-
-        it('maintains separate close method bindings', () => {
-            const dialog1 = MockDialogElement();
-            const dialog2 = MockDialogElement();
-            
-            const sink1 = ClosedSink(dialog1);
-            const sink2 = ClosedSink(dialog2);
-
-            sink1();
-            sink1();
-            sink2();
-
-            expect(dialog1.close).toHaveBeenCalledTimes(2);
             expect(dialog2.close).toHaveBeenCalledTimes(1);
         });
 

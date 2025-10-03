@@ -279,7 +279,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 					addRef(ref, isSinkBindingConfiguration(_source) ? _source : InnerHTML(_source));
 					acc = acc
 						+(existingRef ? string : string.replace(/\s*>\s*$/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`))
-						+(initialValue || '')
+						+(initialValue ?? '')
 					;
 
 				} else if(/>?\s*[^<]*$/m.test(string) && /^\s*[^<]*\s*<?/m.test(nextString)) {

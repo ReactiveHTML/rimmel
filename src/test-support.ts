@@ -101,3 +101,17 @@ export const MockEvent = <E extends Event>(name: string, data: Partial<E>) =>
    type: name,
    ...data,
  });
+
+// Sink binding configuration test helper
+export const expectSinkBindingConfiguration = (
+    config: any,
+    expectedType: string,
+    expectedTag: string,
+    expectedSource: any,
+    expectedSink: any
+) => {
+    expect(config.type).toBe(expectedType);
+    expect(config.t).toBe(expectedTag);
+    expect(config.source).toBe(expectedSource);
+    expect(config.sink).toBe(expectedSink);
+};

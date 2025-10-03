@@ -1,4 +1,4 @@
-import { MockElement } from '../test-support';
+import { MockElement, expectSinkBindingConfiguration } from '../test-support';
 import { Closed, ClosedSink, CLOSED_SINK_TAG } from './closed-sink';
 import { SINK_TAG } from '../constants';
 
@@ -157,10 +157,7 @@ describe('Closed Sink', () => {
             const source = true;
             const config = Closed(source);
 
-            expect(config.type).toBe(SINK_TAG);
-            expect(config.t).toBe(CLOSED_SINK_TAG);
-            expect(config.source).toBe(source);
-            expect(config.sink).toBe(ClosedSink);
+            expectSinkBindingConfiguration(config, SINK_TAG, CLOSED_SINK_TAG, source, ClosedSink);
         });
 
         it('preserves source reference in configuration', () => {
@@ -429,10 +426,7 @@ describe('Closed Sink', () => {
             const source = true;
             const config = Closed(source);
 
-            expect(config).toHaveProperty('type', SINK_TAG);
-            expect(config).toHaveProperty('t', CLOSED_SINK_TAG);
-            expect(config).toHaveProperty('source', source);
-            expect(config).toHaveProperty('sink', ClosedSink);
+            expectSinkBindingConfiguration(config, SINK_TAG, CLOSED_SINK_TAG, source, ClosedSink);
         });
 
         it('maintains proper TypeScript types', () => {

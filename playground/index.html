@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rimmel.js Advanced Interactive Playground</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/playground.css">
+    <link rel="stylesheet" href="styles/debugger.css">
+    <link rel="stylesheet" href="styles/ai-assistant.css">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+</head>
+<body>
+    <!-- Main Application Container -->
+    <div id="app" class="playground-app">
+        <!-- Header with Navigation and Controls -->
+        <header class="playground-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="../favicon.svg" alt="Rimmel.js" class="logo">
+                    <h1>Rimmel.js Advanced Playground</h1>
+                </div>
+                <nav class="main-nav">
+                    <button class="nav-btn active" data-tab="visual">Visual Editor</button>
+                    <button class="nav-btn" data-tab="code">Code Editor</button>
+                    <button class="nav-btn" data-tab="debugger">Stream Debugger</button>
+                    <button class="nav-btn" data-tab="learn">Learn</button>
+                    <button class="nav-btn" data-tab="collaborate">Collaborate</button>
+                </nav>
+                <div class="header-actions">
+                    <button class="action-btn" id="ai-toggle">
+                        <span class="icon">🤖</span>
+                        AI Assistant
+                    </button>
+                    <button class="action-btn" id="share-btn">
+                        <span class="icon">🔗</span>
+                        Share
+                    </button>
+                    <button class="action-btn" id="settings-btn">
+                        <span class="icon">⚙️</span>
+                        Settings
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="playground-main">
+            <!-- Sidebar with Tools and Components -->
+            <aside class="playground-sidebar">
+                <div class="sidebar-section">
+                    <h3>Stream Components</h3>
+                    <div class="component-palette">
+                        <div class="component-category">
+                            <h4>Sources</h4>
+                            <div class="component-item" draggable="true" data-type="subject">
+                                <span class="icon">📡</span>
+                                <span class="label">Subject</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-type="behavior-subject">
+                                <span class="icon">🎯</span>
+                                <span class="label">BehaviorSubject</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-type="interval">
+                                <span class="icon">⏰</span>
+                                <span class="label">Interval</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-type="from-event">
+                                <span class="icon">🖱️</span>
+                                <span class="label">FromEvent</span>
+                            </div>
+                        </div>
+                        <div class="component-category">
+                            <h4>Operators</h4>
+                            <div class="component-item" draggable="true" data-type="map">
+                                <span class="icon">🔄</span>
+                                <span class="label">Map</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-type="filter">
+                                <span class="icon">🔍</span>
+                                <span class="label">Filter</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-type="merge">
+                                <span class="icon">🔀</span>
+                                <span class="label">Merge</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-type="combine-latest">
+                                <span class="icon">🤝</span>
+                                <span class="label">CombineLatest</span>
+                            </div>
+                        </div>
+                        <div class="component-category">
+                            <h4>Sinks</h4>
+                            <div class="component-item" draggable="true" data-type="html-sink">
+                                <span class="icon">📄</span>
+                                <span class="label">HTML Sink</span>
+                            </div>
+                            <div class="component-item" draggable="true" data-type="console-sink">
+                                <span class="icon">📝</span>
+                                <span class="label">Console</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Central Work Area -->
+            <div class="playground-workspace">
+                <!-- Tab Content -->
+                <div class="tab-content active" data-tab="visual">
+                    <div class="visual-editor">
+                        <div class="canvas-container">
+                            <canvas id="stream-canvas" class="stream-canvas"></canvas>
+                            <div id="node-overlay" class="node-overlay"></div>
+                        </div>
+                        <div class="canvas-controls">
+                            <button class="control-btn" id="play-btn">▶️ Play</button>
+                            <button class="control-btn" id="pause-btn">⏸️ Pause</button>
+                            <button class="control-btn" id="step-btn">⏭️ Step</button>
+                            <button class="control-btn" id="reset-btn">🔄 Reset</button>
+                            <button class="control-btn" id="clear-btn">🗑️ Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" data-tab="code">
+                    <div class="code-editor-container">
+                        <div class="editor-toolbar">
+                            <select id="template-selector">
+                                <option value="">Choose Template...</option>
+                                <option value="counter">Click Counter</option>
+                                <option value="color-picker">RGB Color Picker</option>
+                                <option value="todo-list">Todo List</option>
+                                <option value="real-time-chart">Real-time Chart</option>
+                            </select>
+                            <button class="toolbar-btn" id="format-code">Format</button>
+                            <button class="toolbar-btn" id="run-code">Run</button>
+                        </div>
+                        <div class="editor-panels">
+                            <div class="editor-panel">
+                                <h4>JavaScript/TypeScript</h4>
+                                <textarea id="js-editor" class="code-editor"></textarea>
+                            </div>
+                            <div class="editor-panel">
+                                <h4>HTML Template</h4>
+                                <textarea id="html-editor" class="code-editor"></textarea>
+                            </div>
+                            <div class="editor-panel">
+                                <h4>CSS Styles</h4>
+                                <textarea id="css-editor" class="code-editor"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" data-tab="debugger">
+                    <div class="debugger-container">
+                        <div class="debugger-panels">
+                            <div class="debugger-panel">
+                                <h4>Stream Timeline</h4>
+                                <div id="stream-timeline" class="timeline-container"></div>
+                            </div>
+                            <div class="debugger-panel">
+                                <h4>Performance Metrics</h4>
+                                <div id="performance-metrics" class="metrics-container"></div>
+                            </div>
+                            <div class="debugger-panel">
+                                <h4>Memory Usage</h4>
+                                <div id="memory-usage" class="memory-container"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" data-tab="learn">
+                    <div class="learning-container">
+                        <div class="learning-sidebar">
+                            <h3>Learning Path</h3>
+                            <div class="learning-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 30%"></div>
+                                </div>
+                                <span class="progress-text">3/10 Challenges Complete</span>
+                            </div>
+                            <div class="challenge-list">
+                                <div class="challenge-item completed">
+                                    <span class="challenge-icon">✅</span>
+                                    <span class="challenge-title">Basic Subjects</span>
+                                </div>
+                                <div class="challenge-item completed">
+                                    <span class="challenge-icon">✅</span>
+                                    <span class="challenge-title">Map Operator</span>
+                                </div>
+                                <div class="challenge-item active">
+                                    <span class="challenge-icon">🎯</span>
+                                    <span class="challenge-title">Filter & Combine</span>
+                                </div>
+                                <div class="challenge-item">
+                                    <span class="challenge-icon">🔒</span>
+                                    <span class="challenge-title">Async Operators</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="learning-content">
+                            <div class="challenge-header">
+                                <h2>Challenge: Filter & Combine Streams</h2>
+                                <div class="challenge-badges">
+                                    <span class="badge">Intermediate</span>
+                                    <span class="badge">50 XP</span>
+                                </div>
+                            </div>
+                            <div class="challenge-description">
+                                <p>Create a stream that filters even numbers and combines them with a timer stream.</p>
+                                <div class="challenge-hints">
+                                    <h4>Hints:</h4>
+                                    <ul>
+                                        <li>Use the filter operator to select even numbers</li>
+                                        <li>Combine streams using combineLatest or merge</li>
+                                        <li>Consider timing and synchronization</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="challenge-workspace">
+                                <div id="challenge-canvas" class="mini-canvas"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" data-tab="collaborate">
+                    <div class="collaboration-container">
+                        <div class="collaboration-header">
+                            <h3>Collaborative Session</h3>
+                            <div class="session-info">
+                                <span class="session-id">Session: ABC123</span>
+                                <span class="participant-count">👥 3 participants</span>
+                            </div>
+                        </div>
+                        <div class="collaboration-workspace">
+                            <div class="participants-panel">
+                                <h4>Participants</h4>
+                                <div class="participant-list">
+                                    <div class="participant">
+                                        <div class="avatar" style="background-color: #ff6b6b;">A</div>
+                                        <span class="name">Alice (You)</span>
+                                        <span class="status online">🟢</span>
+                                    </div>
+                                    <div class="participant">
+                                        <div class="avatar" style="background-color: #4ecdc4;">B</div>
+                                        <span class="name">Bob</span>
+                                        <span class="status online">🟢</span>
+                                    </div>
+                                    <div class="participant">
+                                        <div class="avatar" style="background-color: #45b7d1;">C</div>
+                                        <span class="name">Charlie</span>
+                                        <span class="status away">🟡</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="chat-panel">
+                                <h4>Chat & Voice</h4>
+                                <div class="chat-messages" id="chat-messages">
+                                    <div class="message">
+                                        <span class="sender">Bob:</span>
+                                        <span class="text">Great work on the filter operator!</span>
+                                        <span class="time">10:23</span>
+                                    </div>
+                                    <div class="message">
+                                        <span class="sender">Charlie:</span>
+                                        <span class="text">Should we try combining this with a timer?</span>
+                                        <span class="time">10:25</span>
+                                    </div>
+                                </div>
+                                <div class="chat-input">
+                                    <input type="text" placeholder="Type a message..." id="chat-input">
+                                    <button class="voice-btn" id="voice-toggle">🎤</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output/Preview Panel -->
+            <div class="playground-output">
+                <div class="output-header">
+                    <h3>Live Preview</h3>
+                    <div class="output-controls">
+                        <button class="output-btn" id="refresh-output">🔄</button>
+                        <button class="output-btn" id="fullscreen-output">⛶</button>
+                    </div>
+                </div>
+                <div class="output-content">
+                    <iframe id="preview-frame" src="about:blank"></iframe>
+                </div>
+                <div class="console-output">
+                    <div class="console-header">
+                        <h4>Console</h4>
+                        <button class="console-btn" id="clear-console">Clear</button>
+                    </div>
+                    <div id="console-log" class="console-log"></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- AI Assistant Panel (Initially Hidden) -->
+        <div id="ai-assistant" class="ai-assistant hidden">
+            <div class="ai-header">
+                <h3>🤖 AI Assistant</h3>
+                <button class="close-btn" id="close-ai">✕</button>
+            </div>
+            <div class="ai-content">
+                <div class="ai-suggestions">
+                    <h4>Smart Suggestions</h4>
+                    <div class="suggestion-list" id="ai-suggestions">
+                        <div class="suggestion">
+                            <span class="suggestion-icon">💡</span>
+                            <span class="suggestion-text">Try using debounceTime to reduce rapid events</span>
+                        </div>
+                        <div class="suggestion">
+                            <span class="suggestion-icon">🔧</span>
+                            <span class="suggestion-text">Consider using switchMap for canceling previous requests</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ai-chat">
+                    <div class="ai-messages" id="ai-messages">
+                        <div class="ai-message assistant">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>Hello! I'm your reactive programming assistant. I can help you with:</p>
+                                <ul>
+                                    <li>RxJS operator suggestions</li>
+                                    <li>Stream composition patterns</li>
+                                    <li>Performance optimization</li>
+                                    <li>Debugging reactive flows</li>
+                                </ul>
+                                <p>What would you like to build today?</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ai-input">
+                        <input type="text" placeholder="Ask me anything about reactive programming..." id="ai-input">
+                        <button class="send-btn" id="send-ai-message">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <button class="close-btn" id="close-settings">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="setting-group">
+                        <h4>Language & Localization</h4>
+                        <select id="language-select">
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                            <option value="zh">中文</option>
+                            <option value="ja">日本語</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
+                        <h4>Accessibility</h4>
+                        <label>
+                            <input type="checkbox" id="high-contrast"> High Contrast Mode
+                        </label>
+                        <label>
+                            <input type="checkbox" id="reduced-motion"> Reduce Animations
+                        </label>
+                        <label>
+                            <input type="checkbox" id="screen-reader"> Screen Reader Mode
+                        </label>
+                    </div>
+                    <div class="setting-group">
+                        <h4>Performance</h4>
+                        <label>
+                            Animation Quality:
+                            <select id="animation-quality">
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Scripts -->
+    <script src="https://unpkg.com/rxjs@7/dist/bundles/rxjs.umd.min.js"></script>
+    <script type="module" src="../dist/esm/index.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/visual-editor.js"></script>
+    <script type="module" src="js/stream-debugger.js"></script>
+    <script type="module" src="js/ai-assistant.js"></script>
+    <script type="module" src="js/collaboration.js"></script>
+    <script type="module" src="js/gamification.js"></script>
+    <script type="module" src="js/accessibility.js"></script>
+</body>
+</html>

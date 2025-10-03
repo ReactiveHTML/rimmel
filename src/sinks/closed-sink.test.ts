@@ -44,25 +44,98 @@ describe('Closed Sink', () => {
             expect(dialog.close).toHaveBeenCalledTimes(2);
         });
 
-        it('closes dialog regardless of input value', () => {
-            const dialog = MockDialogElement();
-            const sink = ClosedSink(dialog);
+        describe('when truthy values are provided', () => {
+            it('closes dialog when given true', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
 
-            // Test with various truthy values
-            sink(true);
-            sink(1);
-            sink('string');
-            sink({});
-            sink([]);
+                sink(true);
 
-            // Test with various falsy values
-            sink(false);
-            sink(0);
-            sink('');
-            sink(null);
-            sink(undefined);
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
 
-            expect(dialog.close).toHaveBeenCalledTimes(10);
+            it('closes dialog when given number 1', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink(1);
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('closes dialog when given non-empty string', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink('string');
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('closes dialog when given object', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink({});
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('closes dialog when given array', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink([]);
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+        });
+
+        describe('when falsy values are provided', () => {
+            it('closes dialog when given false', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink(false);
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('closes dialog when given number 0', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink(0);
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('closes dialog when given empty string', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink('');
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('closes dialog when given null', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink(null);
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('closes dialog when given undefined', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink(undefined);
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
         });
 
         it('binds the close method correctly to dialog element', () => {
@@ -143,16 +216,23 @@ describe('Closed Sink', () => {
             expect(dialog.close).toHaveBeenCalledTimes(1);
         });
 
-        it('closes dialog multiple times when called repeatedly', () => {
-            const dialog = MockDialogElement();
-            const sink = ClosedSink(dialog);
+        describe('when called multiple times', () => {
+            it('closes dialog on each call', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
 
-            sink(true);
-            sink(false);
-            sink(1);
-            sink(0);
+                sink(true);
+                expect(dialog.close).toHaveBeenCalledTimes(1);
 
-            expect(dialog.close).toHaveBeenCalledTimes(4);
+                sink(false);
+                expect(dialog.close).toHaveBeenCalledTimes(2);
+
+                sink(1);
+                expect(dialog.close).toHaveBeenCalledTimes(3);
+
+                sink(0);
+                expect(dialog.close).toHaveBeenCalledTimes(4);
+            });
         });
 
     });
@@ -177,28 +257,80 @@ describe('Closed Sink', () => {
             expect(dialog.close).toHaveBeenCalledWith();
         });
 
-        it('processes truthy non-boolean values', () => {
-            const dialog = MockDialogElement();
-            const sink = ClosedSink(dialog);
+        describe('when truthy non-boolean values are provided', () => {
+            it('processes number 1', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
 
-            sink(1);
-            sink('string');
-            sink({});
-            sink([]);
+                sink(1);
 
-            expect(dialog.close).toHaveBeenCalledTimes(4);
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('processes non-empty string', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink('string');
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('processes object', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink({});
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('processes array', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink([]);
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
         });
 
-        it('processes falsy non-boolean values', () => {
-            const dialog = MockDialogElement();
-            const sink = ClosedSink(dialog);
+        describe('when falsy non-boolean values are provided', () => {
+            it('processes number 0', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
 
-            sink(0);
-            sink('');
-            sink(null);
-            sink(undefined);
+                sink(0);
 
-            expect(dialog.close).toHaveBeenCalledTimes(4);
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('processes empty string', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink('');
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('processes null', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink(null);
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
+
+            it('processes undefined', () => {
+                const dialog = MockDialogElement();
+                const sink = ClosedSink(dialog);
+
+                sink(undefined);
+
+                expect(dialog.close).toHaveBeenCalledTimes(1);
+            });
         });
 
     });

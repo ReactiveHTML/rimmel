@@ -6,337 +6,349 @@ import { SINK_TAG } from '../constants';
 describe('Mixin Sink', () => {
 
     describe('Given a plain object mixin', () => {
+        describe('When creating sink configuration', () => {
+            it('creates sink binding configuration with correct properties', () => {
+                const source = {
+                    'data-foo': 'bar',
+                    'class': 'test-class',
+                    'id': 'test-id'
+                };
 
-        it('creates sink binding configuration with correct properties', () => {
-            const source = {
-                'data-foo': 'bar',
-                'class': 'test-class',
-                'id': 'test-id'
-            };
+                const config = Mixin(source);
 
-            const config = Mixin(source);
-
-            expect(config.type).toBe(SINK_TAG);
-            expect(config.t).toBe(MIXIN_SINK_TAG);
-            expect(config.source).toBe(source);
-            expect(config.sink).toBe(AttributeObjectSink);
+                expect(config.type).toBe(SINK_TAG);
+                expect(config.t).toBe(MIXIN_SINK_TAG);
+                expect(config.source).toBe(source);
+                expect(config.sink).toBe(AttributeObjectSink);
+            });
         });
 
-        it('applies plain object attributes to element immediately', () => {
-            const el = MockElement();
-            const source = {
-                'data-foo': 'bar',
-                'class': 'test-class',
-                'id': 'test-id',
-                'title': 'test-title'
-            };
+        describe('When applying attributes to element', () => {
+            it('applies plain object attributes to element immediately', () => {
+                const el = MockElement();
+                const source = {
+                    'data-foo': 'bar',
+                    'class': 'test-class',
+                    'id': 'test-id',
+                    'title': 'test-title'
+                };
 
-            const config = Mixin(source);
-            const sink = config.sink(el);
-            sink(config.source);
+                const config = Mixin(source);
+                const sink = config.sink(el);
+                sink(config.source);
 
-            expect(el.dataset.foo).toBe('bar');
-            expect(el.className).toBe('test-class');
-            expect(el.id).toBe('test-id');
-            expect(el.getAttribute('title')).toBe('test-title');
+                expect(el.dataset.foo).toBe('bar');
+                expect(el.className).toBe('test-class');
+                expect(el.id).toBe('test-id');
+                expect(el.getAttribute('title')).toBe('test-title');
+            });
+
+            it('handles boolean attributes correctly', () => {
+                const el = MockElement();
+                const source = {
+                    'disabled': true,
+                    'readonly': 'readonly',
+                    'checked': false
+                };
+
+                const config = Mixin(source);
+                const sink = config.sink(el);
+                sink(config.source);
+
+                expect(el.disabled).toBe(true);
+                expect(el.readOnly).toBe('readonly');
+                expect(el.checked).toBe(false);
+            });
+
+            it('removes attributes when set to falsey values', () => {
+                const el = MockElement();
+                
+                // Set initial attributes
+                el.setAttribute('data-foo', 'bar');
+                el.setAttribute('title', 'initial-title');
+                el.className = 'initial-class';
+
+                const source = {
+                    'data-foo': false,
+                    'title': null,
+                    'class': undefined
+                };
+
+                const config = Mixin(source);
+                const sink = config.sink(el);
+                sink(config.source);
+
+                expect(el.getAttribute('data-foo')).toBeUndefined();
+                expect(el.getAttribute('title')).toBeUndefined();
+                expect(el.className).toBe('');
+            });
         });
-
-        it('handles boolean attributes correctly', () => {
-            const el = MockElement();
-            const source = {
-                'disabled': true,
-                'readonly': 'readonly',
-                'checked': false
-            };
-
-            const config = Mixin(source);
-            const sink = config.sink(el);
-            sink(config.source);
-
-            expect(el.disabled).toBe(true);
-            expect(el.readOnly).toBe('readonly');
-            expect(el.checked).toBe(false);
-        });
-
-        it('removes attributes when set to falsey values', () => {
-            const el = MockElement();
-            
-            // Set initial attributes
-            el.setAttribute('data-foo', 'bar');
-            el.setAttribute('title', 'initial-title');
-            el.className = 'initial-class';
-
-            const source = {
-                'data-foo': false,
-                'title': null,
-                'class': undefined
-            };
-
-            const config = Mixin(source);
-            const sink = config.sink(el);
-            sink(config.source);
-
-            expect(el.getAttribute('data-foo')).toBeUndefined();
-            expect(el.getAttribute('title')).toBeUndefined();
-            expect(el.className).toBe('');
-        });
-
     });
 
     describe('Given a future/promise mixin', () => {
+        describe('When creating sink configuration', () => {
+            it('creates sink binding configuration for future source', () => {
+                const futureSource = Promise.resolve({
+                    'data-future': 'value',
+                    'class': 'future-class'
+                });
 
-        it('creates sink binding configuration for future source', () => {
-            const futureSource = Promise.resolve({
-                'data-future': 'value',
-                'class': 'future-class'
+                const config = Mixin(futureSource);
+
+                expect(config.type).toBe(SINK_TAG);
+                expect(config.t).toBe(MIXIN_SINK_TAG);
+                expect(config.source).toBe(futureSource);
+                expect(config.sink).toBe(AttributeObjectSink);
             });
-
-            const config = Mixin(futureSource);
-
-            expect(config.type).toBe(SINK_TAG);
-            expect(config.t).toBe(MIXIN_SINK_TAG);
-            expect(config.source).toBe(futureSource);
-            expect(config.sink).toBe(AttributeObjectSink);
         });
 
-        it('applies future attributes when promise resolves', async () => {
-            const el = MockElement();
-            const futureSource = Promise.resolve({
-                'data-future': 'resolved-value',
-                'class': 'resolved-class',
-                'title': 'resolved-title'
+        describe('When applying future attributes', () => {
+            it('applies future attributes when promise resolves', async () => {
+                const el = MockElement();
+                const futureSource = Promise.resolve({
+                    'data-future': 'resolved-value',
+                    'class': 'resolved-class',
+                    'title': 'resolved-title'
+                });
+
+                const config = Mixin(futureSource);
+                const sink = config.sink(el);
+                
+                // Apply the sink (this should handle the promise)
+                sink(config.source);
+
+                // Wait for promise to resolve
+                await new Promise(resolve => setTimeout(resolve, 10));
+
+                expect(el.dataset.future).toBe('resolved-value');
+                expect(el.className).toBe('resolved-class');
+                expect(el.getAttribute('title')).toBe('resolved-title');
             });
-
-            const config = Mixin(futureSource);
-            const sink = config.sink(el);
-            
-            // Apply the sink (this should handle the promise)
-            sink(config.source);
-
-            // Wait for promise to resolve
-            await new Promise(resolve => setTimeout(resolve, 10));
-
-            expect(el.dataset.future).toBe('resolved-value');
-            expect(el.className).toBe('resolved-class');
-            expect(el.getAttribute('title')).toBe('resolved-title');
         });
-
     });
 
     describe('Given event listener mixins', () => {
+        describe('When applying event listeners from mixin object', () => {
+            it('applies event listeners from mixin object', () => {
+                const el = MockElement();
+                const clickHandler = jest.fn();
+                const mouseoverHandler = jest.fn();
 
-        it('applies event listeners from mixin object', () => {
-            const el = MockElement();
-            const clickHandler = jest.fn();
-            const mouseoverHandler = jest.fn();
+                const source = {
+                    'onclick': clickHandler,
+                    'onmouseover': mouseoverHandler,
+                    'class': 'event-class'
+                };
 
-            const source = {
-                'onclick': clickHandler,
-                'onmouseover': mouseoverHandler,
-                'class': 'event-class'
-            };
+                const config = Mixin(source);
+                const sink = config.sink(el);
+                sink(config.source);
 
-            const config = Mixin(source);
-            const sink = config.sink(el);
-            sink(config.source);
+                expect(el.className).toBe('event-class');
+                
+                // Verify event listeners are attached
+                const clickEvent = new Event('click');
+                el.dispatchEvent(clickEvent);
+                expect(clickHandler).toHaveBeenCalledWith(clickEvent);
 
-            expect(el.className).toBe('event-class');
-            
-            // Verify event listeners are attached
-            const clickEvent = new Event('click');
-            el.dispatchEvent(clickEvent);
-            expect(clickHandler).toHaveBeenCalledWith(clickEvent);
-
-            const mouseoverEvent = new Event('mouseover');
-            el.dispatchEvent(mouseoverEvent);
-            expect(mouseoverHandler).toHaveBeenCalledWith(mouseoverEvent);
-        });
-
-        it('handles future event listeners', async () => {
-            const el = MockElement();
-            const futureHandler = jest.fn();
-
-            const futureSource = Promise.resolve({
-                'onclick': futureHandler,
-                'data-future-event': 'true'
+                const mouseoverEvent = new Event('mouseover');
+                el.dispatchEvent(mouseoverEvent);
+                expect(mouseoverHandler).toHaveBeenCalledWith(mouseoverEvent);
             });
-
-            const config = Mixin(futureSource);
-            const sink = config.sink(el);
-            sink(config.source);
-
-            // Wait for promise to resolve
-            await new Promise(resolve => setTimeout(resolve, 10));
-
-            expect(el.dataset.futureEvent).toBe('true');
-            
-            const clickEvent = new Event('click');
-            el.dispatchEvent(clickEvent);
-            expect(futureHandler).toHaveBeenCalledWith(clickEvent);
         });
 
+        describe('When handling future event listeners', () => {
+            it('handles future event listeners', async () => {
+                const el = MockElement();
+                const futureHandler = jest.fn();
+
+                const futureSource = Promise.resolve({
+                    'onclick': futureHandler,
+                    'data-future-event': 'true'
+                });
+
+                const config = Mixin(futureSource);
+                const sink = config.sink(el);
+                sink(config.source);
+
+                // Wait for promise to resolve
+                await new Promise(resolve => setTimeout(resolve, 10));
+
+                expect(el.dataset.futureEvent).toBe('true');
+                
+                const clickEvent = new Event('click');
+                el.dispatchEvent(clickEvent);
+                expect(futureHandler).toHaveBeenCalledWith(clickEvent);
+            });
+        });
     });
 
     describe('Given complex mixin scenarios', () => {
+        describe('When handling mixed attribute types in single mixin', () => {
+            it('handles mixed attribute types in single mixin', () => {
+                const el = MockElement();
+                const clickHandler = jest.fn();
 
-        it('handles mixed attribute types in single mixin', () => {
-            const el = MockElement();
-            const clickHandler = jest.fn();
+                const source = {
+                    // Regular attributes
+                    'id': 'complex-mixin',
+                    'class': 'complex-class',
+                    'title': 'Complex Mixin',
+                    
+                    // Data attributes
+                    'data-complex': 'value',
+                    'data-number': 42,
+                    
+                    // Boolean attributes
+                    'disabled': false,
+                    'readonly': true,
+                    
+                    // Event listeners
+                    'onclick': clickHandler,
+                    
+                    // Style (if supported)
+                    'style': 'color: red; font-weight: bold;'
+                };
 
-            const source = {
-                // Regular attributes
-                'id': 'complex-mixin',
-                'class': 'complex-class',
-                'title': 'Complex Mixin',
-                
-                // Data attributes
-                'data-complex': 'value',
-                'data-number': 42,
-                
-                // Boolean attributes
-                'disabled': false,
-                'readonly': true,
-                
-                // Event listeners
-                'onclick': clickHandler,
-                
-                // Style (if supported)
-                'style': 'color: red; font-weight: bold;'
-            };
+                const config = Mixin(source);
+                const sink = config.sink(el);
+                sink(config.source);
 
-            const config = Mixin(source);
-            const sink = config.sink(el);
-            sink(config.source);
+                expect(el.id).toBe('complex-mixin');
+                expect(el.className).toBe('complex-class');
+                expect(el.getAttribute('title')).toBe('Complex Mixin');
+                expect(el.dataset.complex).toBe('value');
+                expect(el.dataset.number).toBe('42');
+                expect(el.disabled).toBe(false);
+                expect(el.readOnly).toBe(true);
+                expect(el.getAttribute('style')).toBe('color: red; font-weight: bold;');
 
-            expect(el.id).toBe('complex-mixin');
-            expect(el.className).toBe('complex-class');
-            expect(el.getAttribute('title')).toBe('Complex Mixin');
-            expect(el.dataset.complex).toBe('value');
-            expect(el.dataset.number).toBe('42');
-            expect(el.disabled).toBe(false);
-            expect(el.readOnly).toBe(true);
-            expect(el.getAttribute('style')).toBe('color: red; font-weight: bold;');
-
-            const clickEvent = new Event('click');
-            el.dispatchEvent(clickEvent);
-            expect(clickHandler).toHaveBeenCalledWith(clickEvent);
+                const clickEvent = new Event('click');
+                el.dispatchEvent(clickEvent);
+                expect(clickHandler).toHaveBeenCalledWith(clickEvent);
+            });
         });
 
-        it('overwrites previous attributes when applied multiple times', () => {
-            const el = MockElement();
-            
-            const firstSource = {
-                'id': 'first-id',
-                'class': 'first-class',
-                'data-value': 'first'
-            };
+        describe('When applying multiple mixins to same element', () => {
+            it('overwrites previous attributes when applied multiple times', () => {
+                const el = MockElement();
+                
+                const firstSource = {
+                    'id': 'first-id',
+                    'class': 'first-class',
+                    'data-value': 'first'
+                };
 
-            const secondSource = {
-                'id': 'second-id',
-                'class': 'second-class',
-                'data-value': 'second'
-            };
+                const secondSource = {
+                    'id': 'second-id',
+                    'class': 'second-class',
+                    'data-value': 'second'
+                };
 
-            const config1 = Mixin(firstSource);
-            const config2 = Mixin(secondSource);
-            
-            const sink1 = config1.sink(el);
-            const sink2 = config2.sink(el);
+                const config1 = Mixin(firstSource);
+                const config2 = Mixin(secondSource);
+                
+                const sink1 = config1.sink(el);
+                const sink2 = config2.sink(el);
 
-            sink1(config1.source);
-            expect(el.id).toBe('first-id');
-            expect(el.className).toBe('first-class');
-            expect(el.dataset.value).toBe('first');
+                sink1(config1.source);
+                expect(el.id).toBe('first-id');
+                expect(el.className).toBe('first-class');
+                expect(el.dataset.value).toBe('first');
 
-            sink2(config2.source);
-            expect(el.id).toBe('second-id');
-            expect(el.className).toBe('second-class');
-            expect(el.dataset.value).toBe('second');
+                sink2(config2.source);
+                expect(el.id).toBe('second-id');
+                expect(el.className).toBe('second-class');
+                expect(el.dataset.value).toBe('second');
+            });
         });
-
     });
 
     describe('Given edge cases', () => {
+        describe('When an empty mixin object is given', () => {
+            it('handles empty mixin object', () => {
+                const el = MockElement();
+                const source = {};
 
-        it('handles empty mixin object', () => {
-            const el = MockElement();
-            const source = {};
+                const config = Mixin(source);
+                const sink = config.sink(el);
+                sink(config.source);
 
-            const config = Mixin(source);
-            const sink = config.sink(el);
-            sink(config.source);
-
-            // Should not throw and element should remain unchanged
-            expect(el.className).toBe('');
-            expect(el.id).toBe('');
+                // Should not throw and element should remain unchanged
+                expect(el.className).toBe('');
+                expect(el.id).toBe('');
+            });
         });
 
-        it('handles null and undefined values in mixin', () => {
-            const el = MockElement();
-            
-            // Set initial attributes
-            el.setAttribute('data-foo', 'bar');
-            el.className = 'initial-class';
+        describe('When null or undefined values are given', () => {
+            it('handles null and undefined values in mixin', () => {
+                const el = MockElement();
+                
+                // Set initial attributes
+                el.setAttribute('data-foo', 'bar');
+                el.className = 'initial-class';
 
-            const source = {
-                'data-foo': null,
-                'class': undefined,
-                'title': '',
-                'id': 'valid-id'
-            };
+                const source = {
+                    'data-foo': null,
+                    'class': undefined,
+                    'title': '',
+                    'id': 'valid-id'
+                };
 
-            const config = Mixin(source);
-            const sink = config.sink(el);
-            sink(config.source);
+                const config = Mixin(source);
+                const sink = config.sink(el);
+                sink(config.source);
 
-            expect(el.getAttribute('data-foo')).toBeUndefined();
-            expect(el.className).toBe('');
-            expect(el.getAttribute('title')).toBeUndefined();
-            expect(el.id).toBe('valid-id');
+                expect(el.getAttribute('data-foo')).toBeUndefined();
+                expect(el.className).toBe('');
+                expect(el.getAttribute('title')).toBeUndefined();
+                expect(el.id).toBe('valid-id');
+            });
         });
 
-        it('handles string "false" values correctly', () => {
-            const el = MockElement();
-            
-            const source = {
-                'data-false': 'false',
-                'data-true': 'true',
-                'disabled': 'false',
-                'readonly': 'false'
-            };
+        describe('When string "false" values are given', () => {
+            it('handles string "false" values correctly', () => {
+                const el = MockElement();
+                
+                const source = {
+                    'data-false': 'false',
+                    'data-true': 'true',
+                    'disabled': 'false',
+                    'readonly': 'false'
+                };
 
-            const config = Mixin(source);
-            const sink = config.sink(el);
-            sink(config.source);
+                const config = Mixin(source);
+                const sink = config.sink(el);
+                sink(config.source);
 
-            // String "false" should be treated as falsy for attribute removal
-            expect(el.getAttribute('data-false')).toBeUndefined();
-            expect(el.dataset.true).toBe('true');
-            expect(el.disabled).toBe(false);
-            expect(el.getAttribute('readonly')).toBeUndefined();
+                // String "false" should be treated as falsy for attribute removal
+                expect(el.getAttribute('data-false')).toBeUndefined();
+                expect(el.dataset.true).toBe('true');
+                expect(el.disabled).toBe(false);
+                expect(el.getAttribute('readonly')).toBeUndefined();
+            });
         });
-
     });
 
     describe('Given sink configuration structure', () => {
+        describe('When creating sink configuration', () => {
+            it('returns correct sink binding configuration type', () => {
+                const source = { 'test': 'value' };
+                const config = Mixin(source);
 
-        it('returns correct sink binding configuration type', () => {
-            const source = { 'test': 'value' };
-            const config = Mixin(source);
+                expect(config).toHaveProperty('type', SINK_TAG);
+                expect(config).toHaveProperty('t', MIXIN_SINK_TAG);
+                expect(config).toHaveProperty('source', source);
+                expect(config).toHaveProperty('sink', AttributeObjectSink);
+            });
 
-            expect(config).toHaveProperty('type', SINK_TAG);
-            expect(config).toHaveProperty('t', MIXIN_SINK_TAG);
-            expect(config).toHaveProperty('source', source);
-            expect(config).toHaveProperty('sink', AttributeObjectSink);
+            it('preserves source reference in configuration', () => {
+                const source = { 'preserved': 'reference' };
+                const config = Mixin(source);
+
+                expect(config.source).toBe(source);
+            });
         });
-
-        it('preserves source reference in configuration', () => {
-            const source = { 'preserved': 'reference' };
-            const config = Mixin(source);
-
-            expect(config.source).toBe(source);
-        });
-
     });
 
 });

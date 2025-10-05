@@ -21,7 +21,6 @@ If you come from React, check out [this page](./docs/migrating/react.md)<br>
 ## Hello World 👋🌏🏖️😎
 Let's jump straight in. The "Hello World" for reactive user interfaces is the classic click counter: one button, you click it, ze counts it.
 
-<img src="docs/assets/how-rimmel-works-6a.png" alt="How RimmelJS Works">
 <img src="docs/assets/how-rimmel-works.gif" alt="How RimmelJS Works">
 
 <!-- <iframe src="https://stackblitz.com/edit/rimmel-click-counter?ctl=1&embed=1&file=main.ts" width="100%" height="500" frameborder="0"></iframe> -->
@@ -239,7 +238,7 @@ const apiData = fetch('/api/data').then(r=>r.text());
 
 // Render to the DOM
 document.body.innerHTML = rml`
-	<p>Your reactive content here: ${apiData}</p>
+	<p>Your async content here: ${apiData}</p>
 `;
 
 ```

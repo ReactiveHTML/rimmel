@@ -3,13 +3,14 @@ import json from '@rollup/plugin-json';
 import { join } from 'path';
 import typescript from '@rollup/plugin-typescript';
 import { visualizer } from 'rollup-plugin-visualizer';
-
 import tsConfig from './tsconfig.json' with { type: 'json' };
 
 const getTSConfig = (path) => {
-	tsConfig.compilerOptions.outDir = path;
-	tsConfig.compilerOptions.declarationDir = join(path, 'types');
-	return tsConfig.compilerOptions;
+	// Deep clone to avoid mutating the original config
+	const config = JSON.parse(JSON.stringify(tsConfig));
+	config.compilerOptions.outDir = path;
+	config.compilerOptions.declarationDir = join(path, 'types');
+	return config.compilerOptions;
 };
 
 export default [

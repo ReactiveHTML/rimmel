@@ -1,0 +1,15 @@
+{
+  "name": "rimmel-krausest-benchmark",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "rxjs": "^7.8.1"
+  },
+  "devDependencies": {
+    "vite": "^5.4.9"
+  }
+}

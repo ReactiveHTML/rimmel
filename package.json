@@ -31,6 +31,7 @@
     "website": "cd docs && bundle exec jekyll build",
     "website:local": "cd docs && bundle exec jekyll serve",
     "test": "bun test",
+    "mutate": "stryker run",
     "test:types": "tsd --files src/**/*.test-d.ts"
   },
   "repository": {
@@ -70,6 +71,8 @@
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
+    "@stryker-mutator/core": "^9.2.0",
+    "@stryker-mutator/mocha-runner": "^9.2.0",
     "@types/jest": "^29.5.11",
     "@types/node": "^22.10.2",
     "esbuild": "^0.19.11",

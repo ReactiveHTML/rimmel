@@ -5,3 +5,6 @@ dist
 .vscode
 bundle-stats*
 
+
+# stryker temp files
+.stryker-tmp

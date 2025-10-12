@@ -47,7 +47,8 @@ class RimmelElement extends HTMLElement {
 	component?: RimmelComponent;
 	attrs: Inputs;
 	#externalMutationObserver?: MutationObserver;
-	#internalMutationObserver?: MutationObserver;
+	#lightMutationObserver?: MutationObserver;
+	#shadowMutationObserver?: MutationObserver;
 	extSinks?: Record<string | symbol, Future<any>>;
 	/**
 	 * Attributes on the external HTML element
@@ -150,8 +151,12 @@ class RimmelElement extends HTMLElement {
 		this.#externalMutationObserver.observe(this, { attributes: true, childList: false, subtree: false });
 
 		// Monitor for all other (RML) changes within the custom element, for data binding
-		this.#internalMutationObserver = new MutationObserver(Rimmel_Mount);
-		this.#internalMutationObserver.observe(this, { attributes: false, childList: true, subtree: true });
+		this.#lightMutationObserver = new MutationObserver(Rimmel_Mount);
+		this.#lightMutationObserver.observe(this, { attributes: false, childList: true, subtree: true });
+
+		
+		this.#shadowMutationObserver = new MutationObserver(Rimmel_Mount);
+		this.#shadowMutationObserver.observe(this.shadowRoot, { attributes: false, childList: true, subtree: true });
 
 		if(this.component) {
 			this.render();
@@ -166,7 +171,8 @@ class RimmelElement extends HTMLElement {
 	disconnectedCallback() {
 		// AKA: unmount
 		this.#externalMutationObserver?.disconnect();
-		this.#internalMutationObserver?.disconnect();
+		this.#lightMutationObserver?.disconnect();
+		this.#shadowMutationObserver?.disconnect();
 	}
 };
 

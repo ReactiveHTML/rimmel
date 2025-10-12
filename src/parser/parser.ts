@@ -281,16 +281,30 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						+(existingRef ? string : string.replace(/\s*>\s*$/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`))
 						+(initialValue ?? '')
 					;
-
+							
 				} else if(/>?\s*[^<]*$/m.test(string) && /^\s*[^<]*\s*<?/m.test(nextString)) {
-
 					// TODO
 					// will set the textContent of the given textNode
 					addRef(ref, TextContent(expression));
-					// FIXME: tbd
-					// FIXME: are we adding #REF multiple times?
-					//acc = existingRef?accPlusString:acc +string.replace(/\s*>/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`) +ref;
-					acc += (existingRef?string:string.replace(/\s*>(?=[^<]*$)/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`)) +INTERACTIVE_NODE_START +(initialValue ?? '') +INTERACTIVE_NODE_END;
+					// If there is no tag '>' to attach the resolve attribute,
+					// inject a tiny placeholder element that carries the RESOLVE_ATTRIBUTE so the sink
+					// can later find and bind to a DOM node.
+					const hasClosingTagChar = />\s*[^<]*$/.test(string);
+					let renderedPrefix: string;
+					if (existingRef) {
+						// An element with an existing ref already; just reuse the string as-is
+						renderedPrefix = string;
+					} else if (hasClosingTagChar && /\s*>(?=[^<]*$)/.test(string)) {
+						// Normal case: inject the resolve attribute into the nearest closing tag area
+						renderedPrefix = string.replace(/\s*>(?=[^<]*$)/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`);
+					} else {
+						// Emit a zero-width placeholder element which will receive the sink.
+						// Keep the placeholder empty so it doesn't affect layout.
+						renderedPrefix = `${string}<span ${RESOLVE_ATTRIBUTE}="${ref}"></span>`;
+					}
+
+					// Append the interactive markers and initial value
+					acc += renderedPrefix + INTERACTIVE_NODE_START + (initialValue ?? '') + INTERACTIVE_NODE_END;
 
 				} else {
 					acc = accPlusString;

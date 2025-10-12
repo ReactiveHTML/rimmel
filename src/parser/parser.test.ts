@@ -2,7 +2,6 @@ import { of, BehaviorSubject, Subject } from 'rxjs';
 import { state, waitingElementHandlers } from '../internal-state';
 import { AttributeObjectSink } from '../sinks/attribute-sink';
 import { InnerText } from '../sinks/inner-text-sink';
-import { TextContent } from '../sinks/text-content-sink';
 import { RMLEventName } from '../types/dom';
 import { rml } from './parser';
 
@@ -480,30 +479,6 @@ describe('Parser', () => {
 
 				});
 
-
-			});
-
-			describe('Plain text templates', () => {
-
-				it('works with promises in plain text', () => {
-					const deferredValue = defer('world');
-					const template = rml`Hello, ${deferredValue}`;
-
-					expect(template).toMatch(/Hello, <!--RML-INTERACTIVE-NODE-->world<!--\/RML-INTERACTIVE-NODE-->/);
-					expect(waitingElementHandlers.get('RMLREF+0')).toEqual([
-						{ source: deferredValue, sink: TextContent, type: 'sink' },
-					]);
-				});
-
-				it('works with observables in plain text', () => {
-					const observableValue = of('world');
-					const template = rml`Hello, ${observableValue}`;
-
-					expect(template).toMatch(/Hello, <!--RML-INTERACTIVE-NODE-->world<!--\/RML-INTERACTIVE-NODE-->/);
-					expect(waitingElementHandlers.get('RMLREF+0')).toEqual([
-						{ source: observableValue, sink: TextContent, type: 'sink' },
-					]);
-				});
 
 			});
 

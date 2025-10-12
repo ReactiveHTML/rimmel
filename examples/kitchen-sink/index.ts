@@ -672,6 +672,13 @@ const sinks = {
 		`;
 	},
 
+	ShadowDOMElement: () => {
+		return rml`
+			Should create a web component with a reactive Shadow DOM and elements created after mounting that are still reactive
+			<custom-shadowdom-element />
+		`;
+	},
+
 	EventDelegation: () => {
 		const n = new BehaviorSubject<number>(0);
 
@@ -1798,13 +1805,31 @@ const component = () => {
 	`;
 }
 
+RegisterElement('custom-shadowdom-element', () => {
+	const data = new Subject<string>().pipe(
+		map(data=>{
+			const rm = new Subject<string>;
+			return rml`<button onclick="${rm}" rml:removed="${rm}">${data}</button>`
+		}),
+	);
+
+	return rml`
+		<div class="cls1">
+			Custom Element with Reactive Shadow DOM!<br>
+			<input onchange="${Cut(data)}">
+			<br>
+			Output (buttons should disappear when clicked): <span>${AppendHTML(data)}</span>
+		</div>
+	`;
+});
+
 RegisterElement('custom-element', ({ title, content, onbuttonclick, onput }) => {
 	const internalPut = new Subject();
 	const handle = e => {
 		console.log('Internal event', e);
 		onput.next(e);
 		internalPut.next(e);
-	}
+	};
 
 	return rml`
 		<div class="cls1">

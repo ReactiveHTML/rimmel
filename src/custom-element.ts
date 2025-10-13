@@ -155,8 +155,10 @@ class RimmelElement extends HTMLElement {
 		this.#lightMutationObserver.observe(this, { attributes: false, childList: true, subtree: true });
 
 		
-		this.#shadowMutationObserver = new MutationObserver(Rimmel_Mount);
-		this.#shadowMutationObserver.observe(this.shadowRoot, { attributes: false, childList: true, subtree: true });
+		if(this.shadowRoot) {
+			this.#shadowMutationObserver = new MutationObserver(Rimmel_Mount);
+			this.#shadowMutationObserver.observe(this.shadowRoot, { attributes: false, childList: true, subtree: true });
+		}
 
 		if(this.component) {
 			this.render();

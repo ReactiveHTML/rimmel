@@ -3,22 +3,22 @@ const common = {
   testPathIgnorePatterns: ['<rootDir>/node_modules/'],
   coveragePathIgnorePatterns: ['node_modules'],
   transform: { '^.+\\.(j|t)s(x)?$': 'esbuild-jest' },
-  moduleFileExtensions: ['js'],
+  moduleFileExtensions: ['js', 'ts'],
 };
 
-module.exports = {
+export default {
   projects: [
     {
       ...common,
       displayName: 'dom',
       testEnvironment: 'jsdom',
-      testRegex: '/src/.*\\.web\\.test\\.js$',
+      testMatch: ['<rootDir>/src/**/*.test.ts'],
     },
     {
       ...common,
       displayName: 'node',
       testEnvironment: 'node',
-      testRegex: '/src/.*\\.node\\.test\\.js$',
+      testMatch: ['<rootDir>/src/**/*.test.ts'],
     },
   ],
 };

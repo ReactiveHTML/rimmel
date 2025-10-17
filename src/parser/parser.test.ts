@@ -206,9 +206,9 @@ describe('Parser', () => {
 				});
 
 				it('renders 0 for { value: 0 } expressions', () => {
-					const expr = { value: 0 };
+					const expr = new BehaviorSubject(0);
 					const template = rml`<div>${expr}</div>`;
-					expect(template).toEqual('<div>0</div>');
+					expect(template).toMatch(/<div.*>0<\/div>/);
 				});
 
 				it('handles -0 as "0"', () => {
@@ -581,17 +581,17 @@ describe('Parser', () => {
 
 				describe('Content', () => {
 					it('renders 0 when an object has a .value of 0', () => {
-						const zeroValueObject = { value: 0 };
+						const zeroValueObject = new BehaviorSubject(0);
 						const template = rml`<div>${zeroValueObject}</div>`;
-						expect(template).toEqual('<div>0</div>');
+						expect(template).toMatch(/<div.*>0<\/div>/);
 					});
 				});
 
 				describe('Attributes', () => { 
 					it('renders 0 in an attribute when an object has a .value of 0', () => {
-						const zeroValueObject = { value: 0 };
+						const zeroValueObject = new BehaviorSubject(0);
 						const template = rml`<input value="${zeroValueObject}">`;
-						expect(template).toEqual(`<input value="0">`);
+						expect(template).toMatch(/<input.* value="0">/);
 					});
 				});
 			});

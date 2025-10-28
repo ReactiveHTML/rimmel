@@ -38,7 +38,7 @@ You've probably never seen anything like this before, so just go and try it:
 ## Stream Oriented
 Most JavaScript UI libraries and frameworks are designed for the imperative programming paradigm.
 Occasionally they may also support some aspects of reactive or functional programming, too.
-Third-party adapters or utility libraries can also be used to translate between each paradigm but the reality is that the imperative paradigm is their main focus and everything else was just an afterhthought, severely limited, inconvenient or plain awkward to use in practice.
+Third-party adapters or utility libraries can also be used to translate between each paradigm but the reality is that the imperative paradigm is their main focus and everything else was just an afterthought, severely limited, inconvenient or plain awkward to use in practice.
 
 Rimmel was designed to make reactive streams just work.
 In the Stream Oriented paradigm you begin creating reactive streams for all your state and behaviour, then use declarative templates (e.g.: RML) to bind them to the real world. This helps writing an extremely high quality code that's also very easy to maintain.
@@ -449,7 +449,7 @@ Other sinks can be specified explicitly when it's not obvious from the context o
 ```
 
 ```html
-<!-- Sink the stream's content into `.innerText`, rahter than `.innerHTML` (which is the default) on an element -->
+<!-- Sink the stream's content into `.innerText`, rather than `.innerHTML` (which is the default) on an element -->
 <div>${InnerText(stream)}</div>
 ```
 
@@ -517,7 +517,7 @@ const stream = new Subject<HTMLString>();
 target.innerHTML = rml`<div>${UpperCase(stream)}</div>`;
 ```
 
-Dynamic sinks, on the other hand, are optimised for size and designed for convenience. They can take anyhing as input and figure out how to update the DOM at runtime.
+Dynamic sinks, on the other hand, are optimised for size and designed for convenience. They can take anything as input and figure out how to update the DOM at runtime.
 
 
 ## Attribute Mixins (Directives)
@@ -797,6 +797,16 @@ npm install
 npm run test
 npm run build
 ```
+
+### macOS Users
+If you encounter an error about missing `@rollup/rollup-darwin-arm64` module, this is due to an npm bug with optional dependencies. To fix:
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+The `.npmrc` file in the repository helps prevent this issue.
 
 There is a "kitchen sink" app you can use to play around locally, which should showcase most of what you can do with Rimmel:
 ```bash

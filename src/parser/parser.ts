@@ -84,6 +84,24 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
  * };
  * ```
  **/
+function formatInitialAttributeValue(attributeName: string, initialValue: unknown): string | undefined {
+	if (initialValue === null || initialValue === undefined) return undefined;
+	if (typeof initialValue === 'string' || typeof initialValue === 'number' || typeof initialValue === 'boolean') {
+		return String(initialValue);
+	}
+	if (Array.isArray(initialValue)) {
+		return initialValue.filter(Boolean).map(String).join(' ');
+	}
+	if (attributeName === 'class' && typeof initialValue === 'object') {
+		const obj = initialValue as Record<string, unknown>;
+		return Object.keys(obj).filter(k => obj[k]).join(' ');
+	}
+	if (typeof initialValue === 'object') {
+		try { return JSON.stringify(initialValue); } catch { return String(initialValue); }
+	}
+	return String(initialValue);
+}
+
 export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateExpression[]): HTMLString {
 	let acc = '';
 	const strlen = strings.length -1;
@@ -212,8 +230,9 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 							? accPlusString.replace(new RegExp(`${attributeName}=['"]+$`), `_${attributeName}="`) // TODO: or maybe clean it up completely?
 							: accPlusString
 						;
+						const formattedInitial = formatInitialAttributeValue(attributeName, initialValue);
 
-						acc = (prefix +(initialValue ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
+						acc = (prefix + (formattedInitial ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}
 				} else if(/<[a-z_][a-z0-9_-]*[^>]*(?:\s+\.\.\.)?$/ig.test(accPlusString.substring(lastTag))) {
 

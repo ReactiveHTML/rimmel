@@ -798,6 +798,16 @@ npm run test
 npm run build
 ```
 
+### macOS Users
+If you encounter an error about missing `@rollup/rollup-darwin-arm64` module, this is due to an npm bug with optional dependencies. To fix:
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+The `.npmrc` file in the repository helps prevent this issue.
+
 There is a "kitchen sink" app you can use to play around locally, which should showcase most of what you can do with Rimmel:
 ```bash
 npm run kitchen-sink

@@ -33,7 +33,7 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
 }
 
 /**
- * rml â€” the main entry point for Rimmel.js
+ * rml — the main entry point for Rimmel.js
  *
  * rml is a tag function. You call it by tagging it with an ES6 template literal
  * of HTML text interleaved with references to any JavaScript entity that's in scope.
@@ -85,37 +85,28 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
  * ```
  **/
 function stringifyInitialValue(initialValue: any, attributeName?: string): string {
-	if (initialValue == null) return '';
-	if (typeof initialValue === 'string') return initialValue;
-	if (typeof initialValue === 'number' || typeof initialValue === 'boolean')
-		return String(initialValue);
+	const obj = initialValue as Record<string, any>;
 
-	if (Array.isArray(initialValue)) {
-		return initialValue.filter((v) => typeof v === 'string').join(' ');
-	}
-
-	if (typeof initialValue === 'object') {
-		const obj = initialValue as Record<string, any>;
-		if (attributeName === 'class') {
-			return Object.keys(obj)
-			.filter((k) => Boolean(obj[k]))
+	if (attributeName === 'class') {
+		return Object.entries(obj)
+			.filter(([_, v]) => v)
+			.map(([k]) => k)
 			.join(' ');
-		}
-		
-		if (attributeName === 'style') {
-			return Object.entries(obj)
-			.map(
-				([key, value]) => `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}:${String(value)}`
-			)
-			.join(';');
-		}
-		try {
-			return JSON.stringify(initialValue);
-		} catch {
-			return String(initialValue);
-		}
 	}
-	return String(initialValue);
+
+	if (attributeName === 'style') {
+		return Object.entries(obj)
+			.map(([k, v]) => `${k}:${v}`)
+			.join('; ');
+	}
+
+	try {
+		// an object that isn’t class/style or fails to serialize cleanly
+		return JSON.stringify(initialValue);
+	} catch {
+		// for cyclic objects Ex: const obj: any = {}; obj.self = obj;
+		return String(initialValue);
+	}
 }
 
 

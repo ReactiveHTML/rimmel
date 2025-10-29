@@ -1,4 +1,4 @@
-import type { AttributeObject, BindingConfiguration, FutureSinkAttributeValue, PresentSinkAttributeValue, RMLTemplateExpression, RMLTemplateExpressions, SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
+﻿import type { AttributeObject, BindingConfiguration, FutureSinkAttributeValue, PresentSinkAttributeValue, RMLTemplateExpression, RMLTemplateExpressions, SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
 import type { Future, MaybeFuture } from "../types/futures";
 import type { Sink } from "../types/sink";
 import type { HTMLAttributeName, HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
@@ -33,7 +33,7 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
 }
 
 /**
- * rml — the main entry point for Rimmel.js
+ * rml â€” the main entry point for Rimmel.js
  *
  * rml is a tag function. You call it by tagging it with an ES6 template literal
  * of HTML text interleaved with references to any JavaScript entity that's in scope.
@@ -84,23 +84,40 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
  * };
  * ```
  **/
-function formatInitialAttributeValue(attributeName: string, initialValue: unknown): string | undefined {
-	if (initialValue === null || initialValue === undefined) return undefined;
-	if (typeof initialValue === 'string' || typeof initialValue === 'number' || typeof initialValue === 'boolean') {
+function stringifyInitialValue(initialValue: any, attributeName?: string): string {
+	if (initialValue == null) return '';
+	if (typeof initialValue === 'string') return initialValue;
+	if (typeof initialValue === 'number' || typeof initialValue === 'boolean')
 		return String(initialValue);
-	}
+
 	if (Array.isArray(initialValue)) {
-		return initialValue.filter(Boolean).map(String).join(' ');
+		return initialValue.filter((v) => typeof v === 'string').join(' ');
 	}
-	if (attributeName === 'class' && typeof initialValue === 'object') {
-		const obj = initialValue as Record<string, unknown>;
-		return Object.keys(obj).filter(k => obj[k]).join(' ');
-	}
+
 	if (typeof initialValue === 'object') {
-		try { return JSON.stringify(initialValue); } catch { return String(initialValue); }
+		const obj = initialValue as Record<string, any>;
+		if (attributeName === 'class') {
+			return Object.keys(obj)
+			.filter((k) => Boolean(obj[k]))
+			.join(' ');
+		}
+		
+		if (attributeName === 'style') {
+			return Object.entries(obj)
+			.map(
+				([key, value]) => `${key.replace(/([A-Z])/g, '-$1').toLowerCase()}:${String(value)}`
+			)
+			.join(';');
+		}
+		try {
+			return JSON.stringify(initialValue);
+		} catch {
+			return String(initialValue);
+		}
 	}
 	return String(initialValue);
 }
+
 
 export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateExpression[]): HTMLString {
 	let acc = '';
@@ -230,7 +247,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 							? accPlusString.replace(new RegExp(`${attributeName}=['"]+$`), `_${attributeName}="`) // TODO: or maybe clean it up completely?
 							: accPlusString
 						;
-						const formattedInitial = formatInitialAttributeValue(attributeName, initialValue);
+						const formattedInitial = stringifyInitialValue(initialValue, attributeName);
 
 						acc = (prefix + (formattedInitial ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}

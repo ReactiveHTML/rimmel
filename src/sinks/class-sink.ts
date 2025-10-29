@@ -4,6 +4,7 @@ import type { Sink, ExplicitSink } from "../types/sink";
 
 import { SINK_TAG } from "../constants";
 import { asap } from "../lib/drain";
+import { isFuture } from "../types/futures";
 
 export const TOGGLE_CLASS_SINK_TAG = 'ToggleClass';
 export const CLASS_SINK_TAG = 'class'; // Keeping it same as 'class" attribute for now. Don't change yet...
@@ -35,7 +36,15 @@ export const ClassObjectSink: Sink<Element> = (node: Element) => {
 			// FIXME: is it safe to assume it's an object, at this point?
 			: (<(ClassName | ClassRecord)[]>[]).concat(name).forEach(obj => Object.entries(obj)
 					// TODO: support 3-state with toggle
-					.forEach(([k, v]) => asap(v ? add : remove, k))
+					.forEach(([k, v]) => {
+						// If v is a future (Promise or Observable), defer the decision
+						// until it resolves, otherwise check immediately
+						if (isFuture(v)) {
+							asap((resolvedValue: any) => resolvedValue ? add(k) : remove(k), v);
+						} else {
+							asap(v ? add : remove, k);
+						}
+					})
 				)
 	};
 };

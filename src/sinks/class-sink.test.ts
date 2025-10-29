@@ -61,6 +61,52 @@ describe('Class Sink', () => {
 			expect(el.className).not.toContain('class3');
 		});
 
+		it('should not add class when value is false (promise resolved to false)', () => {
+			const el = MockElement();
+			const sink = ClassObjectSink(<HTMLElement>el);
+
+			// Simulating a promise that resolved to false
+			sink({
+				dotted: false,
+			});
+
+			expect(el.className).not.toContain('dotted');
+			expect(el.className).toEqual('');
+		});
+
+		it('should not add class when promise resolves to false', async () => {
+			const el = MockElement();
+			const sink = ClassObjectSink(<HTMLElement>el);
+
+			// Pass a promise that resolves to false
+			const dottedPromise = Promise.resolve(false);
+			sink({
+				dotted: dottedPromise,
+			});
+
+			// Wait for the promise to resolve
+			await dottedPromise;
+
+			expect(el.className).not.toContain('dotted');
+			expect(el.className).toEqual('');
+		});
+
+		it('should add class when promise resolves to true', async () => {
+			const el = MockElement();
+			const sink = ClassObjectSink(<HTMLElement>el);
+
+			// Pass a promise that resolves to true
+			const activePromise = Promise.resolve(true);
+			sink({
+				active: activePromise,
+			});
+
+			// Wait for the promise to resolve
+			await activePromise;
+
+			expect(el.className).toContain('active');
+		});
+
 	});
 
 });

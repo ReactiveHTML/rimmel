@@ -84,6 +84,29 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
  * };
  * ```
  **/
+function stringifyInitialValue(
+	initialValue: string | number | boolean | Record<string, any> | null | undefined,
+	attributeName?: string
+): string {
+	if (initialValue == null) return '';
+
+	const obj = initialValue as Record<string, any>;
+
+	if (attributeName === 'class') {
+		return Object.entries(obj)
+			.filter(([_, v]) => v)
+			.map(([k]) => k)
+			.join(' ');
+	}
+
+	if (attributeName === 'style') {
+		return Object.entries(obj)
+			.map(kvp => kvp.join(':'))
+			.join('; ');
+	}
+	return String(initialValue ?? '');
+}
+
 export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateExpression[]): HTMLString {
 	let acc = '';
 	const strlen = strings.length -1;
@@ -212,8 +235,9 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 							? accPlusString.replace(new RegExp(`${attributeName}=['"]+$`), `_${attributeName}="`) // TODO: or maybe clean it up completely?
 							: accPlusString
 						;
+						const formattedInitial = stringifyInitialValue(initialValue, attributeName);
 
-						acc = (prefix +(initialValue ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
+						acc = (prefix + formattedInitial).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}
 				} else if(/<[a-z_][a-z0-9_-]*[^>]*(?:\s+\.\.\.)?$/ig.test(accPlusString.substring(lastTag))) {
 

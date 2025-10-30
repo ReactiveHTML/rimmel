@@ -1,4 +1,4 @@
-﻿import type { AttributeObject, BindingConfiguration, FutureSinkAttributeValue, PresentSinkAttributeValue, RMLTemplateExpression, RMLTemplateExpressions, SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
+import type { AttributeObject, BindingConfiguration, FutureSinkAttributeValue, PresentSinkAttributeValue, RMLTemplateExpression, RMLTemplateExpressions, SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
 import type { Future, MaybeFuture } from "../types/futures";
 import type { Sink } from "../types/sink";
 import type { HTMLAttributeName, HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";

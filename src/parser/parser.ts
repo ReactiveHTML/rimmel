@@ -84,7 +84,12 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
  * };
  * ```
  **/
-function stringifyInitialValue(initialValue: any, attributeName?: string): string {
+function stringifyInitialValue(
+	initialValue: string | number | boolean | Record<string, any> | null | undefined,
+	attributeName?: string
+): string {
+	if (initialValue == null) return '';
+
 	const obj = initialValue as Record<string, any>;
 
 	if (attributeName === 'class') {
@@ -96,19 +101,11 @@ function stringifyInitialValue(initialValue: any, attributeName?: string): strin
 
 	if (attributeName === 'style') {
 		return Object.entries(obj)
-			.map(([k, v]) => `${k}:${v}`)
+			.map(kvp => kvp.join(':'))
 			.join('; ');
 	}
-
-	try {
-		// an object that isn’t class/style or fails to serialize cleanly
-		return JSON.stringify(initialValue);
-	} catch {
-		// for cyclic objects Ex: const obj: any = {}; obj.self = obj;
-		return String(initialValue);
-	}
+	return String(initialValue ?? '');
 }
-
 
 export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateExpression[]): HTMLString {
 	let acc = '';

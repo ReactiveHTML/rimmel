@@ -237,7 +237,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						;
 						const formattedInitial = stringifyInitialValue(initialValue, attributeName);
 
-						acc = (prefix + (formattedInitial ?? '')).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
+						acc = (prefix + formattedInitial).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
 					}
 				} else if(/<[a-z_][a-z0-9_-]*[^>]*(?:\s+\.\.\.)?$/ig.test(accPlusString.substring(lastTag))) {
 

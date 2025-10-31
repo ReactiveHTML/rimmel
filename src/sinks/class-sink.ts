@@ -35,7 +35,12 @@ export const ClassObjectSink: Sink<Element> = (node: Element) => {
 			// FIXME: is it safe to assume it's an object, at this point?
 			: (<(ClassName | ClassRecord)[]>[]).concat(name).forEach(obj => Object.entries(obj)
 					// TODO: support 3-state with toggle
-					.forEach(([k, v]) => asap(v ? add : remove, k))
+					.forEach(([k, v]) => {
+						// Use asap to handle both present and future values
+						// For futures (Promise/Observable), it will wait for resolution
+						// For present values, it will execute immediately
+						asap((resolvedValue: any) => resolvedValue ? add(k) : remove(k), v);
+					})
 				)
 	};
 };

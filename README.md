@@ -787,7 +787,7 @@ Come say hi, there's a good amount of work to do and the roadmap is below.
 
 # Get in Touch
 
-Chat? Find us [on Discord](https://discord.com/channels/1392597664184537230)
+Chat? Find us [on Discord](https://discord.gg/2bqpXn3u)
 
 # Building, testing, hacking 🪓
 To work with Rimmel locally, check it out then either with bun or other runtimes:

@@ -75,7 +75,7 @@
     "@stryker-mutator/mocha-runner": "^9.2.0",
     "@types/jest": "^29.5.11",
     "@types/node": "^22.10.2",
-    "esbuild": "^0.19.11",
+    "esbuild": "^0.27.0",
     "esbuild-jest": "^0.5.0",
     "jest": "^27.2.0",
     "rimraf": "^3.0.2",
@@ -87,7 +87,7 @@
     "tslib": "^2.8.0",
     "typedoc": "^0.27.5",
     "typescript": "^5.7.2",
-    "vite": "^5.4.9"
+    "vite": "^7.2.2"
   },
   "peerDependencies": {
     "rxjs": ">=5.5.0 || >=6.0.0 || >=7.0.0 || >=8.0.0-0 <8.0.0"

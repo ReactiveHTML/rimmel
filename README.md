@@ -8,16 +8,6 @@
 
 Rimmel is a powerful, fast and lightweight JavaScript UI library for creating web applications using reactive streams.
 
-It implements [RML](https://github.com/ReactiveHTML/reactive-markup), the Reactive Markup which makes your HTML work with streams in a seamless way.
-
-## Getting started
-If you are new to reactive streams, there is a [3m crash-course](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) tailored for UI development with Rimmel, arguably the simplest RxJS introduction around to get you started.
-
-If you are new to the reactive and functional programming paradigms, this [interactive tutorial](https://reactivex.io/learnrx/) may be an especially useful introduction.
-
-If you come from Angular, check out [this page](./docs/migrating/angular.md)<br>
-If you come from React, check out [this page](./docs/migrating/react.md)<br>
-
 ## Hello World 👋🌏🏖️😎
 Let's jump straight in. The "Hello World" for reactive user interfaces is the classic click counter: one button, you click it, ze counts it.
 
@@ -28,12 +18,33 @@ Let's jump straight in. The "Hello World" for reactive user interfaces is the cl
 The click event from the `<button>` above is plugged into `counter` — a simple stream of events to numbers —
 and the output is plugged into the `<span>` element at the end.
 
-No need for anything else. No need to attach, connect, disconnect, clean up or anything. Rimmel does it all for you in pure JavaScript/TypeScript without any "dark magic".
+```js
+const count = new BehaviorSubject(0).pipe(
+  scan(x=>x+1)
+);
 
-You've probably never seen anything like this before, so just go and try it:
+document.body.innerHTML = rml`
+  <button onclick="${count}">
+    click me (${count})
+  </button>
+`;
+```
+
+No need for anything else. No need to attach, connect, disconnect, clean up or anything. Rimmel does it all for you in pure JavaScript/TypeScript.
+
+You've probably never seen anything like this before, so just go and play with it:
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/rimmel-click-counter)
 
+## Getting started
+OK, let's take one step back, just in case.
+
+If you are new to reactive streams, there is a [3m crash-course](https://medium.com/@fourtyeighthours/the-mostly-inaccurate-crash-course-for-reactive-ui-development-w-rxjs-ddbb7e5e526e) tailored for UI development with Rimmel, arguably the simplest RxJS introduction around to get you started.
+
+If you are new to the reactive and functional programming paradigms, this [interactive tutorial](https://reactivex.io/learnrx/) may be an especially useful introduction.
+
+If you come from Angular, check out [this page](./docs/migrating/angular.md)<br>
+If you come from React, check out [this page](./docs/migrating/react.md)<br>
 
 ## Stream Oriented
 Most JavaScript UI libraries and frameworks are designed for the imperative programming paradigm.
@@ -41,7 +52,7 @@ Occasionally they may also support some aspects of reactive or functional progra
 Third-party adapters or utility libraries can also be used to translate between each paradigm but the reality is that the imperative paradigm is their main focus and everything else was just an afterthought, severely limited, inconvenient or plain awkward to use in practice.
 
 Rimmel was designed to make reactive streams just work.
-In the Stream Oriented paradigm you begin creating reactive streams for all your state and behaviour, then use declarative templates (e.g.: RML) to bind them to the real world. This helps writing an extremely high quality code that's also very easy to maintain.
+In the Stream Oriented paradigm you begin creating reactive streams for all your state and behaviour, then use declarative templates (e.g.: [RML](https://github.com/ReactiveHTML/reactive-markup)) to bind them to the real world. This helps writing an extremely high quality code that's also very easy to maintain.
 
 ### Everything is a Stream ☄️
 This is the key concept of the paradigm. Instead of creating variables, classes, object and methods that perform mutations, you create streams. A stream is optional data-in, optional processing, optional data-out. Can be sync or async and combine other streams.
@@ -60,14 +71,22 @@ target.setProperty('prop1', value);
 What you do instead, is you define all your application logic as streams, then you connect both ends of them to your HTML (Rimmel will know when to connect the input or the output from the context):
 
 ```javascript
-// Stream Oriented
-const stream = <your stream here>;
+// A stream-oriented component
+const stream = /* <your stream definition> */;
 
 const template = rml`
   <button onclick="${stream}">click me</button>
   Total clicks: <b>${stream}</b>
 `;
 ```
+
+# A simple way to manage a complex world
+UI is complex: API calls that might not come back, touch events coming in thousands, user actions, sensor data. They can come in any order and you'd normally have to handle all that.
+
+Stream-Oriented Programming makes complicated UI development an order of magnitude simpler to deal with, once you've learnt how to use streams. This is the promise.
+
+What follows is some of the key aspects of Rimmel that make it so much simpler to deal with.
+
 
 ## No Virtual DOM 🚀
 The concept of Virtual DOM originates from the assumption that the DOM is slow, which might appear to be the case if a framework makes a large number of unnecessary, uncontrolled updates, also known as "re-renders".
@@ -164,13 +183,12 @@ Finally, we have two sinks where the data ends up; one as the innerHTML of the <
 ## State doesn't exist. It's a Stream ✴️
 "State", as the word itself suggests, is something static, so it doesn't belong to the dynamic, interactive, reactive webapps we make every day.
 
-The rationale is that "state", as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow. You only need those when certain events happen, in order to respond.
+The rationale is that "state", as represented by plain old values such as numbers, strings and objects that are stored somewhere in memory is something you almost never need to read. Not now, not in 2 seconds, not in 45 minutes, not tomorrow.
+
+> You only need "state" when certain events happen, in order to respond.
 
 After that, everything should go quiet, including your CPU, to keep your laptop cool until the next UI event occurs.
 
-This is, in summary, the _discrete functional/reactive_ paradigm behind Observables and RxJS (as opposed to the functional-reactive paradigm in general in which state is more like a continuous flow of data over time).
-
-Event-driven reactivity as modelled by Observables is therefore the perfect way to describe state as it changes through the lifetime of an application at the occurrence of various discrete UI events.
 
 
 <img src="docs/assets/how-rimmel-works-9.png" alt="State doesn't exist" style="max-width: 80vw; max-height: 30vh;">
@@ -637,10 +655,13 @@ These are perfect cases to create Custom Sinks implementing relevant design patt
 
 <br>
 
-## Memory management 🧠
-If you come from some other libraries or frameworks, including "vanilla RxJS", you know you're somewhat responsible of cleaning up memory. The indiscriminate use of Observable subscriptions without proper cleanup can cause memory leaks in certain scenarios.
+Here is [an example](https://stackblitz.com/edit/rimmel-table-powersink) code with a custom sink that uses low-level DOM operations to append rows and columns to a table.
 
-Using Observables with Rimmel is trivial. All DOM subscriptions and event listeners are handled by the library behind the scenes, registered when a component is mounted and unregistered when it's removed.
+## Memory management 🧠
+If you come from some other libraries or frameworks, including "vanilla RxJS", but especially Angular, then you know you are responsible for cleaning up memory.
+Certain improper uses of Observable subscriptions in mixed-imperative programming and without proper cleanup cause memory leaks in certain scenarios.
+
+Using Observables with Rimmel is trivial. All DOM event listeners and subscriptions are handled by the library behind the scenes, registered when a component is mounted and unregistered when it's removed.
 
 <br>
 
@@ -651,20 +672,19 @@ A `BehaviorSubject` receives a special treatment from Rimmel in that its initial
 
 ```javascript
 import { BehaviorSubject, switchMap } from 'rxjs';
+import { rml, JSONDump } from 'rimmel';
 
 const WaitingComponent = () =>
   const getData = () => fetch('https://api.example.com/data')
     .then(data => data.json())
-    .then(data => `<pre>${JSON.stringify(data, null, 2)}</pre>`))
   ;
-
 
   const stream = new BehaviorSubject('loading...').pipe(
 	  switchMap(getData)
 	);
 
   return rml`
-    <div>${stream}</div>
+    <div>${JSONDump(stream)}</div>
   `;
 }
 ```
@@ -705,9 +725,7 @@ Rimmel is closely following the above standardisation initiatives and aims to al
 
 # Examples, examples, examples 🛟
 
-There are several collections on Stackblitz that can get you started, give you inspiration or show you advanced design patterns.
-
-There are several collections on Stackblitz that can get you started, give you inspiration or show you advanced design patterns.
+There are several collections on Stackblitz with over 200 examples that can get you started, give you inspiration or show you advanced design patterns.
 
 [The Basics](https://stackblitz.com/@dariomannu/collections/rimmel-js-getting-started) 🧺 A good place to start off. Simple examples for simple tasks.
 

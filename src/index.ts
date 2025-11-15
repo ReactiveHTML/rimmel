@@ -91,6 +91,9 @@ export { asap } from './lib/drain';
 // Experimental Web Component support
 export { RegisterElement } from './custom-element';
 
+// React Interop
+export { WrapForReact } from './interop/react';
+
 // Utilities (Will take them out to the framework)
 export type { Component } from './types/constructs';
 export type { RimmelComponent, RMLTemplateExpressions } from './types/internal';

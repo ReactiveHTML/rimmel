@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ClickCounter } from './rimmel-components';
-import { WrapForReact } from 'rimmel';
+import { WrapForReact } from '@rimmel/in-react';
 
 // Wrap the Rimmel component for use in React
 const ReactClickCounter = WrapForReact(ClickCounter);

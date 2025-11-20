@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@rimmel/in-react": "file:../../packages/react",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimmel": "file:../..",

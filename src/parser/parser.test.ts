@@ -344,6 +344,64 @@ describe('Parser', () => {
 	describe('Sinks', () => {
 
 		describe('Attributes', () => {
+
+			describe('Classes', () => {
+
+				describe('When a string is passed', () => {
+
+					it('sets the value inline', () => {
+						const className = 'my-class';
+						const template = rml`<div class="${className}">Hello</div>`;
+
+						expect(template).toEqual('<div class="my-class">Hello</div>');
+					});
+
+					it('sets deferred values later, initial value is empty', () => {
+						const className = defer('my-class');
+						const template = rml`<div class="${className}">Hello</div>`;
+
+						expect(template).toMatch(/<div.+class="">Hello<\/div>/);
+						expect(waitingElementHandlers.get('RMLREF+0')).toMatchObject([
+							// TODO: match the sink, too
+							{ source: className, type: 'sink', t: 'class' },
+						]);
+					});
+
+				});
+
+				describe('When a plain object is passed', () => {
+
+					it('sets the value inline', () => {
+						const classes = { 'class-a': true, 'class-b': false, 'class-c': true };
+						const template = rml`<div class="${classes}">Hello</div>`;
+
+						expect(template).toEqual('<div class="class-a class-c">Hello</div>');
+					});
+
+				});
+
+				describe('When an object of deferred values is passed', () => {
+
+					it('sets values later, initial value is empty', () => {
+						const classes = { 'class-a': defer(true), 'class-b': defer(false) };
+						const template = rml`<div class="${classes}">Hello</div>`;
+
+						expect(template).toMatch(/<div.+class="">Hello<\/div>/);
+						expect(waitingElementHandlers.get('RMLREF+0')).toMatchObject([
+							// TODO: match the sink, too
+							{ source: classes['class-a'], type: 'sink', t: 'class' },
+						]);
+					});
+
+				});
+
+			});
+
+			describe('Styles', () => {
+
+			});
+
+
 		});
 
 		describe('Dataset', () => {

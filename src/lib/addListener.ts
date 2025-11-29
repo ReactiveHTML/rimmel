@@ -9,10 +9,10 @@ const isEventListenerObject = (l: any): l is EventListenerObject => !!l?.handleE
 
 export const addListener = (node: EventTarget, eventName: RMLEventName, listener: RMLEventListener, options?: AddEventListenerOptions | boolean) => {
 	// We also force-add an event listener if we're inside a ShadowRoot (do we really need to?), as events inside web components don't seem to fire otherwise
-	if (USE_DOM_OBSERVABLES && node.when) {
+	if (USE_DOM_OBSERVABLES && (node as any).when) {
 		// Explicitly excluding the isEventListenerObject as Domenic doesn't want .when() to support it
 		if (!isEventListenerObject(listener)) {
-			const source = node.when(eventName, <ObservableEventListenerOptions | undefined>options);
+			const source = (node as any).when(eventName, <ObservableEventListenerOptions | undefined>options);
 			if (isObservature(listener)) {
 				(<IObservature<Event>>listener).addSource(source as MonkeyPatchedObservable<Event>);
 			} else {

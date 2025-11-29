@@ -731,6 +731,19 @@ There are several collections on Stackblitz with over 200 examples that can get 
 
 [The Collection](https://stackblitz.com/@dariomannu/collections/rimmel-js-experiments) 🧞 Stream-Oriented programming examples using Rimmel.
 
+### Recipes
+How to do stream-oriented this and that
+
+[Drag'n'Drop](https://stackblitz.com/orgs/github/ReactiveHTML/collections/drad-and-drop) Several different ways to implement drag'n'drop 
+
+[Fetching Data](https://stackblitz.com/orgs/github/ReactiveHTML/collections/fetching-data) Connecting to REST APIs
+
+[UI Components](https://stackblitz.com/orgs/github/ReactiveHTML/collections/ui-components) How streams make it simpler to manage any sort of UI component
+
+[Dialog Boxes](https://stackblitz.com/orgs/github/ReactiveHTML/collections/dialog-boxes) From popups to login boxes and forms
+
+[Observable Types](https://stackblitz.com/orgs/github/ReactiveHTML/collections/observable-types) When lists are involved, consider this
+
 ### Experiments
 This is the cutting-edge of what you can do with Rimmel, still being refined here and there, but will show you where things are going and maybe give you some inspiration.
 
@@ -738,11 +751,19 @@ This is the cutting-edge of what you can do with Rimmel, still being refined her
 
 [Web Workers](https://stackblitz.com/@dariomannu/collections/web-workers) 🛠️ Experiments running your Rimmel components inside web workers
 
-[Novel Design Patterns](https://stackblitz.com/@dariomannu/collections/novel-design-patterns) 📖 What makes stream-oriented programming different
+[Novel Design Patterns](https://stackblitz.com/@dariomannu/collections/novel-design-patterns) 📖 What makes stream-oriented programming unique
 
-[Observable Polyfill](https://stackblitz.com/@dariomannu/collections/observable-polyfill) 🧴 stream-oriented examples for the [observable-polyfill](https://github.com/keithamus/observable-polyfill/).
+[Native Observables](https://stackblitz.com/orgs/github/ReactiveHTML/collections/native-observables-in-rimmel-js) 👶 A few ways to integrate with the current web standards proposal for native Observables.
 
-[Native Observables](https://stackblitz.com/orgs/github/ReactiveHTML/collections/native-observables-in-rimmel-js) 👶 Experiments using native Observables.
+[Observable Polyfill](https://stackblitz.com/@dariomannu/collections/observable-polyfill) 🧴 Stream-oriented examples for when you need a native polyfill
+
+[Callforwards](https://stackblitz.com/orgs/github/ReactiveHTML/collections/callforwards) 🤙 Want to explore alternative stream types beside Observables?
+
+[LeapingBunny](https://stackblitz.com/@dariomannu/collections/leapingbunny) 💉 Unit testing your streams and components with ASCII-ART sequences
+
+[WebGL/WebGPU](https://stackblitz.com/orgs/github/ReactiveHTML/collections/webgl-webgpu) 🎲 Integrations with THREE.js
+
+[Security](https://stackblitz.com/@paperboy/collections/rimmel-js-security) 🔒 Hardening your stream-oriented applications
 
 ### The classics
 

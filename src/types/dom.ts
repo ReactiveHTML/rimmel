@@ -106,18 +106,16 @@ export interface EventListenerObject<E extends Event | any> {
     handleEvent(e: E): void;
 };
 
-export type EventListener<E extends Event> = EventListenerFunction<E> | EventListenerObject<E>;
-export type EventListenerOrEventListenerObject<E extends Event> = EventListener<E>;
+export type EventListener<E extends Event = Event> = EventListenerFunction<E> | EventListenerObject<E>;
 
 // /**
 //  * A generic equivalent of the DOM's EventListenerOrEventListenerObject
 //  */
-// export type EventListenerOrEventListenerObject<T = Event> = ((evt: T) => void) | { handleEvent: (evt: T) => void };
+export type EventListenerOrEventListenerObject<E extends Event = Event> = EventListener<E>;
 
 export type BooleanAttributeValue<T extends BooleanAttribute> = MaybeFuture<boolean | T | 'true'>;
 
 type DisabledType = 'disabled';
-
 
 // export type DocumentObject<E extends HTMLElement> = EventObject & ClassAttribute & DatasetObject & StyleObject & ValueAttribute<E> & ContentAttribute & GenericAttribute;
 

@@ -25,4 +25,3 @@ export const InnerHTML: ExplicitSink<'content'> = (source: RMLTemplateExpression
 		sink: InnerHTMLSink,
 	})
 ;
-

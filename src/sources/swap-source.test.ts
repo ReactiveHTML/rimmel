@@ -3,6 +3,7 @@ import type { Observable } from 'rxjs';
 import { Subject } from 'rxjs';
 import { Swap, swap } from './swap-source';
 import { MockElement, MockEvent } from '../test-support';
+import { Observer } from '../types';
 
 describe('Swap Event Adapter', () => {
 	it('Swaps a value from an element with a static string', () => {
@@ -17,7 +18,7 @@ describe('Swap Event Adapter', () => {
 			target: el as HTMLInputElement
 		});
 		const handlerSpy = jest.fn();
-		const source = Swap(newValue, handlerSpy);
+		const source = Swap(newValue, handlerSpy) as Observer<any>;
 
 		source.next(eventData);
 
@@ -36,8 +37,8 @@ it('Swaps a value from an element with empty string by default', () => {
 	const eventData = MockEvent('input', {
 		target: el as HTMLInputElement
 	});
-    const handlerSpy = jest.fn();
-    const source = Swap(undefined, handlerSpy);
+	const handlerSpy = jest.fn();
+	const source = Swap(undefined, handlerSpy) as Observer<any>;
 
 	source.next(eventData);
 
@@ -57,7 +58,7 @@ it('Swaps a value using a function that transforms based on the old value', () =
 		target: el as HTMLInputElement
 	});
 	const handlerSpy = jest.fn();
-	const source = Swap(replacementFn, handlerSpy);
+	const source = Swap(replacementFn, handlerSpy) as Observer<any>;
 
 	source.next(eventData);
 

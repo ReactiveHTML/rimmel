@@ -5,6 +5,8 @@ declare global {
     RMLREF: string;
   }
 }
+
+// FIXME: Deprecate! This should not be stored/exposed this way!
 self.RMLREF='';
 
 export const REF_TAG: string = 'RMLREF+';
@@ -28,7 +30,7 @@ export const SINK_TAG: string = 'sink';
 
 // Use the new native Web Platform Observables instead of addEventListener when available
 export var USE_DOM_OBSERVABLES: boolean = false;
-export const set_USE_DOM_OBSERVABLES = ((x: boolean) =>  USE_DOM_OBSERVABLES = x);
+export const set_USE_DOM_OBSERVABLES = ((x: boolean) => USE_DOM_OBSERVABLES = x);
 
 export const SymbolObservature = Symbol.for('observature');
 

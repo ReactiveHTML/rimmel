@@ -55,3 +55,4 @@ export const source = <I, O=I>(...reversePipeline: [...OperatorPipeline<I, O>, (
 export const sink = (source: MaybeFuture<any>, ...pipeline: OperatorPipeline<any, any>) =>
 	source.pipe(...pipeline);
 
+export const EventAdapter = inputPipe;

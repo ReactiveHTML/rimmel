@@ -95,7 +95,7 @@ export { RegisterElement } from './custom-element';
 export type { Component } from './types/constructs';
 export type { RimmelComponent, RMLTemplateExpressions } from './types/internal';
 
-export { source, sink } from './utils/input-pipe';
+export { EventAdapter, source, sink } from './utils/input-pipe';
 
 // Other Low-Level Utilities
 export { Rimmel_Bind_Subtree, Rimmel_Mount } from './lifecycle/data-binding';

@@ -80,6 +80,7 @@ export type ElementAttribute =
 	| 'onerror'
 	| 'onresize'
 	| 'onscroll'
+	| 'onscrollend'
 	| 'onselect'
 	| 'onwheel'
 ;

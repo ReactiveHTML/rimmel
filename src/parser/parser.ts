@@ -192,7 +192,22 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 				acc = accPlusString +expression.join('');
 			} else {
 				// expression is a future or an object
-
+				
+                if (
+                    expression &&
+                    typeof expression === 'object' &&
+                    'value' in expression &&
+                    !isPromise(expression) &&
+                    !isObservable(expression)
+                ) {
+                    const valueType = typeof expression.value;
+                    if (['string', 'number', 'boolean'].includes(valueType)) {
+                        acc = accPlusString + (expression.value ?? '');
+                        continue;
+                    }
+                }
+            				}
+				// Future / Object Sink
 				const nextString = strings[i+1];
 				// if it's a BehaviorSubject or any other sync stream (e.g.: startWith operator), pick its initial/current value to render it synchronously
 				const initialValue = currentValue(expression.source ?? expression);

@@ -1,5 +1,5 @@
 import type { SinkFunction } from "../types/sink";
-import type { EventListenerObject, EventListenerOrEventListenerObject } from "../types/dom";
+import type { EventListenerObject, EventListener, EventListenerFunction } from "../types/dom";
 import type { MaybeFuture, Observable, Observer, ObserverErrorFunction, ObserverFunction } from "../types/futures";
 import type { RenderingScheduler } from "../types/schedulers";
 
@@ -7,6 +7,9 @@ import { isObservable, isPromise } from "../types/futures";
 import { subscriptions } from "../internal-state";
 // import renderingScheduler from '../schedulers/ema-animation-frame';
 import { toListener } from "../utils/to-listener";
+
+// TODO: what if we have a promise resolving to an observable or the other way around?
+// Those atypical combinations may not be automatically flattened...
 
 /**
  * Return the "callable" part of an entity:
@@ -35,9 +38,9 @@ export const asap = <T>(fn: ObserverFunction<T> | Observer<T>, arg: MaybeFuture<
  * @param error? An error handler on the sink side
  * @param complete? a finalisation function
  */
-export const subscribe =
+export const subscribe = // TODO: rename to bindEvent or something that implies this is for element events
 	<T extends Event>
-	(node: Node, source: MaybeFuture<T>, next: EventListenerOrEventListenerObject<T>, error?: ObserverErrorFunction, complete?: () => void, scheduler?: RenderingScheduler) => {
+	(node: Node, source: MaybeFuture<T>, next: EventListener<T>, error?: ObserverErrorFunction, complete?: () => void, scheduler?: RenderingScheduler) => {
 		// TODO: make this a plugin, in case people don't use handleEvent...
 		const flattenedNext = toListener(next);
 		const task = scheduler?.(node, <SinkFunction>flattenedNext) ?? flattenedNext;
@@ -45,7 +48,7 @@ export const subscribe =
 		if (isObservable(source)) {
 			// TODO: should we handle promise cancellations (cancellable promises?) too?
 			const subscription = source.subscribe({
-				next: <EventListener>task,
+				next: <EventListenerFunction>task,
 				error,
 				complete,
 			});
@@ -54,10 +57,10 @@ export const subscribe =
 
 			return subscription;
 		} else if (isPromise(source)) {
-			source.then(<EventListener>task, error).finally(complete);
+			source.then(<EventListenerFunction>task, error).finally(complete);
 		} else {
 			// TODO: should we handle function cancellations (removeEventListener) too?
-			(<EventListener>task)(source);
+			(<EventListenerFunction>task)(source);
 		}
 	}
 ;

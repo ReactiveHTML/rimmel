@@ -5,7 +5,7 @@ import { GenericAttribute } from "./attribute";
 import { StyleObject } from "./style";
 import { ValueAttribute } from "./value";
 import { ContentAttribute } from "./content";
-import { MaybeFuture } from "./futures";
+import { MaybeFuture, Observer } from "./futures";
 import { RMLTemplateExpressions } from "./internal";
 import { BOOLEAN_ATTRIBUTES, BooleanAttribute } from "../definitions/boolean-attributes";
 
@@ -101,12 +101,14 @@ export type HTMLNumericFieldElement = HTMLInputElement & { type: 'number' | 'ran
 export const isNumericFieldElement = (e: Element): e is HTMLNumericFieldElement => e instanceof HTMLInputElement && (e.type === 'number' || e.type === 'range');
 
 // TODO use EventListenerOrEventListenerObject (or not, because it's not a generic in the DOM, but we want it to be?)
-export type EventListenerFunction<E extends Event = Event> = (event: E, handledTarget?: EventTarget | null) => void;
+export type EventListenerFunction<E extends Event = Event> = (event: E) => void;
 export interface EventListenerObject<E extends Event | any> {
     handleEvent(e: E): void;
 };
 
-export type EventListener<E extends Event = Event> = EventListenerFunction<E> | EventListenerObject<E>;
+export type EventListenerStream<E extends Event = Event> = Observer<E>;
+
+export type EventListener<E extends Event = Event> = EventListenerFunction<E> | EventListenerObject<E> | EventListenerStream<E>;
 
 // /**
 //  * A generic equivalent of the DOM's EventListenerOrEventListenerObject

@@ -296,17 +296,12 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 					;
 
 				} else if(/>?\s*[^<]*$/m.test(string) && /^\s*[^<]*\s*<?/m.test(nextString)) {
-
-					// TODO
-					// will set the textContent of the given textNode
+					// Plain text template with async/observable expression
 					addRef(ref, TextContent(expression));
-					// FIXME: tbd
-					// FIXME: are we adding #REF multiple times?
-					//acc = existingRef?accPlusString:acc +string.replace(/\s*>/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`) +ref;
-					acc += (existingRef?string:string.replace(/\s*>(?=[^<]*$)/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`)) +INTERACTIVE_NODE_START +(initialValue ?? '') +INTERACTIVE_NODE_END;
-
+					acc += string + `<!--RML-INTERACTIVE-NODE ${ref}-->` + (initialValue ?? '') + '<!--/RML-INTERACTIVE-NODE-->';
 				} else {
-					acc = accPlusString;
+					// Handle non-future expressions in plain text or other contexts
+					acc = accPlusString + (expression ?? '');
 				}
 
 			}

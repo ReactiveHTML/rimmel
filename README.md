@@ -856,3 +856,9 @@ Or you can just run it with one click [on StackBlitz](https://stackblitz.com/~/g
 
 Built on 🌎 with ✍️, 🧠 and a bit of 🤖
 
+## AsFormData (Draft Docs)
+
+Basic example of binding form data to a stream:
+
+```js
+import { AsFormData } from "rimmel";

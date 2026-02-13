@@ -1,7 +1,7 @@
 import type { RMLTemplateExpressions } from "../types/internal";
 
 import { map } from 'rxjs';
-import { curry } from "../utils/curry";
+import { korma } from "../utils/curry";
 
 /**
  * An Event Adapter Operator emitting any dataset value from the underlying element instead of a regular DOM Event object
@@ -22,9 +22,9 @@ export const dataset = <E extends Event>(key: string) =>
  * @example <button data-foo="bar" onclick="${Dataset('foo', handlerFn)}"> ... </button>
 **/
 export const Dataset =
-	<T extends HTMLElement, I extends Event, O extends string | undefined>
-	(key: string, source?: RMLTemplateExpressions.SourceExpression<I | O>) =>
-		curry<I, string | undefined>(dataset(key), source)
+	<I extends Event>
+	(key: string, source?: RMLTemplateExpressions.SourceExpression<string | undefined>) =>
+		korma<I, string | undefined>([dataset(key)], source)
 ;
 
 /**
@@ -45,9 +45,9 @@ export const datasetObject =
  * @example <button data-foo="bar" data-baz="bat" onclick="${DatasetObject(handlerFn)}"> ... </button>
 **/
 export const DatasetObject =
-	<T extends HTMLElement, I extends Event, O extends string | undefined>
-	(source?: RMLTemplateExpressions.SourceExpression<I | O>) =>
-		curry<I, DOMStringMap>(datasetObject, source)
+	<I extends Event>
+	(source?: RMLTemplateExpressions.SourceExpression<DOMStringMap>) =>
+		korma<I, DOMStringMap>([datasetObject], source)
 ;
 
 export const asDatasetOf = dataset;

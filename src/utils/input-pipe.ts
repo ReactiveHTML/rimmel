@@ -1,7 +1,7 @@
 import type { MaybeFuture, Observer, OperatorPipeline } from '../types/futures';
 import type { RMLTemplateExpressions } from '../types/internal';
 
-import { Subject } from 'rxjs';
+import { OperatorFunction, Subject } from 'rxjs';
 
 /**
  * Create an "input pipe" by prepending operators to the input of an Observer, Subject, BehaviorSubject, or plain subscriber function.
@@ -10,9 +10,8 @@ import { Subject } from 'rxjs';
 export const pipeIn =
 	<I, O=I>(target: RMLTemplateExpressions.TargetEventHandler<O>, ...pipeline: OperatorPipeline<I, O>): Observer<I> => {
 		const source = new Subject<I>();
-		source
-			.pipe(...pipeline)
-			.subscribe(target)
+		(source.pipe(...pipeline) as Observable<O>)
+			.subscribe(target as Observer<O>)
 		;
 
 		// FIXME: will we need to unsubscribe? Then store a reference for unsubscription
@@ -38,9 +37,9 @@ export const pipeIn =
  *   <input onkeypress="${MyUsefulEventAdapter(targetObserver)}">
  * `;
 **/
-export const inputPipe = <I extends any, O extends any>(...pipeline: OperatorPipeline<I, O>) =>
+export const inputPipe = <I extends any, O extends any>(...pipeline: OperatorFunction<any, any>[]) =>
 	(target: RMLTemplateExpressions.TargetEventHandler<O>) =>
-		pipeIn<I, O>(target, ...pipeline)
+		pipeIn<I, O>(target, ...(pipeline as OperatorPipeline<I, O>))
 ;
 
 export const feed = pipeIn;
@@ -49,8 +48,8 @@ export const feedIn = pipeIn;
 export const reversePipe = inputPipe;
 
 // TBC
-export const source = <I, O=I>(...reversePipeline: [...OperatorPipeline<I, O>, (Observer<any> | Function)]) =>
-	pipeIn(<Observer<any>>reversePipeline.pop(), ...reversePipeline);
+export const source = <I, O=I>(...reversePipeline: [...OperatorFunction<I, O>[], (Observer<any> | Function)]) =>
+	pipeIn(<Observer<any>>reversePipeline.pop(), ...(reversePipeline as OperatorPipeline<I, O>));
 
 export const sink = (source: MaybeFuture<any>, ...pipeline: OperatorPipeline<any, any>) =>
 	source.pipe(...pipeline);

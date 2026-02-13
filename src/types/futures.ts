@@ -3,6 +3,7 @@
 import { map, type OperatorFunction } from 'rxjs';
 
 import { SymbolObservature } from "../constants";
+import { isFunction } from '../utils/is-function';
 
 export type Subject<T> = {
 	subscribe: (observer: ObserverFunction<T>) => Subscription;
@@ -130,8 +131,7 @@ export type Observable<T> = {
 
 export const isObserver = (x: any): x is Observer<any> =>
 	// FIXME: it should actually be x?.next || x?.error || x?.complete
-	// or a function
-	!!x?.next;
+	!!x?.next || isFunction(x);
 
 // export type Subscription = {
 // 	destination: any; // FIXME HACK: an internal RxJS property, not to be relied upon
@@ -144,8 +144,8 @@ export const isObserver = (x: any): x is Observer<any> =>
  * @template I the input type
  * @template O the output type
  */
+// TODO: migrate to using rzjs-provided Streams
 export type Stream<I, O=I> = Observer<I> & Observable<O>;
-// export interface Stream<I, O=I> extends Observable<I>, Observer<O> {};
 
 // A whole pass-through pipeline
 export type Transformer<I, O> = Observer<I> & {

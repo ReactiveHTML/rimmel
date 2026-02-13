@@ -284,6 +284,7 @@ describe('Parser', () => {
 		});
 
 		describe.skip('Symbols', () => {
+
 			describe('Attributes', () => {
 
 				it('handles symbols as strings', () => {

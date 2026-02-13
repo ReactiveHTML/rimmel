@@ -87,7 +87,7 @@ export const valueAsNumber = map((e: Event) => (<HTMLInputElement>e.target).valu
  * @returns EventSource<number>
  */
 export const ValueAsNumber = inputPipe<Event, number>(
-	valueAsNumber
+	valueAsNumber,
 );
 
 /**

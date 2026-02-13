@@ -47,10 +47,10 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
 			return this[name];
 		},
 		hasAttribute(name: string) {
-			return this[name] !== undefined;
+			return this[name] !== undefined && this[name] != null;
 		},
 		removeAttribute(name: string) {
-			delete this[name];
+			this[name] = null;
 		},
 		className: '',
 		classList: {
@@ -79,7 +79,7 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
 		dispatchEvent(event: Event) {
 			(<HTMLEventSource>el)[`on${event.type}` as RMLEventAttributeName]?.(event);
 		},
-		childNodes: [] as NodeListOf<ChildNode>,
+		childNodes: [] as unknown as NodeListOf<ChildNode>,
 		...props,
 	};
 

@@ -36,7 +36,7 @@ export * from './sources/object-source';
 
 // Event Mapping Functions
 export { feed, feedIn, inputPipe, pipeIn } from './utils/input-pipe';
-export { curry } from './utils/curry';
+export { korma } from './utils/curry';
 
 // Event Source Modifiers
 export { Active } from './sources/modifiers/active';

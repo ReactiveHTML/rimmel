@@ -1,10 +1,10 @@
 import type { RMLTemplateExpressions } from '../types/internal';
-import type { Observer } from '../types/futures';
-import type { Source } from '../types/source';
 
 import { map } from "rxjs";
-import { curry } from '../utils/curry';
-import { EventListenerFunction } from '../types/dom';
+import { korma } from '../utils/curry';
+
+type StringFunction = (s: string) => string;
+type Replacement = string | StringFunction;
 
 /**
  * An Event Operator that swaps the value of the underlying <input> element
@@ -13,7 +13,7 @@ import { EventListenerFunction } from '../types/dom';
  * @param replacement A string or function used to compute the new value
  * @returns OperatorFunction<Event, string>
  */
-export const swap =	<E extends Event>(replacement: string | Function) =>
+export const swap =	<E extends Event>(replacement: Replacement = '') =>
 	map((e: E) => {
 		const t = (<HTMLInputElement>e.target);
 		const v = t.value;
@@ -30,7 +30,7 @@ export const swap =	<E extends Event>(replacement: string | Function) =>
  * @returns EventSource<string>
  */
 export const Swap =
-	<T extends HTMLElement, I extends Event, S extends string | Function | undefined>
-	(replacement: string | Function = '', source?: RMLTemplateExpressions.SourceExpression<I>) =>
-		curry<I, string>(swap(replacement), source)
+	<I extends Event>
+	(replacement?: Replacement, source?: RMLTemplateExpressions.SourceExpression<string>) =>
+		korma<I, string>([swap<I>(replacement)], source)
 ;

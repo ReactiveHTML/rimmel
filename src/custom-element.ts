@@ -194,7 +194,7 @@ class RimmelElement extends HTMLElement {
  * }
  * ```
  **/
-export const RegisterElement = (tagName: string, component?: RimmelComponent, initFn?: Function) => {
+export const RegisterElement = (tagName: string, component: RimmelComponent | null | undefined, initFn?: Function) => {
 	// FIXME: prevent redefinition...
 	// TODO: UnregisterElement?
 	customElements.define(tagName, class extends RimmelElement {

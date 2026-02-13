@@ -17,9 +17,10 @@
 
 import type { HTMLString, SinkBindingConfiguration, Stream, Coords } from '../../src/index';
 
-import { BehaviorSubject, Subject, ReplaySubject, catchError, combineLatest, filter, interval, map, merge, mergeWith, Observable, of, pipe, scan, share, startWith, take, tap, timer } from 'rxjs';
+import { BehaviorSubject, Subject, ReplaySubject, catchError, combineLatest, distinctUntilKeyChanged, filter, interval, map, merge, mergeWith, Observable, of, pipe, scan, share, startWith, take, tap, timer, withLatestFrom } from 'rxjs';
 
-import { rml, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Removed, Sanitize, sink, source, Suspend, Suspender, Swap, AsLatestFrom, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, } from '../../src/index';
+import { rml, curry, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Removed, Sanitize, sink, source, Suspend, Suspender, Swap, AsLatestFrom, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, AmbientEffect, } from '../../src/index';
+import { Cookie } from '../../src/ambient/cookies';
 import { subscribe } from '../../src/lib/drain';
 import { set_USE_DOM_OBSERVABLES } from '../../src/index';
 import { char } from '../../src/types/basic';
@@ -281,12 +282,14 @@ const sources = {
 		const stream = new Subject<Date | null>()
 		const yesterday = stream.pipe(
 			map(d=> {
+				d = new Date(d);
 				d?.setDate(d.getDate() -1);
 				return d?.toDateString() ?? '';
 			})
 		);
 		const tomorrow = stream.pipe(
 			map(d=> {
+				d = new Date(d);
 				d?.setDate(d.getDate() +1);
 				return d?.toDateString() ?? '';
 			})
@@ -408,9 +411,8 @@ const sources = {
 				</select> <br>
 
 				<input name="radio1" type="radio" data-type="number" value="1"> One<br>
-				<input name="radio1" type="radio" data-type="number" value="2"> Two<br>
-				<input name="radio1" type="radio" data-type="number" value="3" checked> Three<br>
-
+				<input name="radio1" type="radio" data-type="string" value="two"> Two<br>
+				<input name="radio1" type="radio" data-type="number" value="3"> Three<br>
 
 				<button>submit</button>
 				<input type="submit" value="submit">
@@ -598,7 +600,6 @@ const sinks = {
 	ClassSink: () => {
 		const cls1 = 'cls1';
 		const cls2 = defer('cls2', 1000);
-		const cls3 = defer('cls3', 2000);
 		const cls4 = defer('cls4', 3000);
 
 		return rml`
@@ -1650,6 +1651,10 @@ const component = () => {
 				padding: 1rem;
 				background-color: #e0e0e0;
 				border-radius: .4rem;
+
+				@media(prefers-color-scheme: dark) {
+					background-color: #555;
+				}
 
 				&::before {
 					display: block;

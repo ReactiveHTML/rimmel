@@ -22,6 +22,10 @@ import { isFunction } from "../utils/is-function";
 import { isObservable, isPromise } from "../types/futures"
 import { isRMLEventListener } from "../types/event-listener";
 import { toListener } from "../utils/to-listener";
+import { DatasetItemPreSink } from "../sinks/dataset-sink";
+import { ClassNameSink, ClassObjectSink } from "../sinks/class-sink";
+import { chronolize } from "../utils/chronolize";
+import { KVP } from "../types/key-value-pair";
 
 export const addRef = (ref: string, data: BindingConfiguration) => {
 	waitingElementHandlers.get(ref)?.push(data) ?? waitingElementHandlers.set(ref, [data]);
@@ -84,29 +88,6 @@ const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventNam
  * };
  * ```
  **/
-function stringifyInitialValue(
-	initialValue: string | number | boolean | Record<string, any> | null | undefined,
-	attributeName?: string
-): string {
-	if (initialValue == null) return '';
-
-	const obj = initialValue as Record<string, any>;
-
-	if (attributeName === 'class') {
-		return Object.entries(obj)
-			.filter(([_, v]) => v)
-			.map(([k]) => k)
-			.join(' ');
-	}
-
-	if (attributeName === 'style') {
-		return Object.entries(obj)
-			.map(kvp => kvp.join(':'))
-			.join('; ');
-	}
-	return String(initialValue ?? '');
-}
-
 export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateExpression[]): HTMLString {
 	let acc = '';
 	const strlen = strings.length -1;
@@ -195,7 +176,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 
 				const nextString = strings[i+1];
 				// if it's a BehaviorSubject or any other sync stream (e.g.: startWith operator), pick its initial/current value to render it synchronously
-				const initialValue = currentValue(expression.source ?? expression);
+				let initialValue = currentValue(expression.source ?? expression) ?? '';
 
 				const isAttribute = /(?<attribute>[:a-z0-9\-_]+)\=(?<quote>['"]?)(?<otherValues>[^"]*)$/.exec(accPlusString);
 				if(isAttribute) {
@@ -210,23 +191,48 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 						// <some-tag some-attributes data-xxx="123" data-yyy="${observable}" other-stuff></some-tag>
 
 						let sink: Sink<HTMLElement | SVGElement>;
-						let isBooleanAttribute = false;
+						let isBooleanAttribute;
 						let handler: SinkBindingConfiguration<HTMLElement | SVGElement>;
 						const attributeName = isAttribute.groups!.attribute;
 						if(attributeName == 'style') {
 							const CSSAttribute = /;?(?<key>[a-z\-][a-z0-9\-_]*)\s*:\s*$/.exec(string)?.groups?.key;
-							sink = CSSAttribute ? StylePreSink(CSSAttribute): StyleObjectSink;
+							// Are we setting any specific CSS properties or the whole style attribute?
+							// TODO: what if both?
+							sink = CSSAttribute ? StylePreSink(CSSAttribute) : StyleObjectSink;
 							handler = PreSink<HTMLElement | SVGElement>(STYLE_OBJECT_SINK_TAG, sink, expression, CSSAttribute);
+						} else if(attributeName == 'class') {
+							sink = ClassObjectSink;
+							if(isFutureSinkAttributeValue(expression)) {
+								// it's a Future<class>
+								handler = PreSink(attributeName, sink, expression, attributeName);
+							} else {
+								// it's a Chronosympton<class>
+								// Merge present properties of the object inline and pass the rest as a future sink
+								const splitter = ([k, v]: KVP) => isFutureSinkAttributeValue(v);
+								const [statics, deferreds] = chronolize(expression as AttributeObject || {}, splitter);
+
+								if(deferreds.length) {
+									handler = PreSink(attributeName, sink, Object.fromEntries(deferreds), attributeName);
+								}
+
+								initialValue = statics.filter(([k, v]) => v).map(([k, v]) => k).join(' ');
+							}
 						} else {
 							isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attributeName);
 							const isDatasetAttribute = attributeName.startsWith('data-');
+							sink = (
+								sinkByAttributeName.get(attributeName)
+								?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName))
+								?? (isDatasetAttribute && DatasetItemPreSink(attributeName))
+							) || FixedAttributePreSink(attributeName);
 
-							sink = (sinkByAttributeName.get(attributeName) ?? (isBooleanAttribute && DOMAttributePreSink(<WritableElementAttribute>attributeName)) ?? (isDatasetAttribute && DatasetItemPresink(attributeName))) || FixedAttributePreSink(attributeName);
 							// TODO: hard-match attributeName with a corresponding SINK_TAG...
 							handler = PreSink(attributeName, sink, expression, attributeName);
 						}
 
-						addRef(ref, handler);
+						if(handler!) {
+							addRef(ref, handler);
+						}
 						// TODO: remove boolean attributes if they are bound to streams: disabled="${stream}"
 						// should not be disabled by its mere presence, but depending on the value emitted by the stream.
 
@@ -235,9 +241,11 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 							? accPlusString.replace(new RegExp(`${attributeName}=['"]+$`), `_${attributeName}="`) // TODO: or maybe clean it up completely?
 							: accPlusString
 						;
-						const formattedInitial = stringifyInitialValue(initialValue, attributeName);
-
-						acc = (prefix + formattedInitial).replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
+						const h = prefix +initialValue;
+						acc = (handler!)
+							? h.replace(/<(\w[\w-]*)\s+([^>]+)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`)
+							: h
+						;
 					}
 				} else if(/<[a-z_][a-z0-9_-]*[^>]*(?:\s+\.\.\.)?$/ig.test(accPlusString.substring(lastTag))) {
 
@@ -258,9 +266,8 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 					} else {
 						// Merge static (string, number) properties of the mixin inline in the rendered HTML
 						// and pass the rest as a future sink
-						const [staticAttributes, deferredAttributes] = Object.entries(expression as AttributeObject || {})
-							.reduce((acc, [k, v]) => (acc[+(isFutureSinkAttributeValue(v) || isRMLEventListener(k, v) && isFunction(v) || /^(?:rml:)?onmount$/.test(k))].push([k, v]), acc), [[] as [HTMLAttributeName, PresentSinkAttributeValue][], [] as [HTMLAttributeName, FutureSinkAttributeValue][]])
-						;
+						const splitter = ([k, v]: KVP) => (isFutureSinkAttributeValue(v) || isRMLEventListener(k, v) && isFunction(v) || /^(?:rml:)?onmount$/.test(k));
+						const [staticAttributes, deferredAttributes] = chronolize(expression as AttributeObject || {}, splitter);
 
 						acc += staticAttributes.map(([k, v])=>`${k}="${v}"`).join(' ');
 						// if(split[0].length)
@@ -292,7 +299,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 					addRef(ref, isSinkBindingConfiguration(_source) ? _source : InnerHTML(_source));
 					acc = acc
 						+(existingRef ? string : string.replace(/\s*>\s*$/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`))
-						+(initialValue ?? '')
+						+initialValue
 					;
 
 				} else if(/>?\s*[^<]*$/m.test(string) && /^\s*[^<]*\s*<?/m.test(nextString)) {
@@ -303,7 +310,7 @@ export function rml(strings: TemplateStringsArray, ...expressions: RMLTemplateEx
 					// FIXME: tbd
 					// FIXME: are we adding #REF multiple times?
 					//acc = existingRef?accPlusString:acc +string.replace(/\s*>/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`) +ref;
-					acc += (existingRef?string:string.replace(/\s*>(?=[^<]*$)/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`)) +INTERACTIVE_NODE_START +(initialValue ?? '') +INTERACTIVE_NODE_END;
+					acc += (existingRef?string:string.replace(/\s*>(?=[^<]*$)/, ` ${RESOLVE_ATTRIBUTE}="${ref}">`)) +INTERACTIVE_NODE_START +initialValue +INTERACTIVE_NODE_END;
 
 				} else {
 					acc = accPlusString;

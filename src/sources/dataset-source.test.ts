@@ -1,5 +1,4 @@
 import type { Observable } from 'rxjs';
-import type { Coords } from '../types/coords';
 
 import { Subject } from 'rxjs';
 import { MockElement, MockEvent } from '../test-support';

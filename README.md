@@ -712,8 +712,6 @@ Rimmel is a young project built with meticulous attention to detail and a bold v
 Share the passion? Would like to help?<br>
 Come say hi, there's a good amount of work to do and the roadmap is below.
 
-[![Star History Chart](https://api.star-history.com/svg?repos=reactivehtml/rimmel&type=Date)](https://www.star-history.com/#reactivehtml/rimmel&Date)
-
 [![Stargazers repo roster for @reactivehtml/rimmel](https://reporoster.com/stars/reactivehtml/rimmel)](https://github.com/reactivehtml/rimmel/stargazers)
 
 # Roadmap 👷

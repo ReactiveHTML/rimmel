@@ -543,7 +543,7 @@ Promises and Observables will be merged whenever they resolve/emit.
 
 Performance is always a priority and here's what makes Rimmel extremely fast:<br>
 
-- It doesn't use a Virtual DOM. If you ever believed the story that the DOM is slow and re-running your components' code every time you blink an eye is the way to do, you may have been the victim of a scam.<br>
+- It doesn't use a Virtual DOM. If you ever believed the story that the DOM is slow and re-running your components' code every time you blink an eye is the way to go, you may have been the victim of a scam.<br>
 
 - Rimmel updates the DOM using "precharged" Sinks, which are nothing more than some tiny element-bound "preloaded" functions that can make some of your updates even faster than the the usual `document.getElementById(target).classList.add('big')`.<br>
 We call this the **Vanilla+ Speed**.

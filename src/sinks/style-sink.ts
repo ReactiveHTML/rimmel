@@ -2,6 +2,7 @@ import type { CSSDeclaration, CSSValue, CSSWritableProperty } from "../types/sty
 import type { Sink } from "../types/sink";
 
 import { asap } from "../lib/drain";
+import { camelCase } from "../utils/camelCase";
 
 export const STYLE_OBJECT_SINK_TAG = 'StyleObject';
 
@@ -26,12 +27,12 @@ const getCSSPropertySetter = <K extends keyof CSSDeclaration>(style: CSSStyleDec
 export const StyleSink: Sink<HTMLElement | SVGElement> =
 	<K extends keyof CSSDeclaration>
 	(node: HTMLElement | SVGElement, key: K) =>
-		getCSSPropertySetter(node.style, key);
+		getCSSPropertySetter(node.style, key as keyof CSSStyleDeclaration);
 ;
 
 export const StylePreSink = (key: CSSWritableProperty) =>
 	(node: HTMLElement | SVGElement) =>
-		StyleSink(node, key)
+		StyleSink(node, camelCase(key))
 ;
 
 export const StyleObjectSink: Sink<HTMLElement | SVGElement> = (node: HTMLElement | SVGElement) =>

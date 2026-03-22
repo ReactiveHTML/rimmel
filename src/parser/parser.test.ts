@@ -5,7 +5,7 @@ import { InnerText } from '../sinks/inner-text-sink';
 import { RMLEventName } from '../types/dom';
 import { rml } from './parser';
 
-const defer = <T>(value: T, timeout = 500) => new Promise<T>((resolve) => setTimeout(() => resolve(value), timeout));
+import { defer } from '../test-support';
 
 describe('Parser', () => {
 	beforeEach(() => {
@@ -373,7 +373,11 @@ describe('Parser', () => {
 				describe('When a plain object is passed', () => {
 
 					it('sets the value inline', () => {
-						const classes = { 'class-a': true, 'class-b': false, 'class-c': true };
+						const classes = {
+							'class-a': true,
+							'class-b': false,
+							'class-c': true
+						};
 						const template = rml`<div class="${classes}">Hello</div>`;
 
 						expect(template).toEqual('<div class="class-a class-c">Hello</div>');
@@ -451,10 +455,217 @@ describe('Parser', () => {
 
 			});
 
+
+			describe('Classes', () => {
+
+				describe('When supplied classes resolve to a string', () => {
+
+					describe('When a Simple Present Object (an object with only present values) is supplied', () => {
+
+						it('bakes class values into the HTML', () => {
+							const a = {
+								class: 'cls1'
+							};
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div.*class="cls1".*>Hello<\/div>/);
+						});
+
+					});
+
+					describe('When a Future Object (a Future<Object>) is supplied', () => {
+
+						it('does not bake any values into the HTML', () => {
+							const a = Promise.resolve({
+								class: 'cls1'
+							});
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div\s+resolve="RMLREF\+0"\s*>Hello<\/div>/);
+						});
+
+					});
+
+					describe('When an Object of Futures is supplied', () => {
+
+						it('does not bake any values into the HTML', () => {
+							const a = {
+								class: Promise.resolve('cls1'),
+							};
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div\s+resolve="RMLREF\+0"\s*>Hello<\/div>/);
+						});
+
+					});
+
+				});
+
+				describe('When supplied classes resolve to space-separated strings', () => {
+
+					describe('When a Simple Present Object (an object with only present values) is supplied', () => {
+
+						it('bakes class values into the HTML', () => {
+							const a = {
+								class: 'cls1 cls2'
+							};
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div.*class="cls1 cls2".*>Hello<\/div>/);
+						});
+
+					});
+
+				});
+
+				describe('When supplied classes resolve to objects', () => {
+
+					describe('When a Simple Present Object (an object with only present values) is supplied', () => {
+
+						it('only bakes present truthy class values into the HTML', () => {
+							const a = {
+								class: {
+									cls1: true,
+									cls2: true,
+									cls3: false,
+								},
+							};
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div.*class="cls1 cls2".*>Hello<\/div>/);
+						});
+
+					});
+
+					describe('When a Class Chronosympton (an object with both present and future classes) is supplied', () => {
+
+						it('only bakes present class values into the HTML', () => {
+							const a = {
+								class: {
+									cls1: true,
+									cls2: true,
+									cls3: Promise.resolve(true),
+								},
+							};
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div.*class="cls1 cls2".*>Hello<\/div>/);
+						});
+
+					});
+
+				});
+
+			});
+
+			describe('Styles', () => {
+
+				describe('When supplied styles resolve to a string', () => {
+
+					describe('When a Simple Present Object (an object with only present values) is supplied', () => {
+
+						it('bakes style values into the HTML', () => {
+							const a = {
+								style: 'color: red;'
+							};
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div.*style="color: red;".*>Hello<\/div>/);
+						});
+
+					});
+
+					describe('When a Future Object (a Future<Object>) is supplied', () => {
+
+						it('does not bake any values into the HTML', () => {
+							const a = Promise.resolve({
+								style: 'color: red;'
+							});
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div\s+resolve="RMLREF\+0"\s*>Hello<\/div>/);
+						});
+
+					});
+
+					describe('When an Object of Futures is supplied', () => {
+
+						it('does not bake any values into the HTML', () => {
+							const a = {
+								style: Promise.resolve('color: red;'),
+							};
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div\s+resolve="RMLREF\+0"\s*>Hello<\/div>/);
+						});
+
+					});
+
+				});
+
+				describe('When supplied styles resolve to semicolon-separated strings', () => {
+
+					describe('When a Simple Present Object (an object with only present values) is supplied', () => {
+
+						it('bakes class values into the HTML', () => {
+							const a = {
+								style: 'color: red; background: blue;'
+							};
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div.*style="color: red; background: blue;".*>Hello<\/div>/);
+						});
+
+					});
+
+				});
+
+				describe('When supplied styles resolve to objects', () => {
+
+					describe('When a Simple Present Object (an object with only present values) is supplied', () => {
+
+						it('only bakes present truthy style values into the HTML', () => {
+							const a = {
+								style: {
+									color: 'red',
+									background: 'blue',
+									pointer: null,
+								},
+							};
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div.*style="color: red; background: blue;".*>Hello<\/div>/);
+						});
+
+					});
+
+					describe('When a Style Chronosympton (an object with both present and future classes) is supplied', () => {
+
+						it('only bakes present style values into the HTML', () => {
+							const a = {
+								style: {
+									color: 'red',
+									background: 'blue',
+									pointer: Promise.resolve('none'),
+								},
+							};
+							const template = rml`<div ${a}>Hello</div>`;
+
+							expect(template).toMatch(/<div.*style="color: red; background: blue;".*>Hello<\/div>/);
+						});
+
+					});
+
+				});
+
+			});
+
 			describe('Futures', () => {
 
 				it('works with promises', () => {
-					const a = defer({ 'data-foo': 'bar' });
+					const a = defer({
+						'data-foo': 'bar'
+					});
 					const template = rml`<div ...${a}>Hello</div>`;
 
 					expect(template).toMatch(/<div.*resolve="RMLREF\+0".*>Hello<\/div>/);
@@ -473,26 +684,70 @@ describe('Parser', () => {
 					]);
 				});
 
-				it('works with presents followed by promises', () => {
-					const a = { 'data-foo': 'bar' };
-					const b = defer({ 'data-bar': 'baz' });
-					const template = rml`<div ...${a} ...${b}>Hello</div>`;
+				describe('When multiple mixins are merged into the same element', () => {
 
-					expect(template).toMatch(/<div.*resolve="RMLREF\+0".* data-foo="bar".*>Hello<\/div>/);
-					expect(waitingElementHandlers.get('RMLREF+0')![1]).toEqual(
-						{ type: 'sink', t: 'mixin', source: b, sink: AttributeObjectSink },
-					);
-				});
+					describe('When a present mixin is followed by a future mixin', () => {
 
-				it.skip('works with promises followed by presents', () => {
-					const a = defer({ 'data-bar': 'baz' });
-					const b = { 'data-foo': 'bar' };
-					const template = rml`<div ...${a} ...${b}>Hello</div>`;
+						it('presents are baked in, futures deferred', () => {
+							const a = {
+								'data-foo': 'bar'
+							};
+							const b = defer({
+								'data-bar': 'baz'
+							});
+							const template = rml`<div ...${a} ...${b}>Hello</div>`;
 
-					expect(template).toMatch(/<div.*resolve="RMLREF\+0".* data-foo="bar".*>Hello<\/div>/);
-					expect(waitingElementHandlers.get('RMLREF+0')![0]).toEqual(
-						{ type: 'sink', t: 'mixin', source: b, sink: AttributeObjectSink },
-					);
+							expect(template).toMatch(/<div.*resolve="RMLREF\+0".* data-foo="bar".*>Hello<\/div>/);
+							expect(waitingElementHandlers.get('RMLREF+0')![1]).toEqual(
+								{ type: 'sink', t: 'mixin', source: b, sink: AttributeObjectSink },
+							);
+						});
+
+					});
+
+					describe('When a future mixin is followed by a present mixin', () => {
+
+						it('presents are baked in, futures deferred', async () => {
+							const a = defer({ 'data-bar': 'baz' });
+							const b = { 'data-foo': 'bar' };
+							const template = rml`<div ...${a} ...${b}>Hello</div>`;
+
+							expect(template).toMatch(/<div.*resolve="RMLREF\+0".* data-foo="bar".*>Hello<\/div>/);
+							expect(waitingElementHandlers.get('RMLREF+0')![0]).toEqual(
+								{ type: 'sink', t: 'mixin', source: a, sink: AttributeObjectSink },
+							);
+							expect(waitingElementHandlers.get('RMLREF+0')![0].source).resolves.toEqual(
+								{ 'data-bar': 'baz' },
+							);
+						});
+
+					});
+
+					describe('When a future mixin is followed by another', () => {
+
+						it('both futures are queued for mounting', async () => {
+							const a = defer({ 'data-foo': 'bar' });
+							const b = defer({ 'data-bar': 'baz' });
+							const template = rml`<div ...${a} ...${b}>Hello</div>`;
+
+							expect(template).toMatch(/<div.*resolve="RMLREF\+0"\s*>Hello<\/div>/);
+							expect(waitingElementHandlers.get('RMLREF+0')![0]).toEqual(
+								{ type: 'sink', t: 'mixin', source: a, sink: AttributeObjectSink },
+							);
+							expect(waitingElementHandlers.get('RMLREF+0')![0]).toEqual(
+								{ type: 'sink', t: 'mixin', source: b, sink: AttributeObjectSink },
+							);
+
+							expect(waitingElementHandlers.get('RMLREF+0')![0].source).resolves.toEqual(
+								{ 'data-foo': 'bar' },
+							);
+							expect(waitingElementHandlers.get('RMLREF+0')![1].source).resolves.toEqual(
+								{ 'data-bar': 'baz' },
+							);
+						});
+
+					});
+
 				});
 
 				describe('Event Handlers', () => {
@@ -549,7 +804,7 @@ describe('Parser', () => {
 					const c = { 'data-c': 'c' };
 					const template = rml`<div ...${a} ...${b} ...${c}>Hello</div>`;
 
-					expect(template).toMatch(/<div .* data-a="a" data-b="b" data-c="c">Hello<\/div>/);
+					expect(template).toMatch(/<div .* data-a="a"\s+data-b="b"\s+data-c="c">Hello<\/div>/);
 				});
 
 				it('sets them correctly with other attributes in between', () => {
@@ -557,7 +812,7 @@ describe('Parser', () => {
 					const b = { 'data-b': 'b' };
 					const template = rml`<div ...${a} xxx="yyy" ...${b}>Hello</div>`;
 
-					expect(template).toMatch(/<div .* data-a="a" xxx="yyy" data-b="b">Hello<\/div>/);
+					expect(template).toMatch(/<div .* data-a="a"\s+xxx="yyy"\s+data-b="b">Hello<\/div>/);
 				});
 
 				it('sets them correctly with various types of attributes in between', () => {
@@ -565,7 +820,7 @@ describe('Parser', () => {
 					const b = { 'data-b': 'b' };
 					const template = rml`<div ...${a} xxx="yyy" a="0" zzz c-hello ...${b}>Hello</div>`;
 
-					expect(template).toMatch(/<div .* data-a="a" xxx="yyy" a="0" zzz c-hello data-b="b">Hello<\/div>/);
+					expect(template).toMatch(/<div .* data-a="a"\s+xxx="yyy"\s+a="0"\s+zzz\s+c-hello\s+data-b="b">Hello<\/div>/);
 				});
 
 				it('sets them correctly with other attributes around', () => {
@@ -573,7 +828,7 @@ describe('Parser', () => {
 					const b = { 'data-b': 'b' };
 					const template = rml`<div aaa="bbb" ...${a} ...${b} ccc="ddd">Hello</div>`;
 
-					expect(template).toMatch(/<div .* aaa="bbb" data-a="a" data-b="b" ccc="ddd">Hello<\/div>/);
+					expect(template).toMatch(/<div .* aaa="bbb"\s+data-a="a"\s+data-b="b"\s+ccc="ddd">Hello<\/div>/);
 				});
 
 				it('sets them correctly with other attributes around and between', () => {
@@ -581,7 +836,7 @@ describe('Parser', () => {
 					const b = { 'data-b': 'b' };
 					const template = rml`<div aaa="bbb" ...${a} xxx="yyy" ...${b} ccc="ddd">Hello</div>`;
 
-					expect(template).toMatch(/<div .* aaa="bbb" data-a="a" xxx="yyy" data-b="b" ccc="ddd">Hello<\/div>/);
+					expect(template).toMatch(/<div .* aaa="bbb"\s+data-a="a"\s+xxx="yyy"\s+data-b="b"\s+ccc="ddd">Hello<\/div>/);
 				});
 
 				it('sets them correctly with other passed-in attributes in between', () => {
@@ -590,7 +845,7 @@ describe('Parser', () => {
 					const number = 42;
 					const template = rml`<div aaa="bbb" ...${a} xxx="${number}" ...${b} ccc="ddd">Hello</div>`;
 
-					expect(template).toMatch(/<div .* aaa="bbb" data-a="a" xxx="42" data-b="b" ccc="ddd">Hello<\/div>/);
+					expect(template).toMatch(/<div .* aaa="bbb"\s+data-a="a"\s+xxx="42"\s+data-b="b"\s+ccc="ddd">Hello<\/div>/);
 				});
 
 			});
@@ -598,8 +853,8 @@ describe('Parser', () => {
 			describe('When dataset attributes are passed', () => {
 
 				it('sets their values inline', () => {
-					const obj = { 'data-foo': 'bar', 'data-baz': 'qux' };
-					const template = rml`<div ...${obj}>Hello</div>`;
+					const args = { 'data-foo': 'bar', 'data-baz': 'qux' };
+					const template = rml`<div ${args}>Hello</div>`;
 
 					expect(template).toMatch(/<div.*data-foo="bar" data-baz="qux">Hello<\/div>/);
 				});

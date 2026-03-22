@@ -2,7 +2,7 @@ import { Observer, OperatorPipeline } from '../types';
 import type { RMLTemplateExpressions } from '../types/internal';
 import type { Observable, OperatorFunction, UnaryFunction } from 'rxjs';
 
-import { isFuture, isObserver } from '../types/futures';
+import { isFuture } from '../types/futures';
 import { inputPipe, pipeIn } from '../utils/input-pipe';
 import { pipe } from 'rxjs';
 
@@ -21,14 +21,41 @@ export const curryOut = <I, O>(...args: OperatorFunction<I, O>[] | [...OperatorF
 };
 
 /**
- * Currying for input stream operators
- * Create a curried observer stream from a given target
- * by applying the specified input pipeline to it
+ * Create a reverse-curried observable for a target stream
+ * by applying an input pipeline in front of it
+ * @param pipeline an array of RxJS operators
+ * @param destination the target stream to feed
+ * @returns An Observer if both pipeline and destination are supplied
+ *   or a curried function that takes a stream to return the above.
+ * @example
+ * ```ts
+ * const target = new Subject<number>;
+ * 
+ * // an event adapter that feeds the value of an HTML input
+ * // this will return a function that takes a target stream
+ * // as a parameter
+ * const Value = korma([
+ *   map(e => e.target.value),
+ * ]);
+ * 
+ * rml`<input onchange="${Value(target)}">`
+ * ```
+ * 
+ * * @example
+ * ```ts
+ * const target = new Subject<number>;
+ * 
+ * // an event adapter that feeds the value of an HTML input
+ * const ValueFeeder = korma([
+ *   map(e => e.target.value),
+ * ], target);
+ * 
+ * rml`<input onchange="${valueFeeder}">`
  **/
 export const korma = <I, O=I>(pipeline: OperatorFunction<I, O>[], destination?: RMLTemplateExpressions.SourceExpression<O>) =>
 	// we're collecting pipeline as an array instead of regular parameters because it would be hard
 	// to tell a destination that's a plain function from another operator, which is also a function.
 	destination
 		? pipeIn<I, O>(destination, ...pipeline)
-		: inputPipe(...pipeline)
+		: inputPipe<I, O>(...pipeline)
 ;

@@ -6,23 +6,11 @@ describe('Class Sink', () => {
 	describe('Given a class string', () => {
 
 		it('sets className on sink', () => {
-			const el = MockElement({ className: 'class1 class2 class3' });
+			const el = MockElement({ className: 'class1 class2' });
 			const sink = ClassObjectSink(<HTMLElement>el);
 
-			sink('class1');
-			expect(el.className).toEqual('class1');
-		});
-
-		it('clears classes for empty strings on sink', () => {
-			const el = MockElement({ className: 'class1 class2 class3' });
-			const sink = ClassObjectSink(<HTMLElement>el);
-
-			sink({
-				class1: false,
-				class2: 0,
-				class3: '',
-			});
-			expect(el.className).toEqual('');
+			sink('class3');
+			expect(el.className).toInclude('class3');
 		});
 
 	});

@@ -44,7 +44,7 @@ const SubjectProxy2 = (initials: Record<string | symbol, any> = {}, sources: Rec
 };
 
 class RimmelElement extends HTMLElement {
-	component?: RimmelComponent;
+	component: RimmelComponent | null | undefined;
 	attrs: Inputs;
 	#externalMutationObserver?: MutationObserver;
 	#lightMutationObserver?: MutationObserver;
@@ -56,7 +56,7 @@ class RimmelElement extends HTMLElement {
 	externalSourceAttributes?: Record<string, Sink<any>>;
 	bindings?: {};
 
-	constructor(component?: RimmelComponent, initFn?: Function) {
+	constructor(component: RimmelComponent | null | undefined, initFn?: Function) {
 		super();
 
 		if(component) {

@@ -1,5 +1,6 @@
 import type { Sink } from "../types/sink";
 
+import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
 import { asap } from "../lib/drain";
 import { camelCase } from "../utils/camelCase";
 
@@ -26,7 +27,8 @@ export const DatasetObjectSink: Sink<HTMLElement | SVGElement | MathMLElement> =
 	return (data: Record<DatasetKey, string | null | undefined>) => {
 		for (const [key, str] of Object.entries(data ?? {})) {
 			const camelKey = camelCase(key);
-			(str === undefined || str == null)
+			([undefined, null, false].includes(str) || (str == 'false' && BOOLEAN_ATTRIBUTES.has(key)))
+			//(str === undefined || str == null || (str == false || str == 'false') && BOOLEAN_ATTRIBUTES.has(key))
 				? delete dataset[camelKey]
 				: asap((str: string) => dataset[camelKey] = str, str);
 		}

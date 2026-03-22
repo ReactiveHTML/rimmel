@@ -58,6 +58,7 @@ export interface SinkBindingConfiguration<E extends Element> extends BindingConf
 	t: string;
 	source: Future<unknown>;
 	sink: Sink<E>;
+	textNodeOnly?: boolean;
 	scheduler?: RenderingScheduler;
 	params?: any;
 	error?: ErrorHandler;
@@ -79,7 +80,7 @@ export type SourceAttributeName = RMLEventAttributeName;
 export type SinkAttributeName<T = string> = T extends RMLEventAttributeName ? never : string;
 export type AttributeName = SourceAttributeName | SinkAttributeName;
 
-export type _SinkAttributeValue = boolean | string | number | null | undefined | Function;
+export type _SinkAttributeValue = boolean | string | number | null | undefined | Function | { [key: string]: _SinkAttributeValue };
 export type PresentSinkAttributeValue = _SinkAttributeValue;
 export const isPresentSinkAttributeValue = (value: any): value is PresentSinkAttributeValue => !isFuture(value)
 export type FutureSinkAttributeValue = Future<_SinkAttributeValue>;

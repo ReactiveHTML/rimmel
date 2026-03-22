@@ -6,7 +6,6 @@ import { SINK_TAG } from "../constants";
 
 export const MIXIN_SINK_TAG = 'mixin';
 
-
 /**
  * A specialised sink to merge all properties of an object into a target element.
  * If you pass a plain object it will be merged immediately. You can also merge event listeners on mount.
@@ -92,4 +91,3 @@ export const Mixin: ExplicitSink<'mixin'> = (source: RMLTemplateExpressions.Mixi
 		sink: AttributeObjectSink,
 	};
 };
-

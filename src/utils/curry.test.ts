@@ -57,7 +57,7 @@ describe('korma', () => {
 
 	describe('When a target is provided', () => {
 
-		it('Returns a reverse-piped Observer stream', async () => {
+		it('Returns a reverse-piped Observer', async () => {
 			const { promise, resolve } = Promise.withResolvers()
 
 			const a = 2;

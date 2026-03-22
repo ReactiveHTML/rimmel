@@ -9,7 +9,7 @@ const maybeLift = <T>(v: MaybeFuture<T>): Observable<T> =>
 ;
 
 /**
- * WIP: don't use yet
+ * WIP, experimental, don't use yet
  * Emits the latest value coming from the supplied observable
  */
 export const AsLatestFrom = <I>(source: MaybeFuture<I>, target?: Observer<I>) => {

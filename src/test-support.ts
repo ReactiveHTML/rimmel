@@ -1,10 +1,21 @@
 import { RMLEventAttributeName } from "./types/dom";
+import { camelCase } from "./utils/camelCase";
 
 type HTMLEventSource = {
 	[key in RMLEventAttributeName]?: any;
 }
 
+const kebabCase = (str: string) =>
+	str
+		.replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+		.replace(/[_\s]+/g, "-")
+		.toLowerCase()
+;
+
+export const defer = <T>(value: T, timeout = 10) => new Promise<T>((resolve) => setTimeout(() => resolve(value), timeout));
+
 export interface MockElement extends HTMLElement {
+	autoplay?: boolean,
 	dataset: DOMStringMap;
 	checked?: boolean;
 	disabled?: boolean;
@@ -32,13 +43,13 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
 	const el = <MockElement>{
 		'focus': () => {},
 		'blur': () => {},
-		'dataset': {},
 		'style': {},
 		'tagName': 'MOCKELEMENT',
 		'textContent': '',
 		'innerText': '',
 		'innerHTML': '',
-		'value': '',
+		'value': ['INPUT', 'BUTTON'].includes(props?.tagName) ? '' : undefined,
+		'autoplay': undefined,
 		remove: () => {},
 		setAttribute(name: string, value: string) {
 			this[name] = value;
@@ -57,6 +68,9 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
 			add(name: string) {
 				el.className = el.className.split(' ').filter(x => x !== name).concat(name).join(' ');
 			},
+			contains(name: string) {
+				return new RegExp(`(?:^| )${name}(?: |$)`).test(el.className);
+			},
 			remove(name: string) {
 				el.className = el.className.split(' ').filter(x => x !== name).join(' ');
 			},
@@ -67,6 +81,15 @@ export const MockElement = (props?: Record<string, any>): MockElement => {
 					;
 			},
 		},
+		dataset: new Proxy({}, {
+			get(target, key: string) {
+				return el.getAttribute(`data-${kebabCase(key.replace(/^data-/, ''))}`);
+			},
+			set(target, key: string, value) {
+				el.setAttribute(`data-${kebabCase(key.replace(/^data-/, ''))}`, value);
+				return true;
+			},
+		}),
 		insertAdjacentHTML(pos: InsertPosition, html: string) {
 			if(pos === 'beforeend')
 				el.innerHTML += html

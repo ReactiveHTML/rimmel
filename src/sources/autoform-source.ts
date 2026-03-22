@@ -14,7 +14,7 @@ const ElementMappers = {
 	number: (e: HTMLInputElement) => e.valueAsNumber,
 	date: (e: HTMLInputElement) => e.valueAsDate,
 	checkbox: (e: HTMLInputElement) => e.checked,
-	radio: (e: HTMLInputElement) => e.checked && (DataMappers[e.dataset.type as keyof typeof DataMappers]?.(e.value)??e.value) || undefined,
+	radio: (e: HTMLInputElement) => e.checked && (DataMappers[e.dataset.type as keyof typeof DataMappers]?.(e.value) ?? e.value) || undefined,
 	'select-one': (e: HTMLSelectElement) => DataMappers[(e.options[e.selectedIndex].dataset.type ?? e.dataset.type) as keyof typeof DataMappers]?.(e.value) ?? e.value,
 	'select-multiple': (e: HTMLSelectElement) => [...e.options].filter(o => o.selected).map(o => (DataMappers[o.dataset.type as keyof typeof DataMappers ?? e.dataset.type as keyof typeof DataMappers] ?? DataMappers.text)(o.value)),
 } as const;
@@ -31,9 +31,10 @@ const resolve =
  * @returns OperatorFunction<Event, FormData>
  * @example <form onsubmit="${source(isValid, form, stream)}"> ... </form>
 **/
-export const autoForm =
+export const autoForm = () =>
 	map((e: Event) => Object.fromEntries(
 		[...(<HTMLFormElement>e.currentTarget).elements]
+			// FIXME: doesn't emit unchecked radio buttons. Should emit null, instead?
 			.map((e: Element) => [(e as HTMLFieldElement).name ?? e.id, resolve(e as HTMLFieldElement)])
 			.filter(([k, v]) => k!=='' && v!==undefined)
 	))
@@ -46,7 +47,7 @@ export const autoForm =
  * @example <form action="dialog" onsubmit="${AsTypedForm(handlerFn)}"> ... </form>
 **/
 export const AutoForm = inputPipe<SubmitEvent | Event, Record<HTMLElementName, any>>(
-	autoForm,
+	autoForm(),
 );
 
 export const asTypedFormData = autoForm;

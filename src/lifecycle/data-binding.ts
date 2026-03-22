@@ -2,12 +2,12 @@ import type { RMLEventName } from "../types/dom";
 import type { SourceBindingConfiguration } from "../types/internal";
 
 import { INTERACTIVE_NODE_START, INTERACTIVE_NODE_END, RESOLVE_ATTRIBUTE, RESOLVE_SELECTOR, RML_DEBUG, USE_DOM_OBSERVABLES } from "../constants";
+import { ENABLE_RML_DEBUGGER } from "../debug";
 
 import { subscriptions, waitingElementHandlers } from "../internal-state";
 import { isSinkBindingConfiguration } from "../types/internal";
 import { subscribe } from "../lib/drain";
 import { terminationHandler } from "../sinks/termination-sink";
-import { tracing } from "../debug";
 import { SinkFunction } from "../types";
 import { addListener } from "../lib/addListener";
 
@@ -57,52 +57,57 @@ export const Rimmel_Bind_Subtree = (node: Element): void => {
 	(waitingElementHandlers.get(bindingRef) ?? []).forEach(function Rimmel_Bind_Element(bindingConfiguration) {
 		const debugThisNode = node.hasAttribute(RML_DEBUG);
 
-		// #IFDEF ENABLE_RML_DEBUGGER
-		if(tracing && debugThisNode) {
+		if(ENABLE_RML_DEBUGGER) {
+			if(debugThisNode) {
+				/* Stopped at data binding phase */
 
-			/* Stopped at data binding */
-			debugger;
+				// The node binding will be applied to
+				node;
+
+				node.attributes;
+
+				debugger;
+			}
 		}
-		// #ENDIF ENABLE_RML_DEBUGGER
 
 		if (isSinkBindingConfiguration(bindingConfiguration)) {
-			// DATA SINKS
+			// It's a data sink
 
 			// TODO: bindingConfiguration.sinkParams may itself be a promise or an observable, so need to subscribe to it
-			const targetNode = intermediateInteractiveNodes.shift() ?? node;
+			const targetNode =  bindingConfiguration.textNodeOnly ? (intermediateInteractiveNodes.shift() ?? node) : node;
 			const { sink, t } = bindingConfiguration;
 			const sinkFn = sink(targetNode, bindingConfiguration.params);
 
-			// A pre-sink step that can show the above sinkFn in a stack trace for debugging
-			const loggingSinkFn: SinkFunction = (...data: any) => {
-				console.groupCollapsed('RML: Sinking', t, data);
-				console.log(bindingConfiguration);
-				console.trace('Stack Trace (from Source to Sink), data=', data);
-				sinkFn(...data)
-				console.groupEnd();
-			};
-
-			// #IFDEF ENABLE_RML_DEBUGGER
 			// This is the actual sink that will be bound to a source
-			const sinkFn2 = tracing && debugThisNode ? loggingSinkFn : sinkFn;
+			let sinkFn2 = sinkFn;
 
-			if(tracing && debugThisNode) {
-				console.groupCollapsed('RML: Binding', t, targetNode);
-				console.dir(targetNode);
-				console.debug('Node: %o', targetNode);
-				console.debug('Conf: %o', bindingConfiguration);
-				console.debug('Sink: %o', sinkFn2);
-				console.groupEnd();
+			if(ENABLE_RML_DEBUGGER) {
+				// A pre-sink step that can show the above sinkFn in a stack trace for debugging
+				const loggingSinkFn: SinkFunction = (...data: any) => {
+					console.groupCollapsed('RML: Sinking', t, data);
+					console.log(bindingConfiguration);
+					console.trace('Stack Trace (from Source to Sink), data=', data);
+					sinkFn(...data)
+					console.groupEnd();
+				};
+
+				if(debugThisNode) {
+					sinkFn2 = loggingSinkFn;
+
+					console.groupCollapsed('RML: Binding', t, targetNode);
+					console.dir(targetNode);
+					console.debug('Node: %o', targetNode);
+					console.debug('Conf: %o', bindingConfiguration);
+					console.debug('Sink: %o', sinkFn2);
+					console.groupEnd();
+				}
 			}
-			// #ELSE
-			// const sinkFn2 = sinkFn;
-			// #ENDIF ENABLE_RML_DEBUGGER
 
 			const sourceStream = bindingConfiguration.source;
 
 			subscribe(targetNode, sourceStream, sinkFn2, bindingConfiguration.error ?? errorHandler, bindingConfiguration.termination ?? terminationHandler, bindingConfiguration.scheduler);
 		} else {
-			// EVENT SOURCES
+			// It's an event source
 
 			const sourceBindingConfiguration = <SourceBindingConfiguration<RMLEventName>>bindingConfiguration;
 			const { eventName } = sourceBindingConfiguration;

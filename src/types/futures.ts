@@ -115,6 +115,12 @@ export interface Observer<I> {
 	complete?: ObserverCompleteFunction;
 };
 
+/**
+ * Anything that can consume data from an Observable,
+ * which can be either an Observer, or a plain function.
+ */
+export type Consumer<T> = ObserverFunction<T> | Observer<T>;
+
 export interface Observature<I, O=I> {
 	[SymbolObservature]: any,
 	addSource: <I>(source: Observable<I>) => void,

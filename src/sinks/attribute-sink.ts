@@ -3,6 +3,7 @@ import type { AttributeObject } from '../types/internal';
 import type { MaybeFuture, Observer } from '../types/futures';
 import type { RMLEventAttributeName, RMLEventName } from '../types/dom';
 
+import { BOOLEAN_ATTRIBUTES } from "../definitions/boolean-attributes";
 import { addListener } from '../lib/addListener';
 import { asap } from '../lib/drain';
 import { DatasetItemPreSink, DatasetObjectSink } from './dataset-sink';
@@ -176,6 +177,8 @@ export const DOMAttributePreSink = (attributeName: WritableElementAttribute): Si
 		(value: unknown) => (node[attributeName] as unknown) = value
 ;
 
+const datasetAttributePrefix = 'data-';
+
 export const AttributeObjectSink = <T extends HTMLElement | SVGElement | MathMLElement>(node: T) =>
 	(attributeobject: AttributeObject) => {
 		(Object.entries(attributeobject) ?? [])
@@ -183,17 +186,20 @@ export const AttributeObjectSink = <T extends HTMLElement | SVGElement | MathMLE
 				// TODO: toggle/remove event listener, if matches /^on/ (or /^off/ maybe?)
 				// N.B.: keep v === false || v == 'false' for transpilers changing it to v == '0' || v == 0
 				// which is no good, because 0 is no special value for non-boolean attributess. value="0"
-				if(v == null || v === false || v == 'false' || v == undefined) {
-					node.removeAttribute(k)
-				} else if(isRMLEventListener(k, v)) { //if(k.startsWith('on') /* && isFunction((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then ?? v) */) {
+				if(isRMLEventListener(k, v)) { //if(k.startsWith('on') /* && isFunction((<Observer<any>><unknown>v).next ?? (<Promise<any>>v).then ?? v) */) {
 					// addListener(node, <RMLEventName>k.substring(2), v);
 					const e = k.replace(/^(rml:)?on/, '$1') as RMLEventName;
 					addListener(node, e, v);
 				} else {
+
+					if(v === 'false' && BOOLEAN_ATTRIBUTES.has(k)) {
+						v = false;
+					}
+
 					const sink: Sink<any> =
 						k == 'dataset'
 							? DatasetObjectSink :
-						k.startsWith('data-')
+						k.startsWith(datasetAttributePrefix)
 							? <Sink<T>>DatasetItemPreSink(k.substring(5)) :
 						node.tagName == 'FORM'
 							? FormElementSink :

@@ -34,3 +34,4 @@ export type RMLEventListener<E extends Event = Event> =
 export const isRMLEventListener = (name: string, arg: unknown): arg is RMLEventListener =>
 	/^(?:rml:)?on/.test(name);
 ;
+

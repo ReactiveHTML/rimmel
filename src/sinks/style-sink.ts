@@ -30,9 +30,9 @@ export const StyleSink: Sink<HTMLElement | SVGElement> =
 		getCSSPropertySetter(node.style, key as keyof CSSStyleDeclaration);
 ;
 
-export const StylePreSink = (key: CSSWritableProperty) =>
+export const StylePreSink = (key: keyof CSSWritableProperty) =>
 	(node: HTMLElement | SVGElement) =>
-		StyleSink(node, camelCase(key))
+		StyleSink(node, camelCase(key as string))
 ;
 
 export const StyleObjectSink: Sink<HTMLElement | SVGElement> = (node: HTMLElement | SVGElement) =>

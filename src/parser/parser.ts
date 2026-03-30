@@ -1,5 +1,7 @@
 import type { AttributeObject, BindingConfiguration, RMLTemplateExpression, RMLTemplateExpressions, SinkBindingConfiguration, SourceBindingConfiguration } from "../types/internal";
+import type { CSSWritableProperty } from "../types/style";
 import type { Future, MaybeFuture } from "../types/futures";
+import type { KVP } from "../types/key-value-pair";
 import type { Sink } from "../types/sink";
 import type { HTMLString, RMLEventAttributeName, RMLEventName } from "../types/dom";
 
@@ -23,7 +25,6 @@ import { isRMLEventListener } from "../types/event-listener";
 import { DatasetItemPreSink } from "../sinks/dataset-sink";
 import { ClassObjectSink } from "../sinks/class-sink";
 import { chronolyze } from "../utils/chronolyze";
-import { KVP } from "../types/key-value-pair";
 import { ENABLE_RML_DEBUGGER } from "../debug";
 
 /**
@@ -129,14 +130,14 @@ export function rml(_strings: TemplateStringsArray, ..._expressions: RMLTemplate
 
 				/* Stopped parsing a RML template */
 
-				// The current template being processed, without parameters
-				template;
+				template; // The current template being processed, without parameters
 
 				debugger;
 			}
 		}
 
-		if(['string', 'number', 'boolean'].includes(printableExpressionType)) {
+		// if(['string', 'number', 'boolean'].includes(printableExpressionType)) {
+		if(printableExpressionType == 'string' || printableExpressionType == 'number' || printableExpressionType == 'boolean') {
 			// Static expressions, no data binding. Just concatenate and move on
 			acc = accPlusString +(expression ?? '');
 		} else {
@@ -208,7 +209,7 @@ export function rml(_strings: TemplateStringsArray, ..._expressions: RMLTemplate
 							let handler: SinkBindingConfiguration<HTMLElement | SVGElement>;
 							const attributeName = isAttribute.groups!.attribute;
 							if(attributeName == 'style') {
-								const CSSAttribute = /;?(?<key>[a-z\-][a-z0-9\-_]*)\s*:\s*$/.exec(string)?.groups?.key;
+								const CSSAttribute = /;?(?<key>[a-z\-][a-z0-9\-_]*)\s*:\s*$/.exec(string)?.groups?.key as keyof CSSWritableProperty;
 								// Are we setting any specific CSS properties or the whole style attribute?
 								// TODO: what if both?
 								sink = CSSAttribute ? StylePreSink(CSSAttribute) : StyleObjectSink;

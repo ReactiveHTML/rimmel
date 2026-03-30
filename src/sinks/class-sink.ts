@@ -4,6 +4,7 @@ import type { Sink, ExplicitSink } from "../types/sink";
 
 import { SINK_TAG } from "../constants";
 import { asap } from "../lib/drain";
+import { ObjectMap } from "../lib/object-map";
 
 export const TOGGLE_CLASS_SINK_TAG = 'ToggleClass';
 export const CLASS_SINK_TAG = 'class'; // Keeping it same as 'class" attribute for now. Don't change yet...
@@ -17,8 +18,9 @@ export const ToggleClassSink = (className: ClassName): Sink<HTMLElement | SVGEle
 		node.classList.toggle.bind(node.classList, className)
 ;
 
-export const ClassNameSink: Sink<HTMLElement> = (node: HTMLElement) =>
+export const ClassNameSink: Sink<HTMLElement | SVGElement> = (node: HTMLElement | SVGElement) =>
 	(str: CSSClassName) =>
+		//@ts-ignore
 		node.className = str
 ;
 
@@ -30,10 +32,11 @@ export const ClassObjectSink: Sink<Element> = (node: Element) => {
 	const toggle = cl.toggle.bind(cl);
 
 	return (name: ClassName | ClassRecord | ((ClassName | ClassRecord)[])) => {
+		// Do we really want to check for strings here??
 		typeof name == 'string'
-			? set(name)
+			? add(name)
 			// FIXME: is it safe to assume it's an object, at this point?
-			: (<(ClassName | ClassRecord)[]>[]).concat(name).forEach(obj => Object.entries(obj)
+			: (<(ClassName | ClassRecord)[]>[]).concat(name).forEach(obj => Object.entries(obj ?? {})
 					// TODO: support 3-state with toggle
 					.forEach(([k, v]) => {
 						// Use asap to handle both present and future values
@@ -52,23 +55,24 @@ export const ExperimentalClassObjectSink: Sink<Element> = (node: Element) => {
 	const remove = cl.remove.bind(cl);
 	const toggle = cl.toggle.bind(cl);
 
-	const actions = new Map<string | number | boolean | undefined, (name: ClassName) => void>([
-		[true, add],
-		[false, remove],
-		[undefined, remove],
-		[-1, remove],
-		[0, toggle],
-		[NaN, toggle],
-		[1, add],
-	]);
+	// const actions = Record<string | number | boolean | undefined, (name: ClassName) => void>([
+	const actions = ObjectMap({
+		true: add,
+		false: remove,
+		undefined: remove,
+		[-1]: remove,
+		[0]: toggle,
+		null: toggle,
+		NaN: toggle,
+		[1]: add,
+	});
 
 	return (name: ClassName | ClassRecord) => {
 		typeof name == 'string'
 			? add(name)
 			// FIXME: is it safe to assume it's an object, at this point?
 				: Object.entries(name ?? {})
-				// .forEach(([k, v]) => v ? add(k) : remove(k));
-				.forEach(([k, v]) => actions.get(v)?.(k));
+				.forEach(([k, v]) => actions[v]?.(k));
 	};
 };
 

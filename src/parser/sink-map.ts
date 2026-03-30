@@ -4,6 +4,7 @@ import type { Sink } from "../types/sink";
 import { AppendHTMLSink } from "../sinks/append-html-sink";
 import { BlurSink } from "../sinks/blur-sink";
 import { CheckedSink } from "../sinks/checked-sink";
+import { ClassListSink } from "../sinks/classlist.sink";
 import { ClassObjectSink } from "../sinks/class-sink";
 import { ClosedSink } from "../sinks/closed-sink";
 import { DatasetSink, DatasetObjectSink } from "../sinks/dataset-sink";
@@ -24,6 +25,7 @@ export const sinkByAttributeName = new Map(<Iterable<readonly [string, Sink<any>
 	['appendHTML',      AppendHTMLSink],
 	['checked',         CheckedSink],
 	['class',           ClassObjectSink],
+	['classList',       ClassListSink],
 	//['contenteditable', ToggleAttributePreSink('contenteditable')],
 	['data-',           DatasetSink],
 	['dataset',         DatasetObjectSink], // Shall we include this, too?

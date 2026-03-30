@@ -23,10 +23,10 @@ export const pipeIn =
 ;
 
 /**
- * Create an "input pipe" by prepending operators to an Observer or a Subject
+ * Create an "input pipeline" by prepending operators to the input of an Observer
  *
  * @remarks This works the opposite of the `pipe()` function in RxJS, which
- * transforms the output of an observable whilst this transforms the input.
+ * attaches operators to the output of an Observable.
  *
  * You normally use an input pipe to create Event Adapters.
  * 
@@ -49,7 +49,7 @@ export const reversePipe = inputPipe;
 
 // TBC
 export const source = <I, O=I>(...reversePipeline: [...OperatorFunction<I, O>[], (Observer<any> | Function)]) =>
-	pipeIn(<Observer<any>>reversePipeline.pop(), ...(reversePipeline as OperatorPipeline<I, O>));
+	pipeIn(reversePipeline.pop(), ...reversePipeline);
 
 export const sink = (source: MaybeFuture<any>, ...pipeline: OperatorPipeline<any, any>) =>
 	source.pipe(...pipeline);

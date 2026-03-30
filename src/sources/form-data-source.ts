@@ -67,7 +67,7 @@ export const form =
  * ```
 
 **/
-export const Form = inputPipe<SubmitEvent | Event>(
+export const Form = inputPipe<SubmitEvent | Event, Object>(
 	form,
 );
 

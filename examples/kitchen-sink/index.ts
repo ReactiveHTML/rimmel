@@ -84,7 +84,37 @@ const sources = {
 		return strHTML;
 	},
 
-	SYNC_RENDERING: () => {
+	SYNC_RENDERING_BEHAVIOR: () => {
+		const stream = new BehaviorSubject('initial value').pipe(
+			map(x => 123)
+		);
+
+		const strHTML = rml`
+			<button rml:debugger onclick="${Value(stream)}">next value</button>
+			<div>${stream}</div>
+		`;
+
+		console.log('Initial HTML:', strHTML);
+		return strHTML;
+	},
+
+	SYNC_RENDERING_2PIPE: () => {
+		const stream = new BehaviorSubject('initial value').pipe(
+			map(x => 123)
+		).pipe(
+			map(x => 234)
+		);
+
+		const strHTML = rml`
+			<button rml:debugger onclick="${Value(stream)}">next value</button>
+			<div>${stream}</div>
+		`;
+
+		console.log('Initial HTML:', strHTML);
+		return strHTML;
+	},
+
+	SYNC_RENDERING_STARTWITH: () => {
 		const stream = new Subject().pipe(
 			startWith('initial value'),
 		);
@@ -194,13 +224,13 @@ const sources = {
 	},
 
 	ActiveListener: () => {
-		const stream = new Subject<string>().pipe(
-			tap((e: Event) => {
+		const stream = new Subject<MouseEvent>().pipe(
+			tap(e => {
 				e.preventDefault()
 			}),
-			map((e: TouchEvent) => {
-				return `Cancelled event: ${e}`
-			}),
+			map(e => `defaultPrevented: ${e.defaultPrevented}<br>
+				Test passed: ${e.defaultPrevented == true}`
+			),
 		);
 
 		return rml`
@@ -211,13 +241,13 @@ const sources = {
 	},
 
 	PassiveListener: () => {
-		const stream = new Subject<string>().pipe(
-			tap((e: Event) => {
+		const stream = new Subject<MouseEvent>().pipe(
+			tap(e => {
 				e.preventDefault()
 			}),
-			map((e: TouchEvent) => {
-				return `Cancelled event: ${e}`
-			}),
+			map(e => `defaultPrevented: ${e.defaultPrevented}<br>
+				Test passed: ${e.defaultPrevented == false}`
+			),
 		);
 
 		return rml`
@@ -227,35 +257,35 @@ const sources = {
 		`;
 	},
 
-	AsLatestFrom: () => {
-		const otherStream = new ReplaySubject(123);
-		const stream = new Subject<any>();
+	// AsLatestFrom: () => {
+	// 	const otherStream = new ReplaySubject(123);
+	// 	const stream = new Subject<any>();
 
-		setInterval(() =>
-			otherStream.next(Math.random())
-		, 1000);
+	// 	setInterval(() =>
+	// 		otherStream.next(Math.random())
+	// 	, 1000);
 
-		return rml`
-			<button onclick="${AsLatestFrom(otherStream, stream)}">click me</button>
-			[ <span>${stream}</span> ]
-		`;
-	},
+	// 	return rml`
+	// 		<button onclick="${AsLatestFrom(otherStream, stream)}">click me</button>
+	// 		[ <span>${stream}</span> ]
+	// 	`;
+	// },
 
-	AsLatestFrom2: () => {
-		const otherStream = new ReplaySubject(123);
-		const stream = new Subject<any>();
+	// AsLatestFrom2: () => {
+	// 	const otherStream = new ReplaySubject(123);
+	// 	const stream = new Subject<any>();
 
-		setInterval(() =>
-			otherStream.next(Math.random())
-		, 1000);
+	// 	setInterval(() =>
+	// 		otherStream.next(Math.random())
+	// 	, 1000);
 
-		const AsTheOther = AsLatestFrom(otherStream);
+	// 	const AsTheOther = AsLatestFrom(otherStream);
 
-		return rml`
-			<button onclick="${AsTheOther(stream)}">click me</button>
-			[ <span>${stream}</span> ]
-		`;
-	},
+	// 	return rml`
+	// 		<button onclick="${AsTheOther(stream)}">click me</button>
+	// 		[ <span>${stream}</span> ]
+	// 	`;
+	// },
 
 
 	ValueSource: () => {
@@ -296,8 +326,8 @@ const sources = {
 		);
 
 		return rml`
-			Today is: <input type="date" oninput="${ValueAsDate(stream)}" autofocus><br>
 			Yesterday: <span>${yesterday}</span><br>
+			Today is: <input type="date" oninput="${ValueAsDate(stream)}" autofocus><br>
 			Tomorrow: <span>${tomorrow}</span><br>
 		`;
 	},
@@ -464,7 +494,7 @@ const sources = {
 	},
 
 
-	Dataset_Curried: () => {
+	Dataset_Kormated: () => {
 		const stream = new Subject<string>();
 		const JustFoo = Dataset('foo');
 
@@ -626,11 +656,45 @@ const sinks = {
 			<div class="${cls2}">
 				should go <span class="cls2">green</span>
 			</div>
-			<div class="cls1 ${cls2} cls3 ${cls4} cls5">
+			<div class="${cls1} ${cls2} cls3 ${cls4} cls5">
 				should turn <span class="cls1">glowing</span>, <span class="cls2">green</span>, <span class="cls3">bold</span>, <span class="cls4">italic</span>, then <span class="cls5">underlined</span>
 			</div>
 		`;
 	},
+
+	ClassObjectSink: () => {
+		const cls = {
+			cls1: true,
+			cls2: defer(true, 1000),
+			cls3: false,
+			cls4: defer(true, 3000),
+			cls5: true,
+		};
+
+		return rml`
+			<style>
+				.cls1 .cls1 {
+					text-shadow: 0px 0px 2px goldenrod;
+				}
+				.cls2 .cls2 {
+					color: limegreen;
+				}
+				.cls3 .cls3 {
+					font-weight: bold;
+				}
+				.cls4 .cls4 {
+					font-style: italic;
+				}
+				.cls5 .cls5 {
+					text-decoration: underline;
+				}
+			</style>
+			<div rml:debugger class="${cls}">
+				should be <span class="cls1">glowing</span> and <span class="cls5">underlined</span> from start, then <span class="cls2">green</span>, <span class="cls3">not bold</span>, <span class="cls4">italic</span>
+			</div>
+		`;
+	},
+
 
 	CustomElement: () => {
 		const notify = (key: string) => void console.log('Notify', key);
@@ -642,7 +706,7 @@ const sinks = {
 		return rml`
 			Should be a custom element
 			<p class="colored">colored</p>
-			<custom-element class="css-through" style="--color: lime" title="${titleStream}" content="lime" data-foo="bar2" oninput="${EventData(notify)}" onclick="${Dataset('foo')(notify)}" />
+			<custom-element class="css-through" style="--color: green" title="${titleStream}" content="red" data-foo="bar2" oninput="${EventData(notify)}" onclick="${Dataset('foo')(notify)}" />
 		`;
 	},
 
@@ -708,7 +772,7 @@ const sinks = {
 		const bg = 'green';
 
 		return rml`
-			<div style="background: clay; color: ${bg}; padding: 1rem;">
+			<div style="background: orange; color: ${bg}; padding: 1rem;">
 				Should be green
 			</div>
 		`;
@@ -727,6 +791,15 @@ const sinks = {
 			<div style="background: #f0c0b0; color: ${bg}; text-decoration: ${textDeco}; padding: 1rem; font-size: ${size}; ${rest}; font-family: monospace;">
 				Should turn maroon, underlined, large, rotated, translucent
 			</div>
+		`;
+	},
+
+	'Style with noisy html': () => {
+		const obj = defer('red');
+
+		return rml`
+			Style Attribute sink<br>
+			<div rml:debugger style="color: ${obj};">should become ${obj} quick.</div>
 		`;
 	},
 
@@ -885,7 +958,7 @@ const sinks = {
 				});
 
 				innerHTML.next('Replaced!');
-			}, 1000)
+			}, 1000);
 
 			return {
 				dataset,
@@ -901,6 +974,57 @@ const sinks = {
 				with Mixin2()
 			</div>
 		`;
+	},
+
+	ClassMixin: () => {
+		const mx = (args?: any) => {
+			return {
+				class: {
+					cls1: true,
+					cls2: false,
+					cls3: defer(true, 1e3),
+				}
+			};
+		};
+
+		return rml`
+			<style>
+				.mx::before {
+					content: "mx";
+				}
+				.mx.cls1 {
+					color: blue;
+				}
+				.mx.cls3 {
+					font-weight: bold;
+				}
+			</style>
+			<div class="mx" ...${mx()}>
+				with mixin1()
+			</div>
+		`
+	},
+
+	ClassListMixin: () => {
+		const mx = () => {
+			return {
+				classList: {
+					add: defer('cls1', 1e3),
+					remove: defer('cls1', 2e3),
+				}
+			};
+		};
+
+		return rml`
+			<style>
+				.mx.cls1 {
+					color: blue;
+				}
+			</style>
+			<div class="mx" rml:debugger ...${mx()}>
+				should go blue then normal again
+			</div>
+		`
 	},
 
 	Mixin_Subtree: () => {
@@ -930,6 +1054,19 @@ const sinks = {
 						Grandchild element <span />
 					</div>
 				</child>
+			</div>
+		`
+	},
+
+	'Mixin (innerHTML)': () => {
+		const counter = timer(0, 1000);
+
+		const mix = () => ({
+			innerHTML: rml`<p>Hello, ${counter}</p>`,
+		});
+
+		return rml`
+			<div rml:debugger ${mix()}>
 			</div>
 		`
 	},
@@ -1085,6 +1222,30 @@ const sinks = {
 		`;
 	},
 
+	'Class Attribute (BehaviorSubject)': () => {
+		const cls = new BehaviorSubject({ dotted: true });
+
+		return rml`
+			Class Attribute sink<br>
+			<style>
+				.test{
+					&.dotted::after {
+						content: 'OK';
+						margin: 0 1rem;
+						color: green;
+					}
+					&:not(.dotted)::after {
+						content: 'FAIL';
+						margin: 0 1rem;
+						color: red;
+					}
+				}
+			</style>
+			<div class="test ${cls}">should have the "dotted" class set</div>
+		`;
+	},
+
+
 	'Dataset (static)': () => {
 		const stream = {'data-foo': 'bar'};
 
@@ -1135,10 +1296,29 @@ const sinks = {
 	},
 
 
-	Confusions: () => {
+	Confusions1: () => {
+		const s = new Subject().pipe(
+			map(() => 'should not get this')
+		);
+
 		const disabled = false;
 		return rml`
-			<button rml:disabled="${disabled}">disabled=${disabled}</button>
+			<div>${s}</div>
+			<button rml:disabled="${disabled}" rml:debugger onclick="${s}">disabled=${disabled}</button>
+		`;
+	},
+
+	Confusions2: () => {
+		const s = new Subject().pipe(
+			map(() => 'should not get this')
+		);
+
+		const disabled = false;
+		return rml`
+			<div>
+			<button rml:disabled="${disabled}" rml:debugger onclick="${s}">disabled=${disabled}</button>
+			<div>${s}</div>
+			</div>
 		`;
 	},
 
@@ -1769,7 +1949,7 @@ const component = () => {
 				button:active,
 				button:focus {
 					background-color: #33e;
-					color: #111;
+					color: #aaa;
 				}
 			}
 
@@ -1819,7 +1999,7 @@ RegisterElement('custom-shadowdom-element', () => {
 	);
 
 	return rml`
-		<div class="cls1">
+		<div class="cls1" style="border: 1px dotted;">
 			Custom Element with Reactive Shadow DOM!<br>
 			<input onchange="${Cut(data)}">
 			<br>

@@ -1,4 +1,5 @@
 import { asap } from '../lib/drain';
+import type { HTMLString } from '../types';
 
 import { AppendHTMLSink, APPEND_HTML_SINK_TAG } from '../sinks/append-html-sink';
 import { AttributeObjectSink } from '../sinks/attribute-sink';
@@ -9,6 +10,7 @@ import { DisabledSink, DISABLED_SINK_TAG } from '../sinks/disabled-sink';
 import { FocusSink, FOCUS_SINK_TAG } from '../sinks/focus-sink';
 import { InnerHTMLSink, INNER_HTML_SINK_TAG } from '../sinks/inner-html-sink';
 import { InnerTextSink, INNER_TEXT_SINK_TAG } from '../sinks/inner-text-sink';
+import { TextContentSink, TEXT_CONTENT_SINK_TAG } from '../sinks/text-content-sink';
 import { JSONDumpSink, JSON_DUMP_SINK_TAG } from '../sinks/json-dump-sink';
 import { MIXIN_SINK_TAG } from '../sinks/mixin-sink';
 import { PrependHTMLSink, PREPEND_HTML_SINK_TAG } from '../sinks/prepend-html-sink';
@@ -40,6 +42,7 @@ export const HydrationScript = `
 		'${FOCUS_SINK_TAG}': ${String(FocusSink)},
 		'${INNER_HTML_SINK_TAG}': ${String(InnerHTMLSink)},
 		'${INNER_TEXT_SINK_TAG}': ${String(InnerTextSink)},
+		'${TEXT_CONTENT_SINK_TAG}': ${String(TextContentSink)},
 		'${JSON_DUMP_SINK_TAG}': ${String(JSONDumpSink)},
 		'${MIXIN_SINK_TAG}': ${String(AttributeObjectSink)},
 		'${PREPEND_HTML_SINK_TAG}': ${String(PrependHTMLSink)},
@@ -61,5 +64,4 @@ export const HydrationScript = `
 		sinkFn?.(conf.value);
 	}
 </script>
-`;
-
+` as HTMLString;

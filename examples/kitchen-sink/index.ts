@@ -68,14 +68,10 @@ const sources = {
 		}
 
 		const input = NativeStream();
-		const output = input.map(s=>s.toUpperCase());
-
-		output.subscribe({
-			next: x=>console.log('>>>', x)
-		});
+		const output = input.map(e=>e.target.value.toUpperCase());
 
 		const strHTML = rml`
-			<input oninput="${Value(input)}">
+			<input oninput="${input}" placeholder="text to uppercase">
 			<div>${output}</div>
 		`;
 

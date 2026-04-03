@@ -81,6 +81,7 @@ const sources = {
 	},
 
 	SYNC_RENDERING_BEHAVIOR: () => {
+		// 'initial value' is rendered sync into the HTML, then 123 on the next frame
 		const stream = new BehaviorSubject('initial value').pipe(
 			map(x => 123)
 		);
@@ -1294,7 +1295,7 @@ const sinks = {
 
 	Confusions1: () => {
 		const s = new Subject().pipe(
-			map(() => 'should not get this')
+			map(() => 'it works')
 		);
 
 		const disabled = false;
@@ -1309,7 +1310,7 @@ const sinks = {
 			map(() => 'should not get this')
 		);
 
-		const disabled = false;
+		const disabled = true;
 		return rml`
 			<div>
 			<button rml:disabled="${disabled}" rml:debugger onclick="${s}">disabled=${disabled}</button>

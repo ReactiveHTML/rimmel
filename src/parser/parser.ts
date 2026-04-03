@@ -227,10 +227,10 @@ export function rml(_strings: TemplateStringsArray, ..._expressions: RMLTemplate
 									const [statics, deferreds] = chronolyze(expression as AttributeObject || {}, splitter);
 
 									if(deferreds.length) {
-										handler = PreSink(attributeName, sink, deferreds.reduce((a, b) => ({...a, ...b}), {}), attributeName);
+										handler = PreSink(attributeName, sink, Object.fromEntries(deferreds), attributeName);
 									}
 
-									initialValue = statics.flatMap(s=>Object.entries(s)).filter(([k, v]) => v).map(([k, v]) => k).join(' ');
+									initialValue = statics.filter(([k, v]) => v).map(([k, v]) => k).join(' ');
 								}
 							} else {
 								isBooleanAttribute = BOOLEAN_ATTRIBUTES.has(attributeName);
@@ -284,7 +284,7 @@ export function rml(_strings: TemplateStringsArray, ..._expressions: RMLTemplate
 							const splitter = ([k, v]: KVP) => isFutureSinkAttributeValue(v) || (typeof v != 'string' && isRMLEventListener(k, v));
 							const [staticAttributes, deferredAttributes] = chronolyze(expression as AttributeObject || {}, splitter);
 
-							staticAttributes.map(sa => Object.entries(sa).forEach(([k, v], idx) => {
+							staticAttributes.forEach(([k, v], idx) => {
 								let cake = [];
 								switch(k) {
 									case 'class':
@@ -313,9 +313,8 @@ export function rml(_strings: TemplateStringsArray, ..._expressions: RMLTemplate
 								}
 								acc += ' ' +cake.join(' ');
 								cake = [];
-							}));
-							const s = deferredAttributes.reduce((a, b) => ({...a, ...b}), {})
-							sink = Mixin(s);
+							});
+							sink = Mixin(Object.fromEntries(deferredAttributes));
 						}
 
 						addRef(ref, sink);

@@ -1,6 +1,6 @@
 {
   "name": "rimmel",
-  "version": "1.5.2",
+  "version": "1.6.0-6",
   "description": "A Stream-Oriented UI library for the Rx.Observable Universe",
   "type": "module",
   "_main": "dist/cjs/index.cjs",

@@ -52,10 +52,20 @@ export const curryOut = <I, O>(...args: OperatorFunction<I, O>[] | [...OperatorF
  * 
  * rml`<input onchange="${valueFeeder}">`
  **/
-export const korma = <I, O=I>(pipeline: OperatorFunction<I, O>[], destination?: RMLTemplateExpressions.SourceExpression<O>) =>
-	// we're collecting pipeline as an array instead of regular parameters because it would be hard
-	// to tell a destination that's a plain function from another operator, which is also a function.
-	destination
-		? pipeIn<I, O>(destination, ...pipeline)
-		: inputPipe<I, O>(...pipeline)
-;
+export function korma<I, O = I>(
+  pipeline: OperatorFunction<I, O>[]
+): (destination: RMLTemplateExpressions.SourceExpression<O>) => Observer<I>;
+
+export function korma<I, O = I>(
+  pipeline: OperatorFunction<I, O>[],
+  destination: RMLTemplateExpressions.SourceExpression<O>
+): Observer<I>;
+
+export function korma<I, O = I>(
+  pipeline: OperatorFunction<I, O>[],
+  destination?: RMLTemplateExpressions.SourceExpression<O>
+) {
+  return destination === undefined
+    ? inputPipe<I, O>(...pipeline)
+    : pipeIn<I, O>(destination, ...pipeline);
+}

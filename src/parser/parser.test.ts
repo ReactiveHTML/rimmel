@@ -6,6 +6,7 @@ import { RMLEventName } from '../types/dom';
 import { rml } from './parser';
 
 import { defer } from '../test-support';
+import { SinkBindingConfiguration } from '../types/internal';
 
 describe('Parser', () => {
 	beforeEach(() => {
@@ -712,11 +713,12 @@ describe('Parser', () => {
 							const b = { 'data-foo': 'bar' };
 							const template = rml`<div ...${a} ...${b}>Hello</div>`;
 
+							const sbc = waitingElementHandlers.get('RMLREF+0')![0] as SinkBindingConfiguration;
 							expect(template).toMatch(/<div.*resolve="RMLREF\+0".* data-foo="bar".*>Hello<\/div>/);
-							expect(waitingElementHandlers.get('RMLREF+0')![0]).toEqual(
+							expect(sbc).toEqual(
 								{ type: 'sink', t: 'mixin', source: a, sink: AttributeObjectSink },
 							);
-							expect(waitingElementHandlers.get('RMLREF+0')![0].source).resolves.toEqual(
+							expect(sbc.source).resolves.toEqual(
 								{ 'data-bar': 'baz' },
 							);
 						});
@@ -730,18 +732,21 @@ describe('Parser', () => {
 							const b = defer({ 'data-bar': 'baz' });
 							const template = rml`<div ...${a} ...${b}>Hello</div>`;
 
+							const sbc0 = waitingElementHandlers.get('RMLREF+0')![0] as SinkBindingConfiguration;
+							const sbc1 = waitingElementHandlers.get('RMLREF+0')![1] as SinkBindingConfiguration;
+
 							expect(template).toMatch(/<div.*resolve="RMLREF\+0"\s*>Hello<\/div>/);
-							expect(waitingElementHandlers.get('RMLREF+0')![0]).toEqual(
+							expect(sbc0).toEqual(
 								{ type: 'sink', t: 'mixin', source: a, sink: AttributeObjectSink },
 							);
-							expect(waitingElementHandlers.get('RMLREF+0')![0]).toEqual(
+							expect(sbc0).toEqual(
 								{ type: 'sink', t: 'mixin', source: b, sink: AttributeObjectSink },
 							);
 
-							expect(waitingElementHandlers.get('RMLREF+0')![0].source).resolves.toEqual(
+							expect(sbc0.source).resolves.toEqual(
 								{ 'data-foo': 'bar' },
 							);
-							expect(waitingElementHandlers.get('RMLREF+0')![1].source).resolves.toEqual(
+							expect(sbc1.source).resolves.toEqual(
 								{ 'data-bar': 'baz' },
 							);
 						});

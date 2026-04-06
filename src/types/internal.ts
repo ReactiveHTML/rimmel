@@ -53,7 +53,7 @@ export interface SourceBindingConfiguration<T extends RMLEventName> {
  *   <input value="${p}">
  * `;
  */
-export interface SinkBindingConfiguration<E extends Element> extends BindingConfiguration {
+export interface SinkBindingConfiguration<E extends Element = Element> extends BindingConfiguration {
 	type: 'sink';
 	t: string;
 	source: Future<unknown>;
@@ -148,7 +148,7 @@ export namespace RMLTemplateExpressions {
 	export type GenericHandler = BindingConfiguration;
 
 	// Implicit Source
-	export type SourceExpression<T> = Observer<T> | ((t: T) => void);
+	export type SourceExpression<T> = Observer<T> | ((t: T) => void) | undefined;
 
 	export type SinkExpression = Sink<Element | Text>;
 	// export type Empty = MaybeFuture<undefined | null | ''>;

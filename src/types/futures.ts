@@ -109,11 +109,11 @@ export type ObserverFunction<T> = (value: T) => void;
 export type ObserverErrorFunction = (e: unknown) => void;
 export type ObserverCompleteFunction = () => void;
 
-export interface Observer<I> {
-	next: ObserverFunction<I>;
+export type Observer<I> = Partial<{
+	next?: ObserverFunction<I>;
 	error?: ObserverErrorFunction;
 	complete?: ObserverCompleteFunction;
-};
+}>;
 
 /**
  * Anything that can consume data from an Observable,

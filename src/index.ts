@@ -40,6 +40,7 @@ export { korma } from './utils/curry';
 
 // Event Source Modifiers
 export { Active } from './sources/modifiers/active';
+export { Captive } from './sources/modifiers/captive';
 export { Passive } from './sources/modifiers/passive';
 
 // Event Sources

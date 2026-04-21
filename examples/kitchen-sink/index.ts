@@ -17,9 +17,9 @@
 
 import type { HTMLString, SinkBindingConfiguration, Stream, Coords } from '../../src/index';
 
-import { BehaviorSubject, Subject, ReplaySubject, catchError, combineLatest, distinctUntilKeyChanged, filter, interval, map, merge, mergeWith, Observable, of, pipe, scan, share, startWith, take, tap, timer, withLatestFrom } from 'rxjs';
+import { BehaviorSubject, Subject, ReplaySubject, catchError, combineLatest, distinctUntilKeyChanged, filter, interval, map, mapTo, merge, mergeWith, Observable, of, pipe, scan, share, startWith, take, tap, timer, withLatestFrom } from 'rxjs';
 
-import { rml, curry, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Removed, Sanitize, sink, source, Suspend, Suspender, Swap, AsLatestFrom, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, AmbientEffect, } from '../../src/index';
+import { rml, curry, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Captive, Removed, Sanitize, sink, source, Suspend, Suspender, Swap, AsLatestFrom, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, AmbientEffect, } from '../../src/index';
 import { Cookie } from '../../src/ambient/cookies';
 import { subscribe } from '../../src/lib/drain';
 import { set_USE_DOM_OBSERVABLES } from '../../src/index';
@@ -253,6 +253,29 @@ const sources = {
 			<div>${stream}</div>
 		`;
 	},
+
+	CaptiveListener: () => {
+		const outer = new Subject<MouseEvent>().pipe(
+			tap(e=>e.stopPropagation()),
+			map(e => 'Outer stream captured. Test passed'),
+		);
+
+		const inner = new Subject<MouseEvent>().pipe(
+			map(e => 'Inner stream captured. Test failed'),
+		);
+
+		return rml`
+			The outer &lt;ul&gt; should capture the event, but not the inner &lt;li&gt;.<br>
+			<ul onclick="${Captive(outer)}" style="border: 1px dotted lime;">
+				<li onclick="${inner}" style="border: 1px dotted red;">
+					<button>Click Me</button>
+				</li>
+			</ul>
+			<div>${outer}</div>
+			<div>${inner}</div>
+		`;
+	},
+
 
 	// AsLatestFrom: () => {
 	// 	const otherStream = new ReplaySubject(123);
@@ -1021,7 +1044,23 @@ const sinks = {
 			<div class="mx" rml:debugger ...${mx()}>
 				should go blue then normal again
 			</div>
-		`
+		`;
+	},
+
+	MixinWithEventModifiers: () => {
+		const s1 = new Subject().pipe(
+			mapTo('passed'),
+		);
+		const mx = () => {
+			return {
+				onclick: Passive(s1),
+			};
+		};
+
+		return rml`
+			<button ...${mx(s1)}>click me</button>
+			<div>${s1}</div>
+		`;
 	},
 
 	Mixin_Subtree: () => {

@@ -1,6 +1,6 @@
 import type { SinkFunction } from "../types/sink";
 import type { EventListenerObject, EventListener, EventListenerFunction } from "../types/dom";
-import type { MaybeFuture, Observable, Observer, ObserverErrorFunction, ObserverFunction } from "../types/futures";
+import type { Consumer, MaybeFuture, Observable, Observer, ObserverErrorFunction, ObserverFunction } from "../types/futures";
 import type { RenderingScheduler } from "../types/schedulers";
 
 import { isObservable, isPromise } from "../types/futures";
@@ -23,11 +23,10 @@ export const callable = <T>(x: (Observer<T> | EventListenerObject<T> | ObserverF
 	(x as (t: T)=>any)
 ;
 
-// FIXME: remove, use subscribe below instead
-export const asap = <T>(fn: ObserverFunction<T> | Observer<T>, arg: MaybeFuture<unknown>) => {
-	(<Observable<T>>arg)?.subscribe?.(fn) ??
-	(<Promise<T>>arg)?.then?.((fn as Observer<T>).next?.bind(fn) ?? fn) ??
-	(fn as ObserverFunction<T>)(arg as T);
+export const asap = <T>(target: Consumer<T>, source: MaybeFuture<unknown>) => {
+	(<Observable<T>>source)?.subscribe?.(target) ??
+	(<Promise<T>>source)?.then?.(((target as Observer<T>).next as ObserverFunction<T>)?.bind(target) ?? target) ??
+	(target as ObserverFunction<T>)(source as T);
 };
 
 /**

@@ -1,24 +1,8 @@
-import { Observer, OperatorPipeline } from '../types';
-import type { RMLTemplateExpressions } from '../types/internal';
-import type { Observable, OperatorFunction, UnaryFunction } from 'rxjs';
+import type { NextObserver, OperatorFunction } from 'rxjs';
+import type { OperatorPipeline } from '../types';
+import type { Consumer } from '../types/futures';
 
-import { isFuture } from '../types/futures';
 import { inputPipe, pipeIn } from '../utils/input-pipe';
-import { pipe } from 'rxjs';
-
-/**
- * Currying "out" for observable streams
- * Create a curried observable stream from a given source
- * by applying the specified pipeline to it
- */
-export const curryOut = <I, O>(...args: OperatorFunction<I, O>[] | [...OperatorFunction<any, any>[], Observable<O>]) => {
-	const source = isFuture(args.at(-1)) ? args.pop() as Observable<O> : undefined;
-	const stream = pipe(
-		...(args as UnaryFunction<any, any>[]),
-	);
-
-	return source ? stream(source) : stream;
-};
 
 /**
  * Create a reverse-curried observable for a target stream
@@ -52,20 +36,33 @@ export const curryOut = <I, O>(...args: OperatorFunction<I, O>[] | [...OperatorF
  * 
  * rml`<input onchange="${valueFeeder}">`
  **/
-export function korma<I, O = I>(
-  pipeline: OperatorFunction<I, O>[]
-): (destination: RMLTemplateExpressions.SourceExpression<O>) => Observer<I>;
+export function korma<I, O = I>(pipeline: []): (destination: Consumer<O>) => NextObserver<I>;
 
-export function korma<I, O = I>(
-  pipeline: OperatorFunction<I, O>[],
-  destination: RMLTemplateExpressions.SourceExpression<O>
-): Observer<I>;
+export function korma<I, A>(pipeline: [OperatorFunction<I, A>]): (destination?: Consumer<A>) => NextObserver<I>;
+export function korma<I, A, B>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>]): (destination?: Consumer<B>) => NextObserver<I>;
+export function korma<I, A, B, C>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>]): (destination?: Consumer<C>) => NextObserver<I>;
+export function korma<I, A, B, C, D>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>]): (destination?: Consumer<D>) => NextObserver<I>;
+export function korma<I, A, B, C, D, E>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>, OperatorFunction<D, E>]): (destination?: Consumer<E>) => NextObserver<I>;
+export function korma<I, A, B, C, D, E, F>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>, OperatorFunction<D, E>, OperatorFunction<E, F>]): (destination?: Consumer<F>) => NextObserver<I>;
+export function korma<I, A, B, C, D, E, F, G>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>, OperatorFunction<D, E>, OperatorFunction<E, F>, OperatorFunction<F, G>]): (destination?: Consumer<G>) => NextObserver<I>;
+export function korma<I, A, B, C, D, E, F, G, H>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>, OperatorFunction<D, E>, OperatorFunction<E, F>, OperatorFunction<F, G>, OperatorFunction<G, H>]): (destination?: Consumer<H>) => NextObserver<I>;
+export function korma<I, A, B, C, D, E, F, G, H, J>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>, OperatorFunction<D, E>, OperatorFunction<E, F>, OperatorFunction<F, G>, OperatorFunction<G, H>, OperatorFunction<H, J>]): (destination?: Consumer<J>) => NextObserver<I>;
+export function korma<I, O = I>(pipeline: OperatorPipeline<I, O>): (destination?: Consumer<O>) => NextObserver<I>;
 
-export function korma<I, O = I>(
-  pipeline: OperatorFunction<I, O>[],
-  destination?: RMLTemplateExpressions.SourceExpression<O>
-) {
-  return destination === undefined
-    ? inputPipe<I, O>(...pipeline)
-    : pipeIn<I, O>(destination, ...pipeline);
-}
+export function korma<I, O = I>(pipeline: [], destination?: Consumer<O>): NextObserver<I>;
+export function korma<I, A>(pipeline: [OperatorFunction<I, A>], destination?: Consumer<A>): NextObserver<I>;
+export function korma<I, A, B>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>], destination?: Consumer<B>): NextObserver<I>;
+export function korma<I, A, B, C>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>], destination?: Consumer<C>): NextObserver<I>;
+export function korma<I, A, B, C, D>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>], destination?: Consumer<D>): NextObserver<I>;
+export function korma<I, A, B, C, D, E>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>, OperatorFunction<D, E>], destination?: Consumer<E>): NextObserver<I>;
+export function korma<I, A, B, C, D, E, F>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>, OperatorFunction<D, E>, OperatorFunction<E, F>], destination?: Consumer<F>): NextObserver<I>;
+export function korma<I, A, B, C, D, E, F, G>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>, OperatorFunction<D, E>, OperatorFunction<E, F>, OperatorFunction<F, G>], destination?: Consumer<G>): NextObserver<I>;
+export function korma<I, A, B, C, D, E, F, G, H>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>, OperatorFunction<D, E>, OperatorFunction<E, F>, OperatorFunction<F, G>, OperatorFunction<G, H>], destination?: Consumer<H>): NextObserver<I>;
+export function korma<I, A, B, C, D, E, F, G, H, J>(pipeline: [OperatorFunction<I, A>, OperatorFunction<A, B>, OperatorFunction<B, C>, OperatorFunction<C, D>, OperatorFunction<D, E>, OperatorFunction<E, F>, OperatorFunction<F, G>, OperatorFunction<G, H>, OperatorFunction<H, J>], destination?: Consumer<J>): NextObserver<I>;
+export function korma<I, O = I>(pipeline: OperatorPipeline<I, O>, destination?: Consumer<O>): NextObserver<I>;
+
+export function korma<I, O = I>(pipeline: OperatorPipeline<I, O>, destination?: Consumer<O>) {
+	return destination === undefined
+		? (inputPipe as any)(...pipeline)
+		: (pipeIn as any)(destination, ...pipeline);
+};

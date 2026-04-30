@@ -26,12 +26,13 @@ import { DatasetItemPreSink } from "../sinks/dataset-sink";
 import { ClassObjectSink } from "../sinks/class-sink";
 import { chronolyze } from "../utils/chronolyze";
 import { ENABLE_RML_DEBUGGER } from "../debug";
+import { arrayse } from "../lib/lifts/arrayse";
 
 /**
  * Store some data binding information to be used at mount time
  */
-export const addRef = (ref: string, data: BindingConfiguration) => {
-	waitingElementHandlers.get(ref)?.push(data) ?? waitingElementHandlers.set(ref, [data]);
+export const addRef = (ref: string, ...data: BindingConfiguration[]) => {
+	waitingElementHandlers.get(ref)?.push(...data) ?? waitingElementHandlers.set(ref, data);
 };
 
 const getEventName = (eventAttributeString: RMLEventAttributeName): [RMLEventName, RMLEventAttributeName] | [] => {
@@ -182,7 +183,7 @@ export function rml(_strings: TemplateStringsArray, ..._expressions: RMLTemplate
 			} else {
 				// Data Sink.
 
-				if(Array.isArray(expression)) {
+				if(Array.isArray(expression) && />\s*$/.test(accPlusString)) {
 					// If sinking an array, we're likely just mapping it
 					acc = accPlusString +expression.join('');
 				} else {
@@ -269,56 +270,71 @@ export function rml(_strings: TemplateStringsArray, ..._expressions: RMLTemplate
 						// <some-tag some-attribute="some-value" ${mixin}></some-tag>
 						// <some-tag some-attribute="some-value" ...${mixin}></some-tag>
 						// <some-tag some-attributes ...${mixin} other-stuff>...</some-tag>
+						// <some-tag some-attribute="some-value" ...${[mixin1, mixin2, ...mixinN]}></some-tag>
 						// will bind multiple attributes and values
-						let sink: SinkBindingConfiguration<HTMLElement | SVGElement | MathMLElement>;
 						acc += string.replace(/\.\.\.$/, '');
-						if(isSinkBindingConfiguration(expression)) {
-							// acc = accPlusString;
-							sink = expression;
-						} else if(isFuture(expression)) {
-							// If we have a Promise, we wait for it to resolve and then render the mixin}
-							sink = Mixin(expression as Future<AttributeObject>);
-						} else {
-							// Merge static (string, number) properties of the mixin as inline attributes into the HTML template
-							// then bind the rest after mounting
-							const splitter = ([k, v]: KVP) => isFutureSinkAttributeValue(v) || (typeof v != 'string' && isRMLEventListener(k, v));
-							const [staticAttributes, deferredAttributes] = chronolyze(expression as AttributeObject || {}, splitter);
 
-							staticAttributes.forEach(([k, v], idx) => {
-								let cake = [];
-								switch(k) {
-									case 'class':
-										acc = acc
-											.replace(/(<\w+.*)class="([^"]*)"([^>]*)$/, '')
-											+`${RegExp.$1} class="${([] as string[]).concat(RegExp.$2, Object.entries(typeof v == 'string' ? {[v]: true} : v).filter(([k, v]) => v).map(([k, v])=>k)).filter(x=>x).join(' ')}" ${RegExp.$3}`
-										break;
-									case 'style':
-										acc = acc
-											.replace(/(<\w+.*)style="([^"]*);?\s*"([^>]*)$/, '')
-											+`${RegExp.$1} style="${([] as string[]).concat(RegExp.$2, typeof v == 'string' ? v : Object.entries(v).filter(([k, v]) => v).map(([k, v])=>`${k}: ${v};`)).filter(x=>x).join(' ')}" ${RegExp.$3}`
-										break;
-									case 'innerText':
-									case 'innerHTML':
-									case 'prependHTML':
-										// case 'appendHTML':
-										const [a, b] = nextString.split('>');
-										strings[i]+='>';
-										strings.splice(i+1, 1, a, b);
-										expressions.splice(i+1, 0, '>'+v);
-										// i--;
-										strlen++;
-										break;
-									default:
-										cake.push(`${k}="${v}"`);
+						arrayse(expression).forEach((expression, edx) => {
+							let sinks: SinkBindingConfiguration<HTMLElement | SVGElement | MathMLElement>[];
+							if(isSinkBindingConfiguration(expression)) {
+								// acc = accPlusString;
+								sinks = [expression];
+							} else if(isFuture(expression)) {
+								// If we have a Promise, we wait for it to resolve and then render the mixin}
+								sinks = [Mixin(expression as Future<AttributeObject>)];
+							} else {
+								// Merge static (string, number) properties of the mixin as inline attributes into the HTML template
+								// then bind the rest after mounting
+								const splitter = ([k, v]: KVP) => isFutureSinkAttributeValue(v) || isSourceBindingConfiguration(v) || (typeof v != 'string' && isRMLEventListener(k, v));
+								const [staticAttributes, deferredAttributes] = chronolyze(expression as AttributeObject || {}, splitter);
+
+								staticAttributes.forEach(([k, v], idx) => {
+									let cake = [];
+									switch(k) {
+										case 'class':
+											acc = acc
+												.replace(/(<\w+.*)class="([^"]*)"([^>]*)$/, '')
+												+`${RegExp.$1} class="${arrayse(RegExp.$2, Object.entries(typeof v == 'string' ? {[v]: true} : v).filter(([k, v]) => v).map(([k, v])=>k)).filter(x=>x).join(' ')}" ${RegExp.$3}`
+											break;
+										case 'style':
+											acc = acc
+												.replace(/(<\w+.*)style="([^"]*);?\s*"([^>]*)$/, '')
+												+`${RegExp.$1} style="${arrayse(RegExp.$2, typeof v == 'string' ? v : Object.entries(v).filter(([k, v]) => v).map(([k, v])=>`${k}: ${v};`)).filter(x=>x).join(' ')}" ${RegExp.$3}`
+											break;
+										case 'innerText':
+										case 'innerHTML':
+										case 'prependHTML':
+											// case 'appendHTML':
+											const [a, b] = nextString.split('>');
+											strings[i]+='>';
+											strings.splice(i+1, 1, a, b);
+											expressions.splice(i+1, 0, '>'+v);
+											// i--;
+											strlen++;
+											break;
+										default:
+											cake.push(`${k}="${v}"`);
+									}
+									acc += ' ' +cake.join(' ');
+									cake = [];
+								});
+								if(deferredAttributes.length) {
+									const [attribuends, sources] = deferredAttributes.reduce((acc, [k, v]) => {
+										isSourceBindingConfiguration(v)
+											? acc[1].push({...v, eventName: k.replace(/^(rml:)?on/, '$1') as RMLEventName})
+											: acc[0].push([k, v])
+										;
+										return acc;
+									}, [[], []]);
+									sinks = arrayse(attribuends.length ? Mixin(Object.fromEntries(attribuends)) : [], ...sources);
 								}
-								acc += ' ' +cake.join(' ');
-								cake = [];
-							});
-							sink = Mixin(Object.fromEntries(deferredAttributes));
-						}
+							}
 
-						addRef(ref, sink);
-						acc = acc.replace(/<(\w[\w-]*)\s+([^<]*)$/, `<$1 ${existingRef?'':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
+							if(sinks?.length) {
+								addRef(ref, ...sinks);
+								acc = acc.replace(/<(\w[\w-]*)\s+([^<]*)$/, `<$1 ${existingRef?'data-x="1" ':`${RESOLVE_ATTRIBUTE}="${ref}" `}$2`);
+							}
+						});
 
 					} else if(/>\s*$/.test(string) && /^\s*</.test(nextString)) {
 						// Content Sink

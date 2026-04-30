@@ -16,4 +16,3 @@ export const Passive =
     ({ type: 'source', listener: callable(listener), options: { passive: true } }) as SourceBindingConfiguration<E>;
 ;
 
-

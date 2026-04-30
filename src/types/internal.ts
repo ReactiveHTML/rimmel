@@ -54,6 +54,8 @@ export interface SourceBindingConfiguration<T extends RMLEventName> {
  * `;
  */
 export interface SinkBindingConfiguration<E extends Element = Element> extends BindingConfiguration {
+	// FIXME: use symbols to avoid potential conflicts with certain objects
+	// TODO: also make use of transferable symbols that can traverse a server|client boundary
 	type: 'sink';
 	t: string;
 	source: Future<unknown>;

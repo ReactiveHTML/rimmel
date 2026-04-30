@@ -1,5 +1,8 @@
-import { type Observable, withLatestFrom, map, of, pipe, from } from "rxjs";
+import type { Observable } from "rxjs";
 import type { MaybeFuture, Observer, Present } from "../types/futures";
+
+import { withLatestFrom, map, of, from } from "rxjs";
+
 import { korma } from "../utils/curry";
 
 const maybeLift = <T>(v: MaybeFuture<T>): Observable<T> =>

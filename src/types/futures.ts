@@ -1,6 +1,6 @@
 // import type { BehaviorSubject, Observable, Observer, Subject, Subscription } from 'rxjs';
 // export type { BehaviorSubject, Observable, Observer, OperatorFunction, Subject, Subscription } from 'rxjs';
-import { map, type OperatorFunction } from 'rxjs';
+import type { OperatorFunction } from 'rxjs';
 
 import { SymbolObservature } from "../constants";
 import { isFunction } from '../utils/is-function';
@@ -21,17 +21,10 @@ export type BehaviorSubject<T> = Subject<T> & {
 	value: T;
 };
 
-export type OperatorPipeline<I, O, Ops extends OperatorFunction<any, any>[] = []> =
-	Ops extends []
-		? []                                                    // 0 operators
-		: Ops extends [OperatorFunction<I, infer Next>]         // 1 operator
-			? [OperatorFunction<I, Next>] & (Next extends O ? unknown : never)
-			: Ops extends [OperatorFunction<I, infer Next>, ...infer Rest] // 2+ operators
-				? Rest extends OperatorFunction<any, any>[]
-					? [OperatorFunction<I, Next>, ...OperatorPipeline<Next, O, Rest>]
-					: never
-				: never
-;
+type UnaryOperator<I, O> = OperatorFunction<I, O>;
+
+export type OperatorPipeline<I, O, _Ops extends OperatorFunction<any, any>[] = OperatorFunction<any, any>[]> =
+	UnaryOperator<any, any>[];
 
 // export type OperatorPipeline<I, O> = 
 //   [] |
@@ -120,6 +113,7 @@ export type Observer<I> = Partial<{
  * which can be either an Observer, or a plain function.
  */
 export type Consumer<T> = ObserverFunction<T> | Observer<T>;
+export type Drain<T> = ObserverFunction<T> | Observer<T>;
 
 export interface Observature<I, O=I> {
 	[SymbolObservature]: any,

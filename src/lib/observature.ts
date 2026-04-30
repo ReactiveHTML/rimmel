@@ -3,6 +3,7 @@
 import type { Observable as Observable1, Observer } from '../types/futures';
 import type { MonkeyPatchedObservable as Observable2 } from '../types/monkey-patched-observable';
 import { SymbolObservature } from '../constants';
+import { arrayse } from './lifts/arrayse';
 
 type Observable<T> = Observable1<T> | Observable2<T>;
 type OperatorPreload = [string, unknown[]];
@@ -77,7 +78,7 @@ export const CreateObservature = <I, O>(initial?: O) => {
 				case 'subscribe':
 					return (_observer: Observer<O>) => {
 						subscribers.push(_observer);
-						const starter = Observable.merge(...(<Observable<I>[]>[]).concat(sources, initial ? Observable.from([].concat(initial ?? [])) : <Observable<I>[]>[]));
+						const starter = Observable.merge(...(<Observable<I>[]>[]).concat(sources, initial ? Observable.from(arrayse(initial)) : <Observable<I>[]>[]));
 						const subscription = applyPipeline(starter);
 						if(initial !== undefined) {
 							subscribers.forEach(sub => sub.next?.(initial));

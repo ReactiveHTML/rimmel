@@ -11,6 +11,7 @@ import { BOOLEAN_ATTRIBUTES, BooleanAttribute } from "../definitions/boolean-att
 
 export type RemovePrefix<TPrefix extends string, TString extends string> = TString extends `${TPrefix}${infer T}` ? T : TString extends `rml:${TPrefix}${infer T}` ? `rml:${T}` : never;
 
+// TODO: use GlobalEventHandlersEventMap instead
 
 /**
  * A CSS selector string

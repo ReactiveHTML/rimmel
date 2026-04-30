@@ -698,7 +698,7 @@ describe('Parser', () => {
 							});
 							const template = rml`<div ...${a} ...${b}>Hello</div>`;
 
-							expect(template).toMatch(/<div.*resolve="RMLREF\+0".* data-foo="bar".*>Hello<\/div>/);
+							expect(template).toMatch(/<div\s+resolve="RMLREF\+0"\s+data-foo="bar".*>Hello<\/div>/);
 							expect(waitingElementHandlers.get('RMLREF+0')![1]).toEqual(
 								{ type: 'sink', t: 'mixin', source: b, sink: AttributeObjectSink },
 							);
@@ -758,9 +758,9 @@ describe('Parser', () => {
 				describe('Event Handlers', () => {
 					it('bakes string listeners inline', () => {
 						const a = { 'onmouseover': 'alert(123)' };
-						const template = rml`<div ...${a}>Hello</div>`;
+						const template = rml`<div ...${[a]}>Hello</div>`;
 
-						expect(template).toMatch(/<div.*resolve="RMLREF\+0".* onmouseover="alert\(123\)">Hello<\/div>/);
+						expect(template).toMatch(/<div\s+onmouseover="alert\(123\)">Hello<\/div>/);
 					});
 
 					it('leaves referenced listeners to set on mount', () => {
@@ -809,7 +809,7 @@ describe('Parser', () => {
 					const c = { 'data-c': 'c' };
 					const template = rml`<div ...${a} ...${b} ...${c}>Hello</div>`;
 
-					expect(template).toMatch(/<div .* data-a="a"\s+data-b="b"\s+data-c="c">Hello<\/div>/);
+					expect(template).toMatch(/<div.+data-a="a"\s+data-b="b"\s+data-c="c">Hello<\/div>/);
 				});
 
 				it('sets them correctly with other attributes in between', () => {
@@ -817,7 +817,7 @@ describe('Parser', () => {
 					const b = { 'data-b': 'b' };
 					const template = rml`<div ...${a} xxx="yyy" ...${b}>Hello</div>`;
 
-					expect(template).toMatch(/<div .* data-a="a"\s+xxx="yyy"\s+data-b="b">Hello<\/div>/);
+					expect(template).toMatch(/<div.+data-a="a"\s+xxx="yyy"\s+data-b="b">Hello<\/div>/);
 				});
 
 				it('sets them correctly with various types of attributes in between', () => {
@@ -825,7 +825,7 @@ describe('Parser', () => {
 					const b = { 'data-b': 'b' };
 					const template = rml`<div ...${a} xxx="yyy" a="0" zzz c-hello ...${b}>Hello</div>`;
 
-					expect(template).toMatch(/<div .* data-a="a"\s+xxx="yyy"\s+a="0"\s+zzz\s+c-hello\s+data-b="b">Hello<\/div>/);
+					expect(template).toMatch(/<div.+data-a="a"\s+xxx="yyy"\s+a="0"\s+zzz\s+c-hello\s+data-b="b">Hello<\/div>/);
 				});
 
 				it('sets them correctly with other attributes around', () => {
@@ -833,7 +833,7 @@ describe('Parser', () => {
 					const b = { 'data-b': 'b' };
 					const template = rml`<div aaa="bbb" ...${a} ...${b} ccc="ddd">Hello</div>`;
 
-					expect(template).toMatch(/<div .* aaa="bbb"\s+data-a="a"\s+data-b="b"\s+ccc="ddd">Hello<\/div>/);
+					expect(template).toMatch(/<div.+aaa="bbb"\s+data-a="a"\s+data-b="b"\s+ccc="ddd">Hello<\/div>/);
 				});
 
 				it('sets them correctly with other attributes around and between', () => {
@@ -841,7 +841,7 @@ describe('Parser', () => {
 					const b = { 'data-b': 'b' };
 					const template = rml`<div aaa="bbb" ...${a} xxx="yyy" ...${b} ccc="ddd">Hello</div>`;
 
-					expect(template).toMatch(/<div .* aaa="bbb"\s+data-a="a"\s+xxx="yyy"\s+data-b="b"\s+ccc="ddd">Hello<\/div>/);
+					expect(template).toMatch(/<div.+aaa="bbb"\s+data-a="a"\s+xxx="yyy"\s+data-b="b"\s+ccc="ddd">Hello<\/div>/);
 				});
 
 				it('sets them correctly with other passed-in attributes in between', () => {
@@ -850,7 +850,7 @@ describe('Parser', () => {
 					const number = 42;
 					const template = rml`<div aaa="bbb" ...${a} xxx="${number}" ...${b} ccc="ddd">Hello</div>`;
 
-					expect(template).toMatch(/<div .* aaa="bbb"\s+data-a="a"\s+xxx="42"\s+data-b="b"\s+ccc="ddd">Hello<\/div>/);
+					expect(template).toMatch(/<div.+aaa="bbb"\s+data-a="a"\s+xxx="42"\s+data-b="b"\s+ccc="ddd">Hello<\/div>/);
 				});
 
 			});

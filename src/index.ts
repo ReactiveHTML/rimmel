@@ -71,7 +71,7 @@ export { Blur } from './sinks/blur-sink';
 export { Checked } from './sinks/checked-sink';
 export { ClassName, ToggleClass } from './sinks/class-sink';
 export { Closed } from './sinks/closed-sink';
-export { Disabled } from './sinks/disabled-sink';
+export { Disabled, DisabledSink } from './sinks/disabled-sink';
 export { Catch } from './sinks/error-sink';
 export { Focus } from './sinks/focus-sink';
 export { Hidden } from './sinks/hidden-sink';

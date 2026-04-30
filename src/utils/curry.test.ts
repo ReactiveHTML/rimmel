@@ -5,16 +5,16 @@ describe('korma', () => {
 
 	describe('When no target is provided', () => {
 
-		it('Returns a reverse pipeline', async () => {
+		it('Returns a partially-applied reverse pipeline', async () => {
 			const { promise, resolve } = Promise.withResolvers()
 
 			const a = 2;
 			const b = 3;
 			const target = jest.fn(resolve);
-			const stream = new Subject();
+			const stream = new Subject<number>();
 
 			const increment = korma([
-				map(x=>x+b),
+				map((x: number) => x + b),
 			]);
 
 			const reverseStream = increment(stream);
@@ -34,12 +34,12 @@ describe('korma', () => {
 				const a = 2;
 				const b = 3;
 				const target = jest.fn(resolve);
-				const stream = new Subject();
+				const stream = new Subject<number>();
 
-				const increment = korma([
-					filter(x=>x),
-					map(x=>x+b),
-					map(x=>x),
+				const increment = korma<number, number>([
+					filter(n => !!n),
+					map(x => x+b),
+					map(x => x),
 				]);
 
 				const reverseStream = increment(stream);
@@ -63,10 +63,10 @@ describe('korma', () => {
 			const a = 2;
 			const b = 3;
 			const target = jest.fn(resolve);
-			const stream = new Subject();
+			const stream = new Subject<number>();
 
 			const reverseStream = korma(
-				[map(x=>x+b)],
+				[map((x: number) => x + b)],
 				stream,
 			);
 
@@ -85,13 +85,13 @@ describe('korma', () => {
 				const a = 2;
 				const b = 3;
 				const target = jest.fn(resolve);
-				const stream = new Subject();
+				const stream = new Subject<number>();
 
 				const reverseStream = korma(
 					[
-						filter(x=>x),
-						map(x=>x+b),
-						map(x=>x),
+						filter((x: number) => Boolean(x)),
+						map((x: number) => x + b),
+						map((x: number) => x),
 					], stream,
 				);
 

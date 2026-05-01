@@ -19,7 +19,7 @@ import type { HTMLString, SinkBindingConfiguration, Stream, Coords } from '../..
 
 import { BehaviorSubject, Subject, ReplaySubject, catchError, combineLatest, distinctUntilKeyChanged, filter, interval, map, mapTo, merge, mergeWith, Observable, of, pipe, scan, share, startWith, take, tap, timer, withLatestFrom } from 'rxjs';
 
-import { rml, curry, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Captive, Removed, Sanitize, sink, source, Suspend, Suspender, Swap, AsLatestFrom, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, AmbientEffect, } from '../../src/index';
+import { rml, curry, inputPipe, pipeIn, Active, AppendHTML, AutoForm, cut, Cut, Dataset, DatasetObject, Disabled, DisabledSink, eventData, EventData, form, Form, InnerHTML, InnerText, JSONDump, Key, Numberset, OffsetXY, Passive, Captive, Removed, Sanitize, sink, source, Suspend, Suspender, Swap, AsLatestFrom, TextContent, Update, Value, ValueAsDate, ValueAsNumber, value, AmbientEffect, } from '../../src/index';
 import { Cookie } from '../../src/ambient/cookies';
 import { subscribe } from '../../src/lib/drain';
 import { set_USE_DOM_OBSERVABLES } from '../../src/index';
@@ -1172,6 +1172,38 @@ const sinks = {
 		return rml`<div rml:debugger ...${a}>Hello</div>`;
 	},
 
+	'Mixin Array (sync)': () => {
+		const a = { 'class': 'red' };
+		const b = { 'class': 'underline' };
+		return rml`
+			<style>
+				.red {
+					color: red;
+				}
+				.underline {
+					text-decoration: underline;
+				}
+			</style>
+			<div ...${[a, b]}>Two mixins</div>
+		`;
+	},
+
+	'Mixin Array (async)': () => {
+		const a = defer({ 'class': 'red' });
+		const b = defer({ 'class': 'underline' });
+		return rml`
+			<style>
+				.red {
+					color: red;
+				}
+				.underline {
+					text-decoration: underline;
+				}
+			</style>
+			<div ...${[a, b]}>Two mixins</div>
+		`;
+	},
+
 	'Removed (Implicit)': () => {
 		const removed = new Subject<Event>();
 
@@ -1355,6 +1387,32 @@ const sinks = {
 			<button rml:disabled="${disabled}" rml:debugger onclick="${s}">disabled=${disabled}</button>
 			<div>${s}</div>
 			</div>
+		`;
+	},
+
+	Inert: () => {
+		const toggle = new BehaviorSubject(false).pipe(
+			scan(x => !x),
+		);
+
+		return rml`
+			<button inert="${toggle}" onclick="${toggle}">click me</button>
+			<button onclick="${toggle}">or me</button>
+			<br><br>
+			<div>Clicked? <span>${toggle}</span></div>
+		`;
+	},
+
+	Disabled: () => {
+		const toggle = new BehaviorSubject(false).pipe(
+			scan(x => !x),
+		);
+
+		return rml`
+			<button disabled="${toggle}" onclick="${toggle}">click me</button>
+			<button onclick="${toggle}">or me</button>
+			<br><br>
+			<div>Clicked? <span>${toggle}</span></div>
 		`;
 	},
 
@@ -1654,11 +1712,23 @@ const sinks = {
 //		`;
 //	},
 
-	Sanitize1: () => {
+	Sanitize1a: () => {
 		const stream = of(<HTMLString>`<div>
 			Dirty code
 			<script>alert("evil")</script>
 			<img onload="alert('hack')" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCI+PHBhdGggZmlsbD0icmVkIiBkPSJNNTAgMTAwYTUwIDUwIDAgMSAwIDAtMTAwIDUwIDUwIDAgMCAwIDAgMTAwWiIvPjwvc3ZnPg==" width="10" height="10" />
+			</div>
+		`);
+
+		return rml`
+			<div>${Sanitize(stream)}</div>
+		`;
+	},
+
+	Sanitize1b: () => {
+		const stream = of(<HTMLString>`<div>
+			Dirty code
+			<img onerror="alert('hack')" src="https://example.com/error-nop.jpg" width="30" height="20" />
 			</div>
 		`);
 

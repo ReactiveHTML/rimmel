@@ -1,16 +1,19 @@
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import json from '@rollup/plugin-json';
-import { join } from 'path';
 import typescript from '@rollup/plugin-typescript';
 import { visualizer } from 'rollup-plugin-visualizer';
 
-import tsConfig from './tsconfig.json' with { type: 'json' };
-
-const getTSConfig = (path) => {
-	tsConfig.compilerOptions.outDir = path;
-	tsConfig.compilerOptions.declarationDir = join(path, 'types');
-	return tsConfig.compilerOptions;
-};
+const getTSConfig = (overrides = {}) => ({
+	tsconfig: './tsconfig.build.json',
+	declaration: false,
+	declarationMap: false,
+	emitDeclarationOnly: false,
+	inlineSourceMap: false,
+	inlineSources: true,
+	noEmit: false,
+	sourceMap: true,
+	...overrides,
+});
 
 export default [
 	{	// Global JS
@@ -23,12 +26,7 @@ export default [
 			nodeResolve({ preferBuiltins: true }),
 			// json(),
 			typescript({
-				...getTSConfig('dist/globaljs'),
-				sourceMap: true,
-				outDir: 'dist/globaljs',
-				declaration: false,
-				declarationDir: undefined, // Explicitly unset
-				declarationMap: false,     // Explicitly disable
+				...getTSConfig(),
 			}),
 			visualizer({ filename: 'bundle-stats-globaljs.html' }),
 		],
@@ -58,7 +56,7 @@ export default [
 			nodeResolve({ preferBuiltins: true }),
 			json(),
 			typescript({
-				...getTSConfig('dist/esm'),
+				...getTSConfig(),
 			}),
 			visualizer({ filename: 'bundle-stats-esm.html' }),
 		],
@@ -87,10 +85,7 @@ export default [
 			nodeResolve({ preferBuiltins: true }),
 			json(),
 			typescript({
-				...getTSConfig('dist/ssr'),
-				sourceMap: true,
-				outDir: 'dist/ssr',
-				declaration: true,
+				...getTSConfig(),
 			}),
 			visualizer({ filename: 'bundle-stats-ssr.html' }),
 		],
@@ -116,4 +111,3 @@ export default [
 		],
 	},
 ];
-

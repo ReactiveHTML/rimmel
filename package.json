@@ -17,13 +17,14 @@
     }
   },
   "files": [
-    "dist/"
+    "dist/",
+    "src/"
   ],
   "sideEffects": [
     "./src/lifecycle/data-binding.ts"
   ],
   "scripts": {
-    "build": "rimraf dist && rollup --config rollup.config.js",
+    "build": "rimraf dist && tsc -p tsconfig.dts.json --noCheck && rollup --config rollup.config.js",
     "dev": "rimraf dist && rollup -w --config rollup.config.js",
     "handbook:dev": "npx typedoc --watch",
     "handbook": "npx typedoc",

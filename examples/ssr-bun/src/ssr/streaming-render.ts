@@ -1,4 +1,4 @@
-import type { Observable, Subscription } from 'rxjs';
+import type { Observable } from 'rxjs';
 import type { HTMLString } from "../../../../src/types";
 
 export const streamingRender = (source: Observable<HTMLString>, req: Request) => {
@@ -21,7 +21,9 @@ export const streamingRender = (source: Observable<HTMLString>, req: Request) =>
 				subscription?.unsubscribe();
 				try {
 					controller.close();
-				} catch {}
+				} catch (e) {
+					console.error('Error closing request controller:', e);
+				}
 			});
 		}
 	});

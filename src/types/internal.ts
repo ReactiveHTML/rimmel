@@ -243,5 +243,5 @@ export type Effects = Record<string, any>;
  * A plain function that takes an object of named input parameters and returns an HTML string
  * @param inputs also referred to as "Props" in other frameworks, a simple object containing all parameters of the Component. Those can be static values, Promises, Observables, Event Handlers, literally anything the Component wants to use
  **/
-export type RimmelComponent = (inputs: Inputs) => HTMLString;
+export type RimmelComponent = (...inputs: Inputs[]) => HTMLString;
 

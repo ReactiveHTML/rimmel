@@ -1,0 +1,7 @@
+.Waiting {
+	display: inline-block;
+	min-width: 3cm;
+	min-height: 1cm;
+	background-color: aqua;
+	color: blue;
+}

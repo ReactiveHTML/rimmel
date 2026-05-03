@@ -7,9 +7,6 @@ export const route = (request: Request) => {
 	switch(path) {
 		case '/':
 		default:
-			return {
-				title: 'Home Page | a Rimmel SSR Experiment',
-				body: homeRoute(),
-			};
+			return homeRoute();
 	}
 }

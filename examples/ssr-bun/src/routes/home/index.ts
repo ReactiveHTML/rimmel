@@ -7,15 +7,18 @@ import CSS from './home.module.css';
 
 const thing = "test";
 
-export const homeRoute = () => rml`
-	<main>
-	  <h1>Welcome home</h1>
+export const homeRoute = () => ({
+	title: 'Home Page | Rimmel SSR',
+	body: rml`
+		<main>
+			<h1>Welcome home</h1>
 
-		<p>${thing}</p>
+			<p>${thing}</p>
 
-		<div>Promise: <span class="${CSS.Waiting}">${Delay(5000, 'delayed promise data')}</span></div>
-		<div>${AutoInc(5)}</div>
+			<div>Promise: <span class="${CSS.Waiting}">${Delay(5000, 'delayed promise data')}</span></div>
+			<div>${AutoInc(5)}</div>
 
-		<div>${ClickCounter()}</div>
-	</main>
-`;
+			<div>${ClickCounter()}</div>
+		</main>
+	`
+});

@@ -10,5 +10,5 @@ const server = Bun.serve({
 });
 
 console.log(
-  `🐇 Bun+Rimmel are running on ${server.hostname}:${server.port}`
+  `🐇 Bun & Rimmel are hopping, skipping, and leaping together through ${server.hostname}:${server.port}`
 );

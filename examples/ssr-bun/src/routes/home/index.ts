@@ -1,7 +1,7 @@
 import { rml } from '../../../../../src/ssr';
-import { AutoInc } from '../../app/components/autoinc';
-import { ClickCounter } from '../../app/components/click-counter';
-import { Delay } from '../../app/components/delay';
+import { AutoInc } from '../../components/autoinc';
+import { ClickCounter } from '../../components/click-counter';
+import { Delay } from '../../components/delay';
 
 import CSS from './home.module.css';
 

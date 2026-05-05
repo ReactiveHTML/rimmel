@@ -1,4 +1,4 @@
-import { homeRoute } from "../routes/home";
+import { homeRoute } from "./routes/home";
 
 export const route = (request: Request) => {
 	const url = new URL(request.url);

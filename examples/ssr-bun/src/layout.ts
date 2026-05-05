@@ -1,4 +1,6 @@
-import { route } from "./app/router";
+import { HTMLString } from '../../../src/types';
+
+import { route } from "./router";
 
 export const layout = (rml, request: Request) => {
 	const { body, title } = route(request);
@@ -18,5 +20,5 @@ export const layout = (rml, request: Request) => {
 			${body}
 		</body>
 		</html>
-	`;
+	` as HTMLString;
 };

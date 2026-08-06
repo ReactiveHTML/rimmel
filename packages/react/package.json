@@ -1,0 +1,54 @@
+{
+  "name": "@rimmel/in-react",
+  "version": "1.0.0",
+  "description": "React adapter for Rimmel components - use Rimmel inside React applications",
+  "type": "module",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "types": "./dist/esm/types/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "rimraf dist && rollup --config rollup.config.js",
+    "dev": "rimraf dist && rollup -w --config rollup.config.js",
+    "test": "echo \"Tests should be run from main package\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reactivehtml/rimmel.git",
+    "directory": "packages/react"
+  },
+  "keywords": [
+    "rimmel",
+    "react",
+    "interop",
+    "rxjs",
+    "reactive",
+    "adapter"
+  ],
+  "author": "Dario Mannu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reactivehtml/rimmel/issues"
+  },
+  "homepage": "https://rimmel.js.org",
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "rimmel": ">=1.5.0",
+    "rxjs": ">=7.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/react": "^18.2.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^4.9.5",
+    "typescript": "^5.7.2"
+  }
+}
